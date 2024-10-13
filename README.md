@@ -19,8 +19,10 @@ virst is:
 > > > - `pinegrow`;
 > > > - `WYSIWYG web builder`;
 > > > - or bassically any kind of `SSG` software;
-> - comes with `asyncQueue` handler in the background;
-> > - no need to scratch your head too much for `async` processes;
+- comes with `asyncQueue` handler in the background;
+> - no need to scratch your head too much for `async` processes;
+- all of our class api are `typed` with `jsdoc`:
+> - if you cannot find the documentation in this `readme`, you can allways rely on your `IDE intellisense`
 ## about this readme
 - this `repo`/`lib` only serves for `api-documentation` purposes;
 - as for `example` on how to use on different `useCase` refer to [html-first-virst](https://html-first.bss.design/index.html?page=virst)
