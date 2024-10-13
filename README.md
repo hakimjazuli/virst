@@ -7,7 +7,7 @@ virst is:
 > > - client side `routing` (using query parameter with our `DefineQRouter`);
 > > - `signal` based asyncrhonous reactivity, which supports:
 > > > - `dataOnly`;
-> > > - with `domRelect` (using `attributeName="...attributeValues;"`);
+> > > - with `domReflect` (using `attributeName="...attributeValues;"`);
 > > - optional templating using:
 > > > - `html` page based template;
 > > > - our `Component` instances;
