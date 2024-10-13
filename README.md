@@ -1,5 +1,6 @@
 ## about virst
 virst is:
+- spelled `/fɜrst/` ("technically" pun of first `/fɜrst/` and burst `/bɜrst/`);
 - new repo/library based on `@html_first/simple_signal`;
 > - which itself are inspired by `solidJS` `signal` based `reactivity`
 - collections of library for creating:
