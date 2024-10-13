@@ -3,6 +3,7 @@ virst is:
 - spelled `/fɜrst/` ("technically" pun of first `/fɜrst/` and burst `/bɜrst/`);
 - new repo/library based on `@html_first/simple_signal`;
 > - which itself are inspired by `solidJS` `signal` based `reactivity`
+> > - which then `simple_signal` will be discontinued effective immediately;
 - collections of library for creating:
 > - `reactive`(and if necessary, `declarative`) `SPA web app`, including functionalities such as:
 > > - client side `routing` (using query parameter with our `DefineQRouter`);
@@ -26,6 +27,13 @@ virst is:
 ## about this readme
 - this `repo`/`lib` only serves for `api-documentation` purposes;
 - as for `example` on how to use on different `useCase` refer to [html-first-virst](https://html-first.bss.design/index.html?page=virst)
+## how to install
+```shell
+npm i virst
+// or
+bun i virst
+// or any js package manager with npm capability
+```
 
 
 <h2 id="exported-api-and-type-list">exported-api-and-type-list</h2>
