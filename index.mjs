@@ -11,18 +11,26 @@
  * - new repo/library based on `@html_first/simple_signal`;
  * > - which itself are inspired by `solidJS` `signal` based `reactivity`
  * - collections of library for creating:
- * > - `reactive`(and if necessary, `declarative`) `web app`, including functionalities such as:
- * > > - client side `routing` (using query parameter);
+ * > - `reactive`(and if necessary, `declarative`) `SPA web app`, including functionalities such as:
+ * > > - client side `routing` (using query parameter with our `DefineQRouter`);
  * > > - `signal` based asyncrhonous reactivity, which supports:
  * > > > - `dataOnly`;
- * > > > - with `domRelect` (using `attributeName="attributeValue"`);
+ * > > > - with `domRelect` (using `attributeName="...attributeValues;"`);
  * > > - optional templating using:
  * > > > - `html` page based template;
  * > > > - our `Component` instances;
- * > - client side JS library that are relying on attribute name to track the element lifecycle;
+ * > - client side JS library that are relying on `attributeName` to track the element lifecycle, using our `Lifecyle` class api:
+ * > > - you can use it to create your own `HATEOAS` (like `htmx`) client side library, to interprete returned `htmlString` which have certain `attributeName`;
+ * > > - handle non editable `static site generated` exports/publish such as:
+ * > > > - `bootstrap studio`;
+ * > > > - `pinegrow`;
+ * > > > - `WYSIWYG web builder`;
+ * > > > - or bassically any kind of `SSG` software;
+ * > - comes with `asyncQueue` handler in the background;
+ * > > - no need to scratch your head too much for `async` processes;
  * ## about this readme
- * - this repo/lib only serves for api-documentation purposes;
- * - as for example on how to use on different usecase refer to [virst](https://html-first.bss.design/index.html?page=virst)
+ * - this `repo`/`lib` only serves for `api-documentation` purposes;
+ * - as for `example` on how to use on different `useCase` refer to [html-first-virst](https://html-first.bss.design/index.html?page=virst)
  */
 
 import { $ } from './src/$.mjs';
