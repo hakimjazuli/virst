@@ -21,7 +21,7 @@
  * > > > - our `Component` instances;
  * > - client side JS library that are relying on attribute name to track the element lifecycle;
  * ## about this readme
- * - this repo/lib only serves for documentation purposes;
+ * - this repo/lib only serves for api-documentation purposes;
  * - as for example on how to use on different usecase refer to [virst](https://html-first.bss.design/index.html?page=virst)
  */
 
