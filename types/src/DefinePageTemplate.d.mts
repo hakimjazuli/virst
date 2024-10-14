@@ -24,12 +24,6 @@ export class DefinePageTemplate {
      */
     private static chachedTemplate;
     /**
-     * @param {string} path
-     * @param {string} targetAttribute
-     * @param {string} templateName
-     */
-    static getTemplate: (path: string, targetAttribute: string, templateName: string) => Promise<HTMLElement>;
-    /**
      * @param {Object} options
      * @param {string} options.callerAttribute
      * @param {string} options.targetAttribute
@@ -43,4 +37,34 @@ export class DefinePageTemplate {
         targetPathRule?: (path: string) => string;
         documentScope?: import("./documentScope.type.mjs").documentScope;
     });
+    /**
+     * @private
+     * @type {string}
+     */
+    private targetAttribute;
+    /**
+     * @private
+     * @type {(path:string)=>string}
+     */
+    private targetPathRule;
+    callerAttribute: string;
+    /**
+     * @param {Object} options
+     * @param {HTMLElement} options.element
+     * @param {string} options.path
+     * @param {string} options.templateName
+     */
+    swap: ({ element, path, templateName }: {
+        element: HTMLElement;
+        path: string;
+        templateName: string;
+    }) => void;
+    /**
+     * @private
+     * @param {Object} options
+     * @param {HTMLElement} options.element
+     * @param {string} [options.path]
+     * @param {string} [options.templateName]
+     */
+    private renderElement;
 }

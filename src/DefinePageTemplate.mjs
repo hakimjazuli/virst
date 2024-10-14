@@ -42,27 +42,14 @@ export class DefinePageTemplate {
 		targetPathRule = (path) => path,
 		documentScope = helper.currentDocumentScope,
 	}) {
+		this.targetAttribute = targetAttribute;
+		this.targetPathRule = targetPathRule;
+		this.callerAttribute = callerAttribute;
 		new Lifecycle(
 			{
 				[callerAttribute]: async ({ element, onConnected }) => {
 					onConnected(async () => {
-						const templateSelector = element.getAttribute(callerAttribute);
-						if (!templateSelector) {
-							console.warn({
-								element,
-								callerAttribute,
-								message: `attributeName "${callerAttribute}" must have value to be used as templateSelector`,
-							});
-							return;
-						}
-						const [path, templateName] = templateSelector.split(helper.separator);
-						const template = await DefinePageTemplate.getTemplate(
-							targetPathRule(path),
-							targetAttribute,
-							templateName
-						);
-						const template_ = template.cloneNode(true);
-						element.replaceWith(template_);
+						await this.renderElement({ element });
 					});
 				},
 			},
@@ -70,14 +57,52 @@ export class DefinePageTemplate {
 		);
 	}
 	/**
-	 * @param {string} path
-	 * @param {string} targetAttribute
-	 * @param {string} templateName
+	 * @private
+	 * @type {string}
 	 */
-	static getTemplate = async (path, targetAttribute, templateName) => {
+	targetAttribute;
+	/**
+	 * @private
+	 * @type {(path:string)=>string}
+	 */
+	targetPathRule;
+	/**
+	 * @param {Object} options
+	 * @param {HTMLElement} options.element
+	 * @param {string} options.path
+	 * @param {string} options.templateName
+	 */
+	swap = ({ element, path, templateName }) => {
+		this.renderElement({ element, path, templateName });
+	};
+	/**
+	 * @private
+	 * @param {Object} options
+	 * @param {HTMLElement} options.element
+	 * @param {string} [options.path]
+	 * @param {string} [options.templateName]
+	 */
+	renderElement = async ({ element, path: path_, templateName }) => {
+		if (!path_ || !templateName) {
+			const callerAttribute = this.callerAttribute;
+			const templateSelector = element.getAttribute(callerAttribute);
+			if (!templateSelector) {
+				console.warn({
+					element,
+					callerAttribute,
+					message: `attributeName "${callerAttribute}" must have value to be used as templateSelector`,
+				});
+				return;
+			}
+			[path_, templateName] = templateSelector.split(helper.separator);
+		}
+		const targetAttribute = this.targetAttribute;
+		const path = this.targetPathRule(path_);
 		const fromCache = DefinePageTemplate.chachedTemplate[path]?.[templateName];
 		if (fromCache) {
-			return fromCache;
+			const template_ = fromCache.cloneNode(true);
+			element.replaceWith(template_);
+			return;
 		}
 		try {
 			const response = await fetch(path);
@@ -104,13 +129,16 @@ export class DefinePageTemplate {
 				}
 			}
 			if (retElement) {
-				return retElement;
+				const template_ = retElement.cloneNode(true);
+				element.replaceWith(template_);
+				return;
 			}
 			throw new Error(
 				`couldn't find '[${targetAttribute}="${templateName}"]' in the ${path}`
 			);
 		} catch (error) {
 			console.error(error);
+			return;
 		}
 	};
 }
