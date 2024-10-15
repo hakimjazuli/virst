@@ -60,6 +60,8 @@ bun i virst
 
 - [documentScope](#documentscope)
 
+- [Error_](#error_)
+
 - [Event_](#event_)
 
 - [For](#for)
@@ -182,6 +184,15 @@ create named storage (`localStorage` or `sessionStorage`) through class instanti
 *) <sub>[go to exported list](#exported-api-and-type-list)</sub>
 
 type helper for `documentScope`
+
+*) <sub>[go to exported list](#exported-api-and-type-list)</sub>
+
+
+<h2 id="error_">Error_</h2>
+
+*) <sub>[go to exported list](#exported-api-and-type-list)</sub>
+
+error handling helper;method(s):- `asValue<Ret>(promise:Promise<Ret>)=>Promise<[data:Ret|undefined,error:undefined|Error]>`
 
 *) <sub>[go to exported list](#exported-api-and-type-list)</sub>
 

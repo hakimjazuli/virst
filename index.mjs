@@ -54,6 +54,7 @@ import { DefineQRouter } from './src/DefineQRouter.mjs';
 import { DefineShortCuts } from './src/DefineShortCuts.mjs';
 import { DefineStorage } from './src/DefineStorage.mjs';
 import { Derived } from './src/Derived.mjs';
+import { Error_ } from './src/Error_.mjs';
 import { Event_ } from './src/Event_.mjs';
 import { For } from './src/For.mjs';
 import { Let } from './src/Let.mjs';
@@ -101,4 +102,4 @@ import { _ } from './src/_.mjs';
  * @property {(options:onViewPortHandlerDisconnector)=>Promise<void>} onViewPortHandler.onDisconnected
  */
 
-export { $, Animation, App, Component, CRUD, DefinePageTemplate, DefineQRouter, DefineShortCuts, DefineStorage, Derived, Event_, For, Let, Lifecycle, List, OnViewPort, Ping, ShortCut, WorkerMainThread, WorkerThread, _ };
+export { $, Animation, App, Component, CRUD, DefinePageTemplate, DefineQRouter, DefineShortCuts, DefineStorage, Derived, Error_, Event_, For, Let, Lifecycle, List, OnViewPort, Ping, ShortCut, WorkerMainThread, WorkerThread, _ };
