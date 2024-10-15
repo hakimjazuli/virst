@@ -23,6 +23,10 @@ export class DefineQRouter<dataValueType extends {
      */
     static __: DefineQRouter<any, any>;
     /**
+     * @private
+     */
+    private static useVirstURL;
+    /**
      * @param {Object} options
      * @param {dataValueType} options.data
      * @param {number} [options.queryChangeThrottleMs]

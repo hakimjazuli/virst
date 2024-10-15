@@ -58,6 +58,7 @@ export class DefineQRouter {
 			return;
 		}
 		DefineQRouter.__ = this;
+		DefineQRouter.useVirstURL();
 		// @ts-ignore
 		this.qRoute = {};
 		this.queryChangeThrottle = queryChangeThrottle;
@@ -96,6 +97,16 @@ export class DefineQRouter {
 			});
 		}
 	}
+	/**
+	 * @private
+	 */
+	static useVirstURL = () => {
+		const currentPath = window.location.pathname.split('/').pop();
+		if (currentPath !== 'index.html' && currentPath !== '') {
+			window.location.href = '/';
+			return;
+		}
+	};
 	/**
 	 * @private
 	 * @param {Ping["ping"]} ping
