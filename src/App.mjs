@@ -35,14 +35,14 @@ export class App {
 		definedQRouter,
 		definedStorage,
 		definePageTemplate,
-		title,
+		title = undefined,
 	}) {
 		if (App.__ instanceof App) {
 			helper.warningSingleton(App);
 			return;
 		}
 		App.__ = this;
-		if (title) {
+		if (title !== undefined) {
 			this.title = new Let(title ?? document.title);
 			new $(async () => {
 				document.title = this.title.value;
