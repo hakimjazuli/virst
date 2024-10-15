@@ -9,10 +9,10 @@ import { Ping } from './Ping.mjs';
 export class ShortCut {
 	/**
 	 * @param {Object} options
-	 * @param {(event:KeyboardEvent)=>boolean} options.action
+	 * @param {(event:KeyboardEvent)=>boolean} options.triggerCheck
 	 * @param {(isAtInitisalization:boolean)=>Promise<void>} options.asyncCallback
 	 */
-	constructor({ action, asyncCallback }) {
+	constructor({ triggerCheck: action, asyncCallback }) {
 		this.ping = new Ping(false, asyncCallback).ping;
 		this.action = action;
 		window.addEventListener('keydown', this.event);

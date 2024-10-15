@@ -6,11 +6,11 @@
 export class ShortCut {
     /**
      * @param {Object} options
-     * @param {(event:KeyboardEvent)=>boolean} options.action
+     * @param {(event:KeyboardEvent)=>boolean} options.triggerCheck
      * @param {(isAtInitisalization:boolean)=>Promise<void>} options.asyncCallback
      */
-    constructor({ action, asyncCallback }: {
-        action: (event: KeyboardEvent) => boolean;
+    constructor({ triggerCheck: action, asyncCallback }: {
+        triggerCheck: (event: KeyboardEvent) => boolean;
         asyncCallback: (isAtInitisalization: boolean) => Promise<void>;
     });
     /**
