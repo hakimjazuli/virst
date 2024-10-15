@@ -19,9 +19,8 @@ export class App {
      * @param {import('./DefineQRouter.mjs').DefineQRouter} [options.definedQRouter]
      * @param {import('./DefineStorage.mjs').DefineStorage} [options.definedStorage]
      * @param {import('./DefinePageTemplate.mjs').DefinePageTemplate} [options.definePageTemplate]
-     * @param {string} [options.title]
      */
-    constructor({ lifecycles, forS, rootComponent, definedShortcuts, definedQRouter, definedStorage, definePageTemplate, title, }: {
+    constructor({ lifecycles, forS, rootComponent, definedShortcuts, definedQRouter, definedStorage, definePageTemplate, }: {
         rootComponent?: import("./Component.mjs").Component<any, any>;
         lifecycles?: (import("./Lifecycle.mjs").Lifecycle)[];
         forS?: (import("./For.mjs").For)[];
@@ -29,11 +28,5 @@ export class App {
         definedQRouter?: import("./DefineQRouter.mjs").DefineQRouter<any, any>;
         definedStorage?: import("./DefineStorage.mjs").DefineStorage<any, any, any, any>;
         definePageTemplate?: import("./DefinePageTemplate.mjs").DefinePageTemplate;
-        title?: string;
     });
-    /**
-     * @type {Let<string>}
-     */
-    title: Let<string>;
 }
-import { Let } from './Let.mjs';

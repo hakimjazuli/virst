@@ -25,7 +25,6 @@ export class App {
 	 * @param {import('./DefineQRouter.mjs').DefineQRouter} [options.definedQRouter]
 	 * @param {import('./DefineStorage.mjs').DefineStorage} [options.definedStorage]
 	 * @param {import('./DefinePageTemplate.mjs').DefinePageTemplate} [options.definePageTemplate]
-	 * @param {string} [options.title]
 	 */
 	constructor({
 		lifecycles,
@@ -35,22 +34,11 @@ export class App {
 		definedQRouter,
 		definedStorage,
 		definePageTemplate,
-		title = undefined,
 	}) {
 		if (App.__ instanceof App) {
 			helper.warningSingleton(App);
 			return;
 		}
 		App.__ = this;
-		if (title !== undefined) {
-			this.title = new Let(title ?? document.title);
-			new $(async () => {
-				document.title = this.title.value;
-			});
-		}
 	}
-	/**
-	 * @type {Let<string>}
-	 */
-	title;
 }
