@@ -42,7 +42,7 @@ export class DefineQRouter<dataValueType extends {
     /**
      * @type {Record.<NamedQueryParam, Let<string>>}
      */
-    data: Record<NamedQueryParam, Let<string>>;
+    qRoute: Record<NamedQueryParam, Let<string>>;
     /**
      * @private
      * @param {Ping["ping"]} ping

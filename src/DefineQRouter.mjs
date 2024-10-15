@@ -32,10 +32,16 @@ export class DefineQRouter {
 	 */
 	handler = class {
 		/**
+		 * @param {string} key
 		 * @param {handlerType} options
 		 * - exception is prioritize to be kept;
 		 */
-		constructor({ value = '', clearQueriesWhenImSet = [], clearAllQueriesExcept = [] }) {
+		constructor(key, { value = '', clearQueriesWhenImSet = [], clearAllQueriesExcept = [] }) {
+			const params = new URLSearchParams(window.location.search);
+			const value_ = params.get(key);
+			if (value_) {
+				value = value_;
+			}
 			this.string = Let.dataOnly(value);
 			this.clearListWhenImSet = clearQueriesWhenImSet;
 			this.clearAllQueriesExcept = clearAllQueriesExcept;
@@ -53,21 +59,21 @@ export class DefineQRouter {
 		}
 		DefineQRouter.__ = this;
 		// @ts-ignore
-		this.data = {};
+		this.qRoute = {};
 		this.queryChangeThrottle = queryChangeThrottle;
-		const thisData = this.data;
+		const thisData = this.qRoute;
+		this.registerPopStateEventListener();
 		for (const key in data) {
-			const keyData = new this.handler(data);
-			const thisDataString = (this.data[key.toString()] = keyData.string);
-			new $(async (first) => {
-				const value = thisDataString.value;
-				if (first) {
-					return;
-				}
+			const keyData = new this.handler(key, data[key]);
+			const thisDataString = (this.qRoute[key.toString()] = keyData.string);
+			new $(async () => {
+				const _ = thisDataString.value;
 				const exceptionSet = keyData.clearAllQueriesExcept;
-				if (exceptionSet) {
+				const clearListWhenImSet = keyData.clearListWhenImSet;
+				if (!clearListWhenImSet.length && exceptionSet.length) {
 					const placeHolder = {};
-					for (const exception of exceptionSet) {
+					for (let i = 0; i < exceptionSet.length; i++) {
+						const exception = exceptionSet[i];
 						placeHolder[exception.toString()] = thisData[exception].value;
 					}
 					for (const key in thisData) {
@@ -81,16 +87,14 @@ export class DefineQRouter {
 						}
 					}
 				} else {
-					const clearListWhenImSet = keyData.clearListWhenImSet;
 					for (let i = 0; i < clearListWhenImSet.length; i++) {
 						const queryNeedToBeClear = clearListWhenImSet[i];
-						this.data[queryNeedToBeClear].value = '';
+						this.qRoute[queryNeedToBeClear].value = '';
 					}
 				}
 				this.requestChanges(this.pushPing);
 			});
 		}
-		this.registerPopStateEventListener();
 	}
 	/**
 	 * @private
@@ -119,7 +123,7 @@ export class DefineQRouter {
 	 */
 	pushPing = new Ping(false, async () => {
 		const queryParams = {};
-		const currentData = this.data;
+		const currentData = this.qRoute;
 		for (const key in currentData) {
 			const query = currentData[key].value;
 			if (query) {
@@ -151,7 +155,7 @@ export class DefineQRouter {
 		const url = new URL(window.location.href);
 		const searchParams = url.searchParams;
 		for (const key in searchParams) {
-			const thisData = this.data;
+			const thisData = this.qRoute;
 			if (!(key in thisData)) {
 				continue;
 			}
@@ -164,5 +168,5 @@ export class DefineQRouter {
 	/**
 	 * @type {Record.<NamedQueryParam, Let<string>>}
 	 */
-	data;
+	qRoute;
 }
