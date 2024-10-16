@@ -95,6 +95,7 @@ export class DefineStorage {
 		} else {
 			store = this.data.value[storage_][name] = Let.dataOnly(defaultValue);
 		}
+		console.log(storage, keyIsExist, name, store.value);
 		new $(async () => {
 			storageMode.setItem(name, store.value);
 		});

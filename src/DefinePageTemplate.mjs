@@ -107,9 +107,7 @@ export class DefinePageTemplate {
 		try {
 			const response = await fetch(path);
 			if (!response.ok) {
-				throw new Error(
-					`Error fetching and parsing HTML, HTTP error! status: ${response.status}`
-				);
+				throw Error(`Error fetching: status="${response.status}"`);
 			}
 			const htmlString = await response.text();
 			const parser = new DOMParser();
@@ -128,17 +126,15 @@ export class DefinePageTemplate {
 					retElement = templateElement;
 				}
 			}
-			if (retElement) {
-				const template_ = retElement.cloneNode(true);
-				element.replaceWith(template_);
-				return;
+			if (!retElement) {
+				throw Error(
+					`couldn't find '[${targetAttribute}="${templateName}"]' in the ${path}`
+				);
 			}
-			throw new Error(
-				`couldn't find '[${targetAttribute}="${templateName}"]' in the ${path}`
-			);
+			const template_ = retElement.cloneNode(true);
+			element.replaceWith(template_);
 		} catch (error) {
 			console.error(error);
-			return;
 		}
 	};
 }

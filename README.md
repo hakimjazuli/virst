@@ -61,8 +61,6 @@ bun i virst
 
 - [documentScope](#documentscope)
 
-- [Error_](#error_)
-
 - [Event_](#event_)
 
 - [For](#for)
@@ -82,6 +80,8 @@ bun i virst
 - [Ping](#ping)
 
 - [ShortCut](#shortcut)
+
+- [Try_](#try_)
 
 - [WorkerMainThread](#workermainthread)
 
@@ -180,15 +180,6 @@ type helper for `documentScope`
 *) <sub>[go to exported list](#exported-api-and-type-list)</sub>
 
 
-<h2 id="error_">Error_</h2>
-
-*) <sub>[go to exported list](#exported-api-and-type-list)</sub>
-
-error handling helper;method(s):- `asValue<Ret>(promise:Promise<Ret>)=>Promise<[data:Ret|undefined,error:undefined|Error]>`
-
-*) <sub>[go to exported list](#exported-api-and-type-list)</sub>
-
-
 <h2 id="event_">Event_</h2>
 
 *) <sub>[go to exported list](#exported-api-and-type-list)</sub>
@@ -275,6 +266,15 @@ trigger based callback integrated to the internal library  queue handler;can be
 *) <sub>[go to exported list](#exported-api-and-type-list)</sub>
 
 - helper class to create `ShortCut` through class instantiation;- call `thisInstance.ping` to manually trigger action
+
+*) <sub>[go to exported list](#exported-api-and-type-list)</sub>
+
+
+<h2 id="try_">Try_</h2>
+
+*) <sub>[go to exported list](#exported-api-and-type-list)</sub>
+
+error handling helper;method(s):- async;- sync;
 
 *) <sub>[go to exported list](#exported-api-and-type-list)</sub>
 
