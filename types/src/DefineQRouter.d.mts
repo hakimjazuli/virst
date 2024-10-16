@@ -15,7 +15,8 @@ export class DefineQRouter<dataValueType extends {
     [queryName: string]: {
         value?: string;
         clearQueriesWhenImSet?: NamedQueryParam[];
-        clearAllQueriesExcept?: NamedQueryParam[];
+        clearAllWhenImSetExcept?: NamedQueryParam[];
+        onAfterResolved?: () => Promise<void>;
     };
 }, NamedQueryParam extends Extract<keyof dataValueType, string>> {
     /**
@@ -27,11 +28,16 @@ export class DefineQRouter<dataValueType extends {
      */
     private static useVirstURL;
     /**
+     * @private
+     * @type {'pop'|'push'}
+     */
+    private static historyStateMode;
+    /**
      * @param {Object} options
      * @param {dataValueType} options.data
      * @param {number} [options.queryChangeThrottleMs]
      */
-    constructor({ data, queryChangeThrottleMs: queryChangeThrottle }: {
+    constructor({ data, queryChangeThrottleMs }: {
         data: dataValueType;
         queryChangeThrottleMs?: number;
     });
@@ -40,7 +46,8 @@ export class DefineQRouter<dataValueType extends {
      * @typedef {Object} handlerType
      * @property {string} [value]
      * @property {NamedQueryParam[]} [clearQueriesWhenImSet]
-     * @property {NamedQueryParam[]} [clearAllQueriesExcept]
+     * @property {NamedQueryParam[]} [clearAllWhenImSetExcept]
+     * @property {()=>Promise<void>} [onAfterResolved]
      */
     private handler;
     /**
@@ -51,7 +58,7 @@ export class DefineQRouter<dataValueType extends {
      * @private
      * @param {Ping["ping"]} ping
      */
-    private queryChangeThrottle;
+    private queryChangeThrottleMs;
     /**
      * @private
      * @type { null|number }
@@ -60,13 +67,13 @@ export class DefineQRouter<dataValueType extends {
     /**
      * @private
      * @param {Ping["ping"]} ping
+     * @param {Ping["ping"]} [onAfterResolved]
      */
     private requestChanges;
     /**
      * @private
      */
     private pushPing;
-    currentQuery: Let<string>;
     /**
      * @private
      */

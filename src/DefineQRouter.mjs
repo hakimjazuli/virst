@@ -28,7 +28,8 @@ export class DefineQRouter {
 	 * @typedef {Object} handlerType
 	 * @property {string} [value]
 	 * @property {NamedQueryParam[]} [clearQueriesWhenImSet]
-	 * @property {NamedQueryParam[]} [clearAllQueriesExcept]
+	 * @property {NamedQueryParam[]} [clearAllWhenImSetExcept]
+	 * @property {()=>Promise<void>} [onAfterResolved]
 	 */
 	handler = class {
 		/**
@@ -36,7 +37,15 @@ export class DefineQRouter {
 		 * @param {handlerType} options
 		 * - exception is prioritize to be kept;
 		 */
-		constructor(key, { value = '', clearQueriesWhenImSet = [], clearAllQueriesExcept = [] }) {
+		constructor(
+			key,
+			{
+				value = '',
+				clearQueriesWhenImSet = [],
+				clearAllWhenImSetExcept = [],
+				onAfterResolved = undefined,
+			}
+		) {
 			const params = new URLSearchParams(window.location.search);
 			const value_ = params.get(key);
 			if (value_) {
@@ -44,7 +53,10 @@ export class DefineQRouter {
 			}
 			this.string = Let.dataOnly(value);
 			this.clearListWhenImSet = clearQueriesWhenImSet;
-			this.clearAllQueriesExcept = clearAllQueriesExcept;
+			this.clearAllWhenImSetExcept = clearAllWhenImSetExcept;
+			if (onAfterResolved) {
+				this.onAfterResolved = new Ping(false, onAfterResolved).ping;
+			}
 		}
 	};
 	/**
@@ -52,7 +64,7 @@ export class DefineQRouter {
 	 * @param {dataValueType} options.data
 	 * @param {number} [options.queryChangeThrottleMs]
 	 */
-	constructor({ data, queryChangeThrottleMs: queryChangeThrottle = 300 }) {
+	constructor({ data, queryChangeThrottleMs = 300 }) {
 		if (DefineQRouter.__ instanceof DefineQRouter) {
 			helper.warningSingleton(DefineQRouter);
 			return;
@@ -61,7 +73,7 @@ export class DefineQRouter {
 		DefineQRouter.useVirstURL();
 		// @ts-ignore
 		this.qRoute = {};
-		this.queryChangeThrottle = queryChangeThrottle;
+		this.queryChangeThrottleMs = queryChangeThrottleMs;
 		const thisData = this.qRoute;
 		this.registerPopStateEventListener();
 		for (const key in data) {
@@ -69,7 +81,7 @@ export class DefineQRouter {
 			const thisDataString = (this.qRoute[key.toString()] = keyData.string);
 			new $(async () => {
 				const _ = thisDataString.value;
-				const exceptionSet = keyData.clearAllQueriesExcept;
+				const exceptionSet = keyData.clearAllWhenImSetExcept;
 				const clearListWhenImSet = keyData.clearListWhenImSet;
 				if (!clearListWhenImSet.length && exceptionSet.length) {
 					const placeHolder = {};
@@ -93,7 +105,10 @@ export class DefineQRouter {
 						this.qRoute[queryNeedToBeClear].value = '';
 					}
 				}
-				this.requestChanges(this.pushPing);
+				if (DefineQRouter.historyStateMode === 'push') {
+					this.requestChanges(this.pushPing, keyData.onAfterResolved);
+				}
+				DefineQRouter.historyStateMode = 'push';
 			});
 		}
 	}
@@ -104,14 +119,13 @@ export class DefineQRouter {
 		const currentPath = window.location.pathname.split('/').pop();
 		if (currentPath !== 'index.html' && currentPath !== '') {
 			window.location.href = '/';
-			return;
 		}
 	};
 	/**
 	 * @private
 	 * @param {Ping["ping"]} ping
 	 */
-	queryChangeThrottle;
+	queryChangeThrottleMs;
 	/**
 	 * @private
 	 * @type { null|number }
@@ -120,15 +134,24 @@ export class DefineQRouter {
 	/**
 	 * @private
 	 * @param {Ping["ping"]} ping
+	 * @param {Ping["ping"]} [onAfterResolved]
 	 */
-	requestChanges = async (ping) => {
+	requestChanges = async (ping, onAfterResolved) => {
 		if (this.timeoutId) {
 			clearTimeout(this.timeoutId);
 		}
 		this.timeoutId = window.setTimeout(async () => {
 			ping();
-		}, this.queryChangeThrottle);
+			if (onAfterResolved) {
+				onAfterResolved();
+			}
+		}, this.queryChangeThrottleMs);
 	};
+	/**
+	 * @private
+	 * @type {'pop'|'push'}
+	 */
+	static historyStateMode = 'push';
 	/**
 	 * @private
 	 */
@@ -152,7 +175,6 @@ export class DefineQRouter {
 		}
 		window.history.pushState({}, '', url);
 	}).ping;
-	currentQuery = Let.dataOnly('');
 	/**
 	 * @private
 	 */
@@ -163,18 +185,16 @@ export class DefineQRouter {
 	 * @private
 	 */
 	popPing = new Ping(false, async () => {
-		const url = new URL(window.location.href);
-		const searchParams = url.searchParams;
-		for (const key in searchParams) {
+		const urlParams = new URLSearchParams(window.location.search);
+		DefineQRouter.historyStateMode = 'pop';
+		urlParams.forEach((value, key) => {
 			const thisData = this.qRoute;
 			if (!(key in thisData)) {
-				continue;
+				return;
 			}
-			if (Object.prototype.hasOwnProperty.call(searchParams, key)) {
-				const query = searchParams[key];
-				thisData[key].value = query;
-			}
-		}
+			const query = value;
+			thisData[key].value = query;
+		});
 	}).ping;
 	/**
 	 * @type {Record.<NamedQueryParam, Let<string>>}
