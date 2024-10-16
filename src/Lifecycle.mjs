@@ -123,10 +123,18 @@ export class Lifecycle {
 	 */
 	attributeLifecyclesHandler;
 	/**
-	 * @param {attributeLifecyclesHandler} attributeLifecyclesHandler
-	 * @param {documentScope} documentScope
+	 * @private
+	 * @type {boolean}
 	 */
-	constructor(attributeLifecyclesHandler, documentScope = helper.currentDocumentScope) {
+	isGlobal;
+	/**
+	 * @param {attributeLifecyclesHandler} attributeLifecyclesHandler
+	 * @param {boolean} [isGlobal]
+	 * - allow global attributeName to be handled inside nested `Lifecycle`
+	 */
+	constructor(attributeLifecyclesHandler, isGlobal = false) {
+		this.isGlobal = isGlobal;
+		const documentScope = helper.currentDocumentScope;
 		this.attributeLifecyclesHandler = attributeLifecyclesHandler;
 		this.currentDocumentScope = documentScope;
 		const [mObs, mLet] = mutaitonObserver.create(documentScope);
@@ -217,6 +225,9 @@ export class Lifecycle {
 	 * @returns {boolean}
 	 */
 	checkValidScoping = (node) => {
+		if (this.isGlobal) {
+			return true;
+		}
 		const documentScope = this.currentDocumentScope;
 		while (node) {
 			if (!Lifecycle.ID.has(node)) {
@@ -239,8 +250,7 @@ export class Lifecycle {
 		if (
 			!((addedNode instanceof HTMLElement) /** to eliminate repeatition on ANH call */) ||
 			!addedNode.hasAttribute(attributeName /** primary criteria */) ||
-			(!attributeName.startsWith(helper.globalSignalPrefix) &&
-				!this.checkValidScoping(addedNode))
+			!this.checkValidScoping(addedNode)
 		) {
 			return;
 		}

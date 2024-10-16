@@ -38,9 +38,9 @@ export class Let<V> {
     /**
      * @param {V} value
      * @param {string} [attributeName]
-     * @param {import('./documentScope.type.mjs').documentScope} [documentScope]
+     * @param {boolean} [isGlobal]
      */
-    constructor(value: V, attributeName?: string, documentScope?: import("./documentScope.type.mjs").documentScope);
+    constructor(value: V, attributeName?: string, isGlobal?: boolean);
     /**
      * remove all effects
      * @return {void}

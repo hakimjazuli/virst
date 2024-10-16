@@ -29,9 +29,8 @@ export class OnViewPort {
 	/**
 	 * @param {onViewPortatributesHandler} attributeHandler
 	 * undefined: will automatically fires unObserve callback;
-	 * @param {import('./documentScope.type.mjs').documentScope} documentScope
 	 */
-	constructor(attributeHandler, documentScope = helper.currentDocumentScope) {
+	constructor(attributeHandler) {
 		this.attrbuteHandler = attributeHandler;
 		/**
 		 * @type {{[attributeName:string]:
@@ -60,7 +59,7 @@ export class OnViewPort {
 				});
 			};
 		}
-		this.lifecycleObserver = new Lifecycle(intersectionLifecycle, documentScope);
+		this.lifecycleObserver = new Lifecycle(intersectionLifecycle, true);
 	}
 	/**
 	 * @private

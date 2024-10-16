@@ -12,11 +12,10 @@ export class OnViewPort {
     /**
      * @param {onViewPortatributesHandler} attributeHandler
      * undefined: will automatically fires unObserve callback;
-     * @param {import('./documentScope.type.mjs').documentScope} documentScope
      */
     constructor(attributeHandler: {
         [attributeName: string]: import("./onViewPortHandler.type.mjs").onViewPortHandler;
-    }, documentScope?: import("./documentScope.type.mjs").documentScope);
+    });
     /**
      * @private
      * @type {Lifecycle}

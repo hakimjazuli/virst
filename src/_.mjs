@@ -7,8 +7,8 @@ import { Lifecycle } from './Lifecycle.mjs';
 
 /**
  * @description
- * - scoping helper for `signal` based reactifity stored in static Method of class `_`;
- * - if you use our `Component` class, use this class static method, instead of their respective class, for `autoscoping`, which then you can use it's `attr` returned value to mark the element
+ * - auto `attributeName` assign for `signal` based reactifity stored in static Method of class `_`;
+ * - if you use our `Component` class, use this class static method, instead of their respective class, for generating `attributeName` to watch, which then you can use it's `attr` returned value to mark the element
  * ```js
  * // on Component scope
  * onConnected(async()=>{
@@ -19,12 +19,13 @@ import { Lifecycle } from './Lifecycle.mjs';
  */
 export class _ {
 	/**
-	 * scoping helper for `Let`
+	 * auto `attributeName` assign for `Let`
 	 * @template V
 	 * @param {V} value
+	 * @param {boolean} [isGlobal]
 	 */
-	static let = (value) =>
-		new Let(value, helper.attributeIndexGenerator(), helper.currentDocumentScope);
+	static let = (value, isGlobal = false) =>
+		new Let(value, helper.attributeIndexGenerator(), isGlobal);
 	/**
 	 * syntax sugar for `Let.dataOnly`
 	 * @template D
@@ -33,12 +34,13 @@ export class _ {
 	 */
 	static letD = (data) => Let.dataOnly(data);
 	/**
-	 * scoping helper for `Derived`
+	 * auto `attributeName` assign for `Derived`
 	 * @template V
 	 * @param {()=>Promise<V>} asyncCallback
+	 * @param {boolean} [isGlobal]
 	 */
-	static derived = (asyncCallback) =>
-		new Derived(asyncCallback, helper.attributeIndexGenerator(), helper.currentDocumentScope);
+	static derived = (asyncCallback, isGlobal = false) =>
+		new Derived(asyncCallback, helper.attributeIndexGenerator(), isGlobal);
 	/**
 	 * syntax sugar for `Derived.dataOnly`
 	 * @template V
@@ -47,11 +49,12 @@ export class _ {
 	 */
 	static derivedD = (asyncCallback) => Derived.dataOnly(asyncCallback);
 	/**
-	 * scoping helper for `Lifecycle`
+	 * singlar attribute watcher for `Lifecycle`
 	 * @param {string} attributeName
 	 * @param {(options:import('./lifecycleHandler.type.mjs').lifecycleHandler)=>Promise<void>} lifecycleCallback
+	 * @param {boolean} [isGlobal]
 	 * @returns {Lifecycle}
 	 */
-	static lifecycle = (attributeName, lifecycleCallback) =>
-		new Lifecycle({ [attributeName]: lifecycleCallback });
+	static lifecycle = (attributeName, lifecycleCallback, isGlobal = false) =>
+		new Lifecycle({ [attributeName]: lifecycleCallback }, isGlobal);
 }

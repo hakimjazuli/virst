@@ -36,10 +36,10 @@ export class Derived extends Let {
 	/**
 	 * @param {()=>Promise<V>} asyncCallback
 	 * @param {string} [attributeName]
-	 * @param {import('./documentScope.type.mjs').documentScope} [documentScope]
+	 * @param {boolean} [isGlobal]
 	 */
-	constructor(asyncCallback, attributeName = undefined, documentScope = undefined) {
-		super('', attributeName, documentScope);
+	constructor(asyncCallback, attributeName = undefined, isGlobal = false) {
+		super('', attributeName, isGlobal);
 		new $(async () => {
 			super.value = await asyncCallback();
 		});

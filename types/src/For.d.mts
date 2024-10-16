@@ -55,6 +55,7 @@ export class For {
     /**
      * @private
      * @param {childLifeCycleCallback} childLifeCycleCallback
+     * @param {lifecycleHandler["onDisconnected"]} onParentDisconnected
      */
     private childLifecycle;
     /**

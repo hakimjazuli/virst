@@ -46,12 +46,12 @@ export class DefineStorage<Local extends {
     /**
      * @typedef {Record<LocalKey,Let<string>>} letLocal
      * @typedef {Record<SessionKey,Let<string>>} letSession
-     * @type {Let<{local:letLocal,session:letSession}>}
+     * @type {{local:letLocal,session:letSession}}
      */
-    data: Let<{
+    data: {
         local: { [P in LocalKey]: Let<string>; };
         session: { [P_1 in SessionKey]: Let<string>; };
-    }>;
+    };
     /**
      * @private
      * @param {"session"|"local"} storage

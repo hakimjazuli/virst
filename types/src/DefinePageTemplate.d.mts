@@ -29,13 +29,11 @@ export class DefinePageTemplate {
      * @param {string} options.targetAttribute
      * @param {(path:string)=>string} [options.targetPathRule]
      * - return processed path
-     * @param {import('./documentScope.type.mjs').documentScope} [options.documentScope]
      */
-    constructor({ callerAttribute, targetAttribute, targetPathRule, documentScope, }: {
+    constructor({ callerAttribute, targetAttribute, targetPathRule }: {
         callerAttribute: string;
         targetAttribute: string;
         targetPathRule?: (path: string) => string;
-        documentScope?: import("./documentScope.type.mjs").documentScope;
     });
     /**
      * @private

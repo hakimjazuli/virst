@@ -34,14 +34,8 @@ export class DefinePageTemplate {
 	 * @param {string} options.targetAttribute
 	 * @param {(path:string)=>string} [options.targetPathRule]
 	 * - return processed path
-	 * @param {import('./documentScope.type.mjs').documentScope} [options.documentScope]
 	 */
-	constructor({
-		callerAttribute,
-		targetAttribute,
-		targetPathRule = (path) => path,
-		documentScope = helper.currentDocumentScope,
-	}) {
+	constructor({ callerAttribute, targetAttribute, targetPathRule = (path) => path }) {
 		this.targetAttribute = targetAttribute;
 		this.targetPathRule = targetPathRule;
 		this.callerAttribute = callerAttribute;
@@ -53,7 +47,7 @@ export class DefinePageTemplate {
 					});
 				},
 			},
-			documentScope
+			true
 		);
 	}
 	/**

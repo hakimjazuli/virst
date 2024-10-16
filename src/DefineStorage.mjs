@@ -66,10 +66,10 @@ export class DefineStorage {
 	/**
 	 * @typedef {Record<LocalKey,Let<string>>} letLocal
 	 * @typedef {Record<SessionKey,Let<string>>} letSession
-	 * @type {Let<{local:letLocal,session:letSession}>}
+	 * @type {{local:letLocal,session:letSession}}
 	 */
 	// @ts-ignore
-	data = Let.dataOnly({ local: {}, session: {} });
+	data = { local: {}, session: {} };
 	/**
 	 * @private
 	 * @param {"session"|"local"} storage
@@ -91,11 +91,10 @@ export class DefineStorage {
 		const storage_ = storage.toString();
 		let store;
 		if (keyIsExist) {
-			store = this.data.value[storage_][name] = Let.dataOnly(keyIsExist);
+			store = this.data[storage_][name] = Let.dataOnly(keyIsExist);
 		} else {
-			store = this.data.value[storage_][name] = Let.dataOnly(defaultValue);
+			store = this.data[storage_][name] = Let.dataOnly(defaultValue);
 		}
-		console.log(storage, keyIsExist, name, store.value);
 		new $(async () => {
 			storageMode.setItem(name_, store.value);
 		});
@@ -131,14 +130,14 @@ export class DefineStorage {
 	 */
 	autoDeprecate = () => {
 		const sessionKeys = Object.keys(sessionStorage);
-		const sessionCompare = Object.keys(this.data.value.session);
+		const sessionCompare = Object.keys(this.data.session);
 		for (const key of sessionKeys) {
 			if (key.startsWith(helper.storageIdentifier) && !sessionCompare.includes(key)) {
 				sessionStorage.removeItem(key);
 			}
 		}
 		const localKeys = Object.keys(localStorage);
-		const localComapare = Object.keys(this.data.value.local);
+		const localComapare = Object.keys(this.data.local);
 		for (const key of localKeys) {
 			if (key.startsWith(helper.storageIdentifier) && !localComapare.includes(key)) {
 				localStorage.removeItem(key);

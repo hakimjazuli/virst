@@ -30,10 +30,6 @@ export class helper {
 	 */
 	static ForChildAttributePrefix = `virst-fc-`;
 	/**
-	 * @readonly
-	 */
-	static globalSignalPrefix = `g-`;
-	/**
 	 * @param {Object} class_
 	 */
 	static warningSingleton = (class_) => {

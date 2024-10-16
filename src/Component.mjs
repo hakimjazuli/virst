@@ -54,62 +54,55 @@ export class Component {
 		attributeName = helper.attributeIndexGenerator(),
 	}) {
 		this.attr = attributeName;
-		new Lifecycle(
-			{
-				[attributeName]: ({
-					element,
-					lifecycleObserver: componentLifecycle,
-					onAttributeChanged,
-					onConnected,
-					onDisconnected,
-				}) => {
-					if (onConnectedCallback) {
-						onConnected(async () => {
-							/**
-							 * @type {onConnectedOptions["reactiveProps"]}
-							 */
-							// @ts-ignore
-							const reactiveProps = {};
-							for (const propName in props) {
-								const value =
-									element.getAttribute(propName) ?? props[propName.toString()];
-								reactiveProps[propName.toString()] = new Let(
-									value,
-									propName,
-									element
-								);
-							}
-							await onConnectedCallback({
-								reactiveProps,
-								attr: attributeName,
-								element,
-								html: (strings, ...values) => {
-									const result = [];
-									for (let i = 0; i < strings.length; i++) {
-										result.push(strings[i]);
-										if (i < values.length) {
-											result.push(values[i]);
-										}
+		new Lifecycle({
+			[attributeName]: ({
+				element,
+				lifecycleObserver: componentLifecycle,
+				onAttributeChanged,
+				onConnected,
+				onDisconnected,
+			}) => {
+				if (onConnectedCallback) {
+					onConnected(async () => {
+						/**
+						 * @type {onConnectedOptions["reactiveProps"]}
+						 */
+						// @ts-ignore
+						const reactiveProps = {};
+						for (const propName in props) {
+							const value =
+								element.getAttribute(propName) ?? props[propName.toString()];
+							reactiveProps[propName.toString()] = new Let(value, propName);
+						}
+						await onConnectedCallback({
+							reactiveProps,
+							attr: attributeName,
+							element,
+							html: (strings, ...values) => {
+								const result = [];
+								for (let i = 0; i < strings.length; i++) {
+									result.push(strings[i]);
+									if (i < values.length) {
+										result.push(values[i]);
 									}
-									element.innerHTML = result.join('');
-								},
-								onDisconnected: (onDCed) => {
-									onDisconnected(onDCed);
-								},
-								componentLifecycle,
-							});
-							onAttributeChanged(async ({ attributeName, newValue }) => {
-								if (!(attributeName in props)) {
-									return;
 								}
-								reactiveProps[attributeName].value = newValue;
-							});
+								element.innerHTML = result.join('');
+							},
+							onDisconnected: (onDCed) => {
+								onDisconnected(onDCed);
+							},
+							componentLifecycle,
 						});
-					}
-				},
+						onAttributeChanged(async ({ attributeName, newValue }) => {
+							if (!(attributeName in props)) {
+								return;
+							}
+							reactiveProps[attributeName].value = newValue;
+						});
+					});
+				}
 			},
-			helper.currentDocumentScope
-		);
+		});
 		/**
 		 * @param {Partial<DefaultProps>} [props__]
 		 * @returns {string}

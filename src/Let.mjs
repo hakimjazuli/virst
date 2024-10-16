@@ -120,13 +120,12 @@ export class Let {
 	/**
 	 * @param {V} value
 	 * @param {string} [attributeName]
-	 * @param {import('./documentScope.type.mjs').documentScope} [documentScope]
+	 * @param {boolean} [isGlobal]
 	 */
-	constructor(value, attributeName = undefined, documentScope = undefined) {
+	constructor(value, attributeName = undefined, isGlobal = false) {
 		this.value_ = value;
 		if (attributeName) {
 			this.attr = attributeName;
-			documentScope = documentScope ?? document;
 			new Lifecycle(
 				{
 					[attributeName]: async ({ element, onConnected, onDisconnected }) => {
@@ -143,7 +142,7 @@ export class Let {
 						});
 					},
 				},
-				documentScope
+				isGlobal
 			);
 		}
 	}

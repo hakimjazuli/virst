@@ -26,10 +26,6 @@ export class helper {
      */
     static readonly ForChildAttributePrefix: "virst-fc-";
     /**
-     * @readonly
-     */
-    static readonly globalSignalPrefix: "g-";
-    /**
      * @param {Object} class_
      */
     static warningSingleton: (class_: any) => void;
