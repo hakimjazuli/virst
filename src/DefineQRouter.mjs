@@ -42,7 +42,7 @@ export class DefineQRouter {
 			{
 				value = '',
 				clearQueriesWhenImSet = [],
-				clearAllWhenImSetExcept = [],
+				clearAllWhenImSetExcept = undefined,
 				onAfterResolved = undefined,
 			}
 		) {
@@ -83,30 +83,37 @@ export class DefineQRouter {
 				const _ = thisDataString.value;
 				const exceptionSet = keyData.clearAllWhenImSetExcept;
 				const clearListWhenImSet = keyData.clearListWhenImSet;
-				if (!clearListWhenImSet.length && exceptionSet.length) {
+				if (!clearListWhenImSet.length && exceptionSet) {
 					const placeHolder = {};
 					for (let i = 0; i < exceptionSet.length; i++) {
 						const exception = exceptionSet[i];
-						placeHolder[exception.toString()] = thisData[exception].value;
+						if (exception in thisData) {
+							placeHolder[exception.toString()] = thisData[exception].value;
+						}
 					}
-					for (const key in thisData) {
-						if (key in thisData) {
-							const keyStr = key.toString();
-							if (key in exceptionSet) {
-								thisData[key].value = placeHolder[keyStr];
-							} else {
-								thisData[key].value = '';
+					for (const key__ in thisData) {
+						const keyStr = key__.toString();
+						if (exceptionSet.includes(key__) || key === keyStr) {
+							const placeholderValue = placeHolder[keyStr];
+							if (placeholderValue) {
+								thisData[keyStr].value = placeholderValue;
 							}
+						} else {
+							thisData[key__].value = '';
 						}
 					}
 				} else {
 					for (let i = 0; i < clearListWhenImSet.length; i++) {
 						const queryNeedToBeClear = clearListWhenImSet[i];
-						this.qRoute[queryNeedToBeClear].value = '';
+						const qRotue = this.qRoute;
+						if (queryNeedToBeClear in qRotue) {
+							qRotue[queryNeedToBeClear].value = '';
+						}
 					}
 				}
+				DefineQRouter.onAfterResolved = keyData.onAfterResolved;
 				if (DefineQRouter.historyStateMode === 'push') {
-					this.requestChanges(this.pushPing, keyData.onAfterResolved);
+					this.requestChanges(this.pushPing);
 				}
 				DefineQRouter.historyStateMode = 'push';
 			});
@@ -134,17 +141,17 @@ export class DefineQRouter {
 	/**
 	 * @private
 	 * @param {Ping["ping"]} ping
-	 * @param {Ping["ping"]} [onAfterResolved]
 	 */
-	requestChanges = async (ping, onAfterResolved) => {
+	requestChanges = async (ping) => {
 		if (this.timeoutId) {
 			clearTimeout(this.timeoutId);
 		}
 		this.timeoutId = window.setTimeout(async () => {
 			ping();
-			if (onAfterResolved) {
-				onAfterResolved();
+			if (DefineQRouter.onAfterResolved) {
+				DefineQRouter.onAfterResolved();
 			}
+			DefineQRouter.onAfterResolved = null;
 		}, this.queryChangeThrottleMs);
 	};
 	/**
@@ -181,6 +188,11 @@ export class DefineQRouter {
 	registerPopStateEventListener = () => {
 		window.addEventListener('popstate', () => this.requestChanges(this.popPing));
 	};
+	/**
+	 * @private
+	 * @type {Ping["ping"]}
+	 */
+	static onAfterResolved;
 	/**
 	 * @private
 	 */

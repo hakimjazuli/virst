@@ -33,6 +33,11 @@ export class DefineQRouter<dataValueType extends {
      */
     private static historyStateMode;
     /**
+     * @private
+     * @type {Ping["ping"]}
+     */
+    private static onAfterResolved;
+    /**
      * @param {Object} options
      * @param {dataValueType} options.data
      * @param {number} [options.queryChangeThrottleMs]
@@ -67,7 +72,6 @@ export class DefineQRouter<dataValueType extends {
     /**
      * @private
      * @param {Ping["ping"]} ping
-     * @param {Ping["ping"]} [onAfterResolved]
      */
     private requestChanges;
     /**
