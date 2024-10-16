@@ -126,7 +126,7 @@ export class Lifecycle {
 	 * @param {attributeLifecyclesHandler} attributeLifecyclesHandler
 	 * @param {documentScope} documentScope
 	 */
-	constructor(attributeLifecyclesHandler, documentScope = document) {
+	constructor(attributeLifecyclesHandler, documentScope = helper.currentDocumentScope) {
 		this.attributeLifecyclesHandler = attributeLifecyclesHandler;
 		this.currentDocumentScope = documentScope;
 		const [mObs, mLet] = mutaitonObserver.create(documentScope);

@@ -1,8 +1,7 @@
 /**
  * @description
  * - scoping helper for `signal` based reactifity stored in static Method of class `_`;
- * - if you use our `Component` class, use this class static method, instead of their respective class, for `autoscoping`,
- * > which then you can use it's `attr` returned value to mark the element
+ * - if you use our `Component` class, use this class static method, instead of their respective class, for `autoscoping`, which then you can use it's `attr` returned value to mark the element
  * ```js
  * // on Component scope
  * onConnected(async()=>{
@@ -13,19 +12,11 @@
  */
 export class _ {
     /**
-     * syntax sugar for `Let`
-     * @template V
-     * @param {V} value
-     * @param {string} [attributeName]
-     * @param {import('./documentScope.type.mjs').documentScope} [documentScope]
-     */
-    static let: <V>(value: V, attributeName?: string, documentScope?: import("./documentScope.type.mjs").documentScope) => Let<V>;
-    /**
      * scoping helper for `Let`
      * @template V
      * @param {V} value
      */
-    static let_: <V>(value: V) => Let<V>;
+    static let: <V>(value: V) => Let<V>;
     /**
      * syntax sugar for `Let.dataOnly`
      * @template D
@@ -35,18 +26,10 @@ export class _ {
     static letD: <D>(data: D) => Let<D>;
     /**
      * scoping helper for `Derived`
-     * @template  V
-     * @param {()=>Promise<V>} asyncCallback
-     * @param {string} [attributeName]
-     * @param {import('./documentScope.type.mjs').documentScope} [documentScope]
-     */
-    static derived: <V>(asyncCallback: () => Promise<V>, attributeName?: string, documentScope?: import("./documentScope.type.mjs").documentScope) => Derived<V>;
-    /**
-     * scoping helper for `Derived`
      * @template V
      * @param {()=>Promise<V>} asyncCallback
      */
-    static derived_: <V>(asyncCallback: () => Promise<V>) => Derived<V>;
+    static derived: <V>(asyncCallback: () => Promise<V>) => Derived<V>;
     /**
      * syntax sugar for `Derived.dataOnly`
      * @template V
@@ -55,19 +38,13 @@ export class _ {
      */
     static derivedD: <V>(asyncCallback: () => Promise<V>) => Derived<V>;
     /**
-     * scoping helper for `$`
-     * @param {(isAtInitialization:boolean)=>Promise<void>} asyncCallback
+     * scoping helper for `Lifecycle`
+     * @param {string} attributeName
+     * @param {(options:import('./lifecycleHandler.type.mjs').lifecycleHandler)=>Promise<void>} lifecycleCallback
+     * @returns {Lifecycle}
      */
-    static $: (asyncCallback: (isAtInitialization: boolean) => Promise<void>) => $;
-    /**
-     * scoping helper for `List`
-     * @template {Record<string, string>} ListArg
-     * @template {keyof ListKeys} ListKeys
-     * @param {ListArg[]} listArray
-     */
-    static list: <ListArg extends Record<string, string>, ListKeys extends keyof ListKeys>(listArray: ListArg[]) => List<ListArg>;
+    static lifecycle: (attributeName: string, lifecycleCallback: (options: import("./lifecycleHandler.type.mjs").lifecycleHandler) => Promise<void>) => Lifecycle;
 }
 import { Let } from './Let.mjs';
 import { Derived } from './Derived.mjs';
-import { $ } from './$.mjs';
-import { List } from './List.mjs';
+import { Lifecycle } from './Lifecycle.mjs';

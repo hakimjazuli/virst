@@ -301,6 +301,6 @@ helper class to define web worker thread;```jsnew WorkerThread({	onMessage: (
 
 *) <sub>[go to exported list](#exported-api-and-type-list)</sub>
 
-- scoping helper for `signal` based reactifity stored in static Method of class `_`;- if you use our `Component` class, use this class static method, instead of their respective class, for `autoscoping`,> which then you can use it's `attr` returned value to mark the element```js// on Component scopeonConnected(async()=>{	const data = _.let('test');	html`<div ${data.attr}="innerText"></div>`})```
+- scoping helper for `signal` based reactifity stored in static Method of class `_`;- if you use our `Component` class, use this class static method, instead of their respective class, for `autoscoping`, which then you can use it's `attr` returned value to mark the element```js// on Component scopeonConnected(async()=>{	const data = _.let('test');	html`<div ${data.attr}="innerText"></div>`})```
 
 *) <sub>[go to exported list](#exported-api-and-type-list)</sub>
