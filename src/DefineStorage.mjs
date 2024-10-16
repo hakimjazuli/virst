@@ -77,7 +77,7 @@ export class DefineStorage {
 	 * @param {string} defaultValue
 	 */
 	resolve = (storage, name, defaultValue) => {
-		name = DefineStorage.nameSpace(name);
+		const name_ = DefineStorage.nameSpace(name);
 		let storageMode;
 		switch (storage) {
 			case 'local':
@@ -87,7 +87,7 @@ export class DefineStorage {
 				storageMode = sessionStorage;
 				break;
 		}
-		const keyIsExist = storageMode.getItem(name);
+		const keyIsExist = storageMode.getItem(name_);
 		const storage_ = storage.toString();
 		let store;
 		if (keyIsExist) {
@@ -97,7 +97,7 @@ export class DefineStorage {
 		}
 		console.log(storage, keyIsExist, name, store.value);
 		new $(async () => {
-			storageMode.setItem(name, store.value);
+			storageMode.setItem(name_, store.value);
 		});
 	};
 	refreshLocal = () => {
