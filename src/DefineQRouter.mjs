@@ -186,15 +186,15 @@ export class DefineQRouter {
 	 */
 	popPing = new Ping(false, async () => {
 		const urlParams = new URLSearchParams(window.location.search);
-		DefineQRouter.historyStateMode = 'pop';
-		urlParams.forEach((value, key) => {
+		const entries = urlParams.entries();
+		for (const [key, value] of entries) {
+			DefineQRouter.historyStateMode = 'pop';
 			const thisData = this.qRoute;
 			if (!(key in thisData)) {
-				return;
+				continue;
 			}
-			const query = value;
-			thisData[key].value = query;
-		});
+			thisData[key].value = value;
+		}
 	}).ping;
 	/**
 	 * @type {Record.<NamedQueryParam, Let<string>>}
