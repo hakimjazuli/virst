@@ -21,7 +21,6 @@ export type onViewPortHandler = {
     onDisconnected: (options: onViewPortHandlerDisconnector) => Promise<void>;
 };
 import { $ } from './src/$.mjs';
-import { Animation } from './src/Animation.mjs';
 import { App } from './src/App.mjs';
 import { Component } from './src/Component.mjs';
 import { CRUD } from './src/CRUD.mjs';
@@ -42,4 +41,4 @@ import { ShortCut } from './src/ShortCut.mjs';
 import { WorkerMainThread } from './src/WorkerMainThread.mjs';
 import { WorkerThread } from './src/WorkerThread.mjs';
 import { _ } from './src/_.mjs';
-export { $, Animation, App, Component, CRUD, DefinePageTemplate, DefineQRouter, DefineShortCuts, DefineStorage, Derived, Error_, Event_, For, Let, Lifecycle, List, OnViewPort, Ping, ShortCut, WorkerMainThread, WorkerThread, _ };
+export { $, App, Component, CRUD, DefinePageTemplate, DefineQRouter, DefineShortCuts, DefineStorage, Derived, Error_, Event_, For, Let, Lifecycle, List, OnViewPort, Ping, ShortCut, WorkerMainThread, WorkerThread, _ };

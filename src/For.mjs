@@ -28,7 +28,12 @@ export class For {
 	 * @param {childLifeCycleCallback} childLifeCycleCallback
 	 * @param {import('./documentScope.type.mjs').documentScope} documentScope
 	 */
-	constructor(listInstance, attributeName, childLifeCycleCallback, documentScope = document) {
+	constructor(
+		listInstance,
+		attributeName,
+		childLifeCycleCallback,
+		documentScope = helper.currentDocumentScope
+	) {
 		this.listInstance = listInstance;
 		this.attr = attributeName;
 		this.DS = documentScope;

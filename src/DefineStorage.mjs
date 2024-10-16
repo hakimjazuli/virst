@@ -46,17 +46,15 @@ export class DefineStorage {
 		this.autoDeprecate();
 	}
 	/**
+	 * @private
 	 * @type { Record<LocalKey,string> }
 	 */
 	defaultLocal;
 	/**
+	 * @private
 	 * @type { Record<SessionKey,string> }
 	 */
 	defaultSession;
-	/**
-	 * @private
-	 */
-
 	/**
 	 * @private
 	 * @param {string} name
@@ -66,9 +64,11 @@ export class DefineStorage {
 		return `${helper.storageIdentifier}-${name}`;
 	};
 	/**
-	 * @param {Record<LocalKey,Let<string>>} local
-	 * @param {Record<SessionKey,Let<string>>} session
+	 * @typedef {Record<LocalKey,Let<string>>} letLocal
+	 * @typedef {Record<SessionKey,Let<string>>} letSession
+	 * @type {Let<{local:letLocal,session:letSession}>}
 	 */
+	// @ts-ignore
 	data = Let.dataOnly({ local: {}, session: {} });
 	/**
 	 * @private
@@ -88,11 +88,12 @@ export class DefineStorage {
 				break;
 		}
 		const keyIsExist = storageMode.getItem(name);
+		const storage_ = storage.toString();
 		let store;
 		if (keyIsExist) {
-			store = this.data.value[storage][name] = Let.dataOnly(keyIsExist);
+			store = this.data.value[storage_][name] = Let.dataOnly(keyIsExist);
 		} else {
-			store = this.data.value[storage][name] = Let.dataOnly(defaultValue);
+			store = this.data.value[storage_][name] = Let.dataOnly(defaultValue);
 		}
 		new $(async () => {
 			storageMode.setItem(name, store.value);

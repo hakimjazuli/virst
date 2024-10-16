@@ -1,7 +1,8 @@
 /**
  * @description
- * `App` starter helper for module environtment;
- * the sole purpose is just to auto import the necessary file in your main js file;
+ * `App` starter helper for module environtment:
+ * - the sole purpose is just to auto import the necessary global file in your main js file;
+ * - if it's `elementScoped` `instances`/`statics methods`, it will be better to just leave it for the `parentModule` to import it accordingly;
  */
 export class App {
     /**
@@ -15,18 +16,18 @@ export class App {
      * - the inputed root component must manually fills attributeName option argument, to target root element on the real dom;
      * @param {(import("./Lifecycle.mjs").Lifecycle)[]} [options.lifecycles]
      * @param {(import("./For.mjs").For)[]} [options.forS]
-     * @param {import('./DefineShortCuts.mjs').DefineShortCuts} [options.definedShortcuts]
-     * @param {import('./DefineQRouter.mjs').DefineQRouter} [options.definedQRouter]
-     * @param {import('./DefineStorage.mjs').DefineStorage} [options.definedStorage]
+     * @param {import('./DefineShortCuts.mjs').DefineShortCuts} [options.defineShortcuts]
+     * @param {import('./DefineQRouter.mjs').DefineQRouter} [options.defineQRouter]
+     * @param {import('./DefineStorage.mjs').DefineStorage} [options.defineStorage]
      * @param {import('./DefinePageTemplate.mjs').DefinePageTemplate} [options.definePageTemplate]
      */
-    constructor({ lifecycles, forS, rootComponent, definedShortcuts, definedQRouter, definedStorage, definePageTemplate, }: {
+    constructor({ lifecycles, forS, rootComponent, defineShortcuts: definedShortcuts, defineQRouter: definedQRouter, defineStorage: definedStorage, definePageTemplate, }: {
         rootComponent?: import("./Component.mjs").Component<any, any>;
         lifecycles?: (import("./Lifecycle.mjs").Lifecycle)[];
         forS?: (import("./For.mjs").For)[];
-        definedShortcuts?: import("./DefineShortCuts.mjs").DefineShortCuts<any, any>;
-        definedQRouter?: import("./DefineQRouter.mjs").DefineQRouter<any, any>;
-        definedStorage?: import("./DefineStorage.mjs").DefineStorage<any, any, any, any>;
+        defineShortcuts?: import("./DefineShortCuts.mjs").DefineShortCuts<any, any>;
+        defineQRouter?: import("./DefineQRouter.mjs").DefineQRouter<any, any>;
+        defineStorage?: import("./DefineStorage.mjs").DefineStorage<any, any, any, any>;
         definePageTemplate?: import("./DefinePageTemplate.mjs").DefinePageTemplate;
     });
 }

@@ -31,7 +31,7 @@ export class OnViewPort {
 	 * undefined: will automatically fires unObserve callback;
 	 * @param {import('./documentScope.type.mjs').documentScope} documentScope
 	 */
-	constructor(attributeHandler, documentScope = document) {
+	constructor(attributeHandler, documentScope = helper.currentDocumentScope) {
 		this.attrbuteHandler = attributeHandler;
 		/**
 		 * @type {{[attributeName:string]:

@@ -42,10 +42,12 @@
  * bun i virst
  * // or any js package manager with npm capability
  * ```
+ * ## v0.9.x
+ * - drop supports for `Animation`
+ * > - it's better to use more dedicated library like [animeJS](https://animejs.com/)
  */
 
 import { $ } from './src/$.mjs';
-import { Animation } from './src/Animation.mjs';
 import { App } from './src/App.mjs';
 import { Component } from './src/Component.mjs';
 import { CRUD } from './src/CRUD.mjs';
@@ -102,4 +104,4 @@ import { _ } from './src/_.mjs';
  * @property {(options:onViewPortHandlerDisconnector)=>Promise<void>} onViewPortHandler.onDisconnected
  */
 
-export { $, Animation, App, Component, CRUD, DefinePageTemplate, DefineQRouter, DefineShortCuts, DefineStorage, Derived, Error_, Event_, For, Let, Lifecycle, List, OnViewPort, Ping, ShortCut, WorkerMainThread, WorkerThread, _ };
+export { $, App, Component, CRUD, DefinePageTemplate, DefineQRouter, DefineShortCuts, DefineStorage, Derived, Error_, Event_, For, Let, Lifecycle, List, OnViewPort, Ping, ShortCut, WorkerMainThread, WorkerThread, _ };

@@ -20,9 +20,6 @@ export class DefineStorage<Local extends {
     static __: DefineStorage<any, any, any, any>;
     /**
      * @private
-     */
-    /**
-     * @private
      * @param {string} name
      * @returns {string}
      */
@@ -37,20 +34,23 @@ export class DefineStorage<Local extends {
         session?: Session;
     });
     /**
+     * @private
      * @type { Record<LocalKey,string> }
      */
-    defaultLocal: Record<LocalKey, string>;
+    private defaultLocal;
     /**
+     * @private
      * @type { Record<SessionKey,string> }
      */
-    defaultSession: Record<SessionKey, string>;
+    private defaultSession;
     /**
-     * @param {Record<LocalKey,Let<string>>} local
-     * @param {Record<SessionKey,Let<string>>} session
+     * @typedef {Record<LocalKey,Let<string>>} letLocal
+     * @typedef {Record<SessionKey,Let<string>>} letSession
+     * @type {Let<{local:letLocal,session:letSession}>}
      */
     data: Let<{
-        local: {};
-        session: {};
+        local: { [P in LocalKey]: Let<string>; };
+        session: { [P_1 in SessionKey]: Let<string>; };
     }>;
     /**
      * @private

@@ -34,13 +34,14 @@ npm i virst
 bun i virst
 // or any js package manager with npm capability
 ```
+## v0.9.x
+- drop supports for `Animation`
+> - it's better to use more dedicated library like [animeJS](https://animejs.com/)
 
 
 <h2 id="exported-api-and-type-list">exported-api-and-type-list</h2>
 
 - [$](#$)
-
-- [Animation](#animation)
 
 - [App](#app)
 
@@ -97,20 +98,11 @@ generate side effect for `signal` based reactivity such as for:- [Let](#let)``
 *) <sub>[go to exported list](#exported-api-and-type-list)</sub>
 
 
-<h2 id="animation">Animation</h2>
-
-*) <sub>[go to exported list](#exported-api-and-type-list)</sub>
-
-collections of static methods helper for animation;static method prefixed with `animation` can be used to generate recuring keyframes,which in turn can be used in the callback to animate stuffs
-
-*) <sub>[go to exported list](#exported-api-and-type-list)</sub>
-
-
 <h2 id="app">App</h2>
 
 *) <sub>[go to exported list](#exported-api-and-type-list)</sub>
 
-`App` starter helper for module environtment;the sole purpose is just to auto import the necessary file in your main js file;
+`App` starter helper for module environtment:- the sole purpose is just to auto import the necessary global file in your main js file;- if it's `elementScoped` `instances`/`statics methods`, it will be better to just leave it for the `parentModule` to import it accordingly;
 
 *) <sub>[go to exported list](#exported-api-and-type-list)</sub>
 
