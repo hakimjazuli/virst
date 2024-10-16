@@ -34,7 +34,7 @@ npm i virst
 bun i virst
 // or any js package manager with npm capability
 ```
-## v0.9.x
+## v0.^9.x
 - drop supports for `Animation`
 > - it's better to use more dedicated library like [animeJS](https://animejs.com/)
 
