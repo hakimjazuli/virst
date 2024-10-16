@@ -16,19 +16,19 @@ export class helper {
 	/**
 	 * @readonly
 	 */
-	static val = 'hf_ss-b-a-val';
+	static val = 'virst-a-val';
 	/**
 	 * @readonly
 	 */
-	static storageIdentifier = 'hf_ss-b-store';
-	static DCCBIdentifier = 'hf_ss-b-dc';
-	static ACCBIdentifier = 'hf_ss-b-ac';
-	static onViewCBIdentifier = `hf_ss-ov`;
-	static onExitViewCBIdentifier = `hf_ss-oxv`;
+	static storageIdentifier = 'virst-st';
+	static DCCBIdentifier = 'virst-dc';
+	static ACCBIdentifier = 'virst-ac';
+	static onViewCBIdentifier = `virst-ov`;
+	static onExitViewCBIdentifier = `virst-oxv`;
 	/**
 	 * @readonly
 	 */
-	static ForChildAttributePrefix = `hf_ss-fc-`;
+	static ForChildAttributePrefix = `virst-fc-`;
 	/**
 	 * @readonly
 	 */
@@ -62,11 +62,7 @@ export class helper {
 	 * @private
 	 * @type {string}
 	 */
-	static attrPrefix = 'hf_ss-a-';
-	/**
-	 * @type {string}
-	 */
-	static slotPrefix = 'hf_ss-slot-';
+	static attrPrefix = 'virst-ap-';
 	/**
 	 * @return {string|null}
 	 */

@@ -12,11 +12,11 @@ export class helper {
     /**
      * @readonly
      */
-    static readonly val: "hf_ss-b-a-val";
+    static readonly val: "virst-a-val";
     /**
      * @readonly
      */
-    static readonly storageIdentifier: "hf_ss-b-store";
+    static readonly storageIdentifier: "virst-st";
     static DCCBIdentifier: string;
     static ACCBIdentifier: string;
     static onViewCBIdentifier: string;
@@ -24,7 +24,7 @@ export class helper {
     /**
      * @readonly
      */
-    static readonly ForChildAttributePrefix: "hf_ss-fc-";
+    static readonly ForChildAttributePrefix: "virst-fc-";
     /**
      * @readonly
      */
@@ -50,10 +50,6 @@ export class helper {
      * @type {string}
      */
     private static attrPrefix;
-    /**
-     * @type {string}
-     */
-    static slotPrefix: string;
     /**
      * @return {string|null}
      */
