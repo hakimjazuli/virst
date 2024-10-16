@@ -8,17 +8,17 @@
  * @template {{
  * [queryName:string]:
  * handlerType
- * }} dataValueType
- * @template {Extract<keyof dataValueType, string>} NamedQueryParam
+ * }} queryValueType
+ * @template {Extract<keyof queryValueType, string>} NamedQueryParam
  */
-export class DefineQRouter<dataValueType extends {
+export class DefineQRouter<queryValueType extends {
     [queryName: string]: {
         value?: string;
         clearQueriesWhenImSet?: NamedQueryParam[];
         clearAllWhenImSetExcept?: NamedQueryParam[];
         onAfterResolved?: () => Promise<void>;
     };
-}, NamedQueryParam extends Extract<keyof dataValueType, string>> {
+}, NamedQueryParam extends Extract<keyof queryValueType, string>> {
     /**
      * @type {DefineQRouter}
      */
@@ -39,11 +39,11 @@ export class DefineQRouter<dataValueType extends {
     private static onAfterResolved;
     /**
      * @param {Object} options
-     * @param {dataValueType} options.data
+     * @param {queryValueType} options.queryName
      * @param {number} [options.queryChangeThrottleMs]
      */
-    constructor({ data, queryChangeThrottleMs }: {
-        data: dataValueType;
+    constructor({ queryName, queryChangeThrottleMs }: {
+        queryName: queryValueType;
         queryChangeThrottleMs?: number;
     });
     /**

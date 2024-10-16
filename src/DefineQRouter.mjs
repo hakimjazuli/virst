@@ -15,8 +15,8 @@ import { Ping } from './Ping.mjs';
  * @template {{
  * [queryName:string]:
  * handlerType
- * }} dataValueType
- * @template {Extract<keyof dataValueType, string>} NamedQueryParam
+ * }} queryValueType
+ * @template {Extract<keyof queryValueType, string>} NamedQueryParam
  */
 export class DefineQRouter {
 	/**
@@ -61,10 +61,10 @@ export class DefineQRouter {
 	};
 	/**
 	 * @param {Object} options
-	 * @param {dataValueType} options.data
+	 * @param {queryValueType} options.queryName
 	 * @param {number} [options.queryChangeThrottleMs]
 	 */
-	constructor({ data, queryChangeThrottleMs = 300 }) {
+	constructor({ queryName, queryChangeThrottleMs = 300 }) {
 		if (DefineQRouter.__ instanceof DefineQRouter) {
 			helper.warningSingleton(DefineQRouter);
 			return;
@@ -74,32 +74,32 @@ export class DefineQRouter {
 		// @ts-ignore
 		this.qRoute = {};
 		this.queryChangeThrottleMs = queryChangeThrottleMs;
-		const thisData = this.qRoute;
+		const thisQuery = this.qRoute;
 		this.registerPopStateEventListener();
-		for (const key in data) {
-			const keyData = new this.handler(key, data[key]);
-			const thisDataString = (this.qRoute[key.toString()] = keyData.string);
+		for (const key in queryName) {
+			const keyQuery = new this.handler(key, queryName[key]);
+			const thisQueryString = (this.qRoute[key.toString()] = keyQuery.string);
 			new $(async () => {
-				const _ = thisDataString.value;
-				const exceptionSet = keyData.clearAllWhenImSetExcept;
-				const clearListWhenImSet = keyData.clearListWhenImSet;
+				const _ = thisQueryString.value;
+				const exceptionSet = keyQuery.clearAllWhenImSetExcept;
+				const clearListWhenImSet = keyQuery.clearListWhenImSet;
 				if (!clearListWhenImSet.length && exceptionSet) {
 					const placeHolder = {};
 					for (let i = 0; i < exceptionSet.length; i++) {
 						const exception = exceptionSet[i];
-						if (exception in thisData) {
-							placeHolder[exception.toString()] = thisData[exception].value;
+						if (exception in thisQuery) {
+							placeHolder[exception.toString()] = thisQuery[exception].value;
 						}
 					}
-					for (const key__ in thisData) {
+					for (const key__ in thisQuery) {
 						const keyStr = key__.toString();
 						if (exceptionSet.includes(key__) || key === keyStr) {
 							const placeholderValue = placeHolder[keyStr];
 							if (placeholderValue) {
-								thisData[keyStr].value = placeholderValue;
+								thisQuery[keyStr].value = placeholderValue;
 							}
 						} else {
-							thisData[key__].value = '';
+							thisQuery[key__].value = '';
 						}
 					}
 				} else {
@@ -111,7 +111,7 @@ export class DefineQRouter {
 						}
 					}
 				}
-				DefineQRouter.onAfterResolved = keyData.onAfterResolved;
+				DefineQRouter.onAfterResolved = keyQuery.onAfterResolved;
 				if (DefineQRouter.historyStateMode === 'push') {
 					this.requestChanges(this.pushPing);
 				}
@@ -164,9 +164,9 @@ export class DefineQRouter {
 	 */
 	pushPing = new Ping(false, async () => {
 		const queryParams = {};
-		const currentData = this.qRoute;
-		for (const key in currentData) {
-			const query = currentData[key].value;
+		const currentQuery = this.qRoute;
+		for (const key in currentQuery) {
+			const query = currentQuery[key].value;
 			if (query) {
 				queryParams[key.toString()] = query;
 			}
@@ -201,11 +201,11 @@ export class DefineQRouter {
 		const entries = urlParams.entries();
 		for (const [key, value] of entries) {
 			DefineQRouter.historyStateMode = 'pop';
-			const thisData = this.qRoute;
-			if (!(key in thisData)) {
+			const thisQuery = this.qRoute;
+			if (!(key in thisQuery)) {
 				continue;
 			}
-			thisData[key].value = value;
+			thisQuery[key].value = value;
 		}
 	}).ping;
 	/**
