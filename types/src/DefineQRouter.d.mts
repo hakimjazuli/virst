@@ -39,11 +39,11 @@ export class DefineQRouter<queryValueType extends {
     private static onAfterResolved;
     /**
      * @param {Object} options
-     * @param {queryValueType} options.queryName
+     * @param {queryValueType} options.queries
      * @param {number} [options.queryChangeThrottleMs]
      */
-    constructor({ queryName, queryChangeThrottleMs }: {
-        queryName: queryValueType;
+    constructor({ queries, queryChangeThrottleMs }: {
+        queries: queryValueType;
         queryChangeThrottleMs?: number;
     });
     /**

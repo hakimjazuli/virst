@@ -61,10 +61,10 @@ export class DefineQRouter {
 	};
 	/**
 	 * @param {Object} options
-	 * @param {queryValueType} options.queryName
+	 * @param {queryValueType} options.queries
 	 * @param {number} [options.queryChangeThrottleMs]
 	 */
-	constructor({ queryName, queryChangeThrottleMs = 300 }) {
+	constructor({ queries, queryChangeThrottleMs = 300 }) {
 		if (DefineQRouter.__ instanceof DefineQRouter) {
 			helper.warningSingleton(DefineQRouter);
 			return;
@@ -76,8 +76,8 @@ export class DefineQRouter {
 		this.queryChangeThrottleMs = queryChangeThrottleMs;
 		const thisQuery = this.qRoute;
 		this.registerPopStateEventListener();
-		for (const key in queryName) {
-			const keyQuery = new this.handler(key, queryName[key]);
+		for (const key in queries) {
+			const keyQuery = new this.handler(key, queries[key]);
 			const thisQueryString = (this.qRoute[key.toString()] = keyQuery.string);
 			new $(async () => {
 				const _ = thisQueryString.value;
