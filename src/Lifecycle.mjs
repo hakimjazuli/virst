@@ -276,12 +276,6 @@ export class Lifecycle {
 						const index = this.elementCMRefed.push(async () => {
 							Lifecycle.onParentDCWrapper(addedNode, async () => {
 								await connectedCallback();
-								// if (addedNode instanceof HTMLAnchorElement) {
-								// 	console.log({
-								// 		addedNode,
-								// 		currentIndex: index - 1,
-								// 	});
-								// }
 								this.elementCMRefed.splice(index - 1, 1);
 							});
 						});

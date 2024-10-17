@@ -157,7 +157,6 @@ export class DefineQRouter {
 						if (!(element instanceof HTMLAnchorElement)) {
 							return;
 						}
-						console.log(element);
 						element.onclick = (event) => {
 							event.preventDefault();
 							const path_ = navigationPathRule(element.getAttribute('href') ?? '');
