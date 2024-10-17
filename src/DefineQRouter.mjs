@@ -26,6 +26,12 @@ export class DefineQRouter {
 	static __;
 	/**
 	 * @private
+	 * @type {Record<NamedQueryParam, DefineQRouter["handler"]>}
+	 */
+	// @ts-ignore
+	handlers = {};
+	/**
+	 * @private
 	 * @typedef {Object} handlerType
 	 * @property {string} [value]
 	 * @property {NamedQueryParam[]} [clearQueriesWhenImSet]
@@ -87,7 +93,7 @@ export class DefineQRouter {
 		const thisQuery = this.qRoute;
 		this.registerPopStateEventListener();
 		for (const key in queries) {
-			const keyQuery = new this.handler(key, queries[key]);
+			const keyQuery = (this.handlers[key.toString()] = new this.handler(key, queries[key]));
 			const thisQueryString = (this.qRoute[key.toString()] = keyQuery.string);
 			new $(async () => {
 				const _ = thisQueryString.value;
@@ -254,6 +260,7 @@ export class DefineQRouter {
 			if (!(key in thisQuery)) {
 				continue;
 			}
+			DefineQRouter.onAfterResolved = this.handlers[key].onAfterResolved;
 			thisQuery[key].value = value;
 		}
 	}).ping;

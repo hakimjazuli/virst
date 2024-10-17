@@ -53,6 +53,11 @@ export class DefineQRouter<queryValueType extends {
     });
     /**
      * @private
+     * @type {Record<NamedQueryParam, DefineQRouter["handler"]>}
+     */
+    private handlers;
+    /**
+     * @private
      * @typedef {Object} handlerType
      * @property {string} [value]
      * @property {NamedQueryParam[]} [clearQueriesWhenImSet]
