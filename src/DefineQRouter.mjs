@@ -89,13 +89,11 @@ export class DefineQRouter {
 		for (const key in queries) {
 			const keyQuery = new this.handler(key, queries[key]);
 			const thisQueryString = (this.qRoute[key.toString()] = keyQuery.string);
-			new $(async (first) => {
+			new $(async () => {
 				const _ = thisQueryString.value;
-				if (first) {
-					return;
-				}
 				const exceptionSet = keyQuery.clearAllWhenImSetExcept;
 				const clearListWhenImSet = keyQuery.clearListWhenImSet;
+				DefineQRouter.onAfterResolved = keyQuery.onAfterResolved;
 				if (!clearListWhenImSet.length && exceptionSet) {
 					const placeHolder = {};
 					for (let i = 0; i < exceptionSet.length; i++) {
@@ -124,7 +122,6 @@ export class DefineQRouter {
 						}
 					}
 				}
-				DefineQRouter.onAfterResolved = keyQuery.onAfterResolved;
 				if (DefineQRouter.historyStateMode === 'push') {
 					this.requestChanges(this.pushPing);
 				}
