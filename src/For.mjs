@@ -26,17 +26,10 @@ export class For {
 	 * @param {string} attributeName
 	 * - parent attributeName
 	 * @param {childLifeCycleCallback} childLifeCycleCallback
-	 * @param {import('./documentScope.type.mjs').documentScope} documentScope
 	 */
-	constructor(
-		listInstance,
-		attributeName,
-		childLifeCycleCallback,
-		documentScope = helper.currentDocumentScope
-	) {
+	constructor(listInstance, attributeName, childLifeCycleCallback) {
 		this.listInstance = listInstance;
 		this.attr = attributeName;
-		this.DS = documentScope;
 		new Lifecycle(false, {
 			[attributeName]: async ({ element, onConnected, onDisconnected }) => {
 				onConnected(async () => {
@@ -124,7 +117,16 @@ export class For {
 					// @ts-ignore
 					const derived = {};
 					for (const dataName in data) {
-						derived[dataName] = new Derived(async () => data[dataName].value, dataName);
+						Lifecycle.manualScope({
+							documentScope: childElement,
+							runCheckAtFirst: true,
+							scopedCallback: async () => {
+								derived[dataName] = new Derived(
+									async () => data[dataName].value,
+									dataName
+								);
+							},
+						});
 					}
 					onDisconnected(async () => {
 						await childLifeCycleCallback.onDisconnected({

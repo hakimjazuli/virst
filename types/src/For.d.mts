@@ -19,7 +19,6 @@ export class For {
      * @param {string} attributeName
      * - parent attributeName
      * @param {childLifeCycleCallback} childLifeCycleCallback
-     * @param {import('./documentScope.type.mjs').documentScope} documentScope
      */
     constructor(listInstance: import("./List.mjs").List<any>, attributeName: string, childLifeCycleCallback: {
         onConnected: (arg0: {
@@ -36,13 +35,12 @@ export class For {
             attributeName: string;
             newValue: string;
         }) => Promise<void>;
-    }, documentScope?: import("./documentScope.type.mjs").documentScope);
+    });
     listInstance: import("./List.mjs").List<any>;
     /**
      * @type {string}
      */
     attr: string;
-    DS: import("./documentScope.type.mjs").documentScope;
     /**
      * @private
      * @param {HTMLElement} parentElement

@@ -94,10 +94,11 @@ export class Lifecycle {
      * @param {boolean} isGlobal
      * @param {attributeLifecyclesHandler} attributeLifecyclesHandler
      * - allow global attributeName to be handled inside nested `Lifecycle`
+     * @param {documentScope} [manualScope]
      */
     constructor(isGlobal: boolean, attributeLifecyclesHandler: {
         [attributeName: string]: (options: import("./lifecycleHandler.type.mjs").lifecycleHandler) => void;
-    });
+    }, manualScope?: import("./documentScope.type.mjs").documentScope);
     /**
      * @private
      * @type {documentScope}

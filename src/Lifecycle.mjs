@@ -130,10 +130,11 @@ export class Lifecycle {
 	 * @param {boolean} isGlobal
 	 * @param {attributeLifecyclesHandler} attributeLifecyclesHandler
 	 * - allow global attributeName to be handled inside nested `Lifecycle`
+	 * @param {documentScope} [manualScope]
 	 */
-	constructor(isGlobal, attributeLifecyclesHandler) {
+	constructor(isGlobal, attributeLifecyclesHandler, manualScope = undefined) {
 		this.isGlobal = isGlobal;
-		const documentScope = helper.currentDocumentScope;
+		const documentScope = manualScope ?? helper.currentDocumentScope;
 		this.attributeLifecyclesHandler = attributeLifecyclesHandler;
 		this.currentDocumentScope = documentScope;
 		const [mObs, mLet] = mutaitonObserver.create(documentScope);
@@ -279,14 +280,18 @@ export class Lifecycle {
 					return;
 				}
 				addedNode.setAttribute(helper.LCCBIdentifier, '');
+				const currentScope = this.currentDocumentScope;
 				Lifecycle.manualScope({
-					documentScope: helper.currentDocumentScope,
+					documentScope: currentScope,
 					runCheckAtFirst: true,
 					scopedCallback: async () => {
 						const index = this.elementCMRefed.push(async () => {
-							Lifecycle.onParentDCWrapper(addedNode, async () => {
+							await Lifecycle.onParentDCWrapper(addedNode, async () => {
+								const tempDocumentScope = helper.currentDocumentScope;
+								helper.currentDocumentScope = this.currentDocumentScope;
 								await connectedCallback();
 								this.elementCMRefed.splice(index - 1, 1);
+								helper.currentDocumentScope = tempDocumentScope;
 							});
 						});
 					},
@@ -294,10 +299,10 @@ export class Lifecycle {
 			},
 			onDisconnected: (disconnectCallback) => {
 				Lifecycle.manualScope({
-					documentScope: helper.currentDocumentScope,
+					documentScope: this.currentDocumentScope,
 					runCheckAtFirst: true,
 					scopedCallback: async () => {
-						Lifecycle.onParentDCWrapper(addedNode, async () => {
+						await Lifecycle.onParentDCWrapper(addedNode, async () => {
 							currentOnParentDCCB(disconnectCallback);
 						});
 					},
@@ -305,10 +310,10 @@ export class Lifecycle {
 			},
 			onAttributeChanged: (attributeChangedCallback) => {
 				Lifecycle.manualScope({
-					documentScope: helper.currentDocumentScope,
+					documentScope: this.currentDocumentScope,
 					runCheckAtFirst: true,
 					scopedCallback: async () => {
-						Lifecycle.onParentDCWrapper(addedNode, async () => {
+						await Lifecycle.onParentDCWrapper(addedNode, async () => {
 							Lifecycle.setACCB(addedNode, attributeChangedCallback);
 						});
 					},
