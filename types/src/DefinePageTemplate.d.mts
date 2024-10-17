@@ -18,6 +18,10 @@
  */
 export class DefinePageTemplate {
     /**
+     * @type {DefinePageTemplate}
+     */
+    static __: DefinePageTemplate;
+    /**
      * @private
      * @typedef {{[templateName:string]:HTMLElement}} templateSingle
      * @type {{[path:string]:templateSingle}}

@@ -17,6 +17,7 @@ export class helper {
      * @readonly
      */
     static readonly storageIdentifier: "virst-st";
+    static LCCBIdentifier: string;
     static DCCBIdentifier: string;
     static ACCBIdentifier: string;
     static onViewCBIdentifier: string;

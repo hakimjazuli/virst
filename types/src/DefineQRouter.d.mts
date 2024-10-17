@@ -26,7 +26,7 @@ export class DefineQRouter<queryValueType extends {
     /**
      * @private
      */
-    private static useVirstURL;
+    private static redirectToIndex;
     /**
      * @private
      * @type {'pop'|'push'}
@@ -40,10 +40,15 @@ export class DefineQRouter<queryValueType extends {
     /**
      * @param {Object} options
      * @param {queryValueType} options.queries
+     * @param {NamedQueryParam} [options.useAsNavigation]
+     * @param {(hrefValue:string)=>string} [options.navigationPathRule]
+     * - modify path
      * @param {number} [options.queryChangeThrottleMs]
      */
-    constructor({ queries, queryChangeThrottleMs }: {
+    constructor({ queries, useAsNavigation, navigationPathRule, queryChangeThrottleMs, }: {
         queries: queryValueType;
+        useAsNavigation?: NamedQueryParam;
+        navigationPathRule?: (hrefValue: string) => string;
         queryChangeThrottleMs?: number;
     });
     /**
@@ -64,6 +69,12 @@ export class DefineQRouter<queryValueType extends {
      * @param {Ping["ping"]} ping
      */
     private queryChangeThrottleMs;
+    /**
+     * @private
+     * @param {NamedQueryParam} [useAsNavigation]
+     * @param {(hrefValue:string)=>string} [navigationPathRule]
+     */
+    private useVirstURL;
     /**
      * @private
      * @type { null|number }

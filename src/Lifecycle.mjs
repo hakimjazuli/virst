@@ -248,8 +248,9 @@ export class Lifecycle {
 	 */
 	addedNodeHandler = async (addedNode, attributeName) => {
 		if (
-			!((addedNode instanceof HTMLElement) /** to eliminate repeatition on ANH call */) ||
-			!addedNode.hasAttribute(attributeName /** primary criteria */) ||
+			/** to eliminate repeatition on ANH call */ !(addedNode instanceof HTMLElement) ||
+			/** primary criteria */ !('hasAttribute' in addedNode) ||
+			('hasAttribute' in addedNode && !addedNode.hasAttribute(attributeName)) ||
 			!this.checkValidScoping(addedNode)
 		) {
 			return;
@@ -264,18 +265,26 @@ export class Lifecycle {
 			element: addedNode,
 			lifecycleObserver: this,
 			onConnected: (connectedCallback) => {
+				if (addedNode.hasAttribute(helper.LCCBIdentifier)) {
+					return;
+				}
+				addedNode.setAttribute(helper.LCCBIdentifier, '');
 				Lifecycle.manualScope({
 					documentScope: helper.currentDocumentScope,
 					runCheckAtFirst: true,
 					scopedCallback: async () => {
-						const index = this.elementCMRefed.push(connectedCallback);
-						const currentIndex = index - 1;
-						this.elementCMRefed[currentIndex] = async () => {
+						const index = this.elementCMRefed.push(async () => {
 							Lifecycle.onParentDCWrapper(addedNode, async () => {
-								this.elementCMRefed.splice(currentIndex, 1);
 								await connectedCallback();
+								// if (addedNode instanceof HTMLAnchorElement) {
+								// 	console.log({
+								// 		addedNode,
+								// 		currentIndex: index - 1,
+								// 	});
+								// }
+								this.elementCMRefed.splice(index - 1, 1);
 							});
-						};
+						});
 					},
 				});
 			},

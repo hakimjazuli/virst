@@ -23,6 +23,10 @@ import { Lifecycle } from './Lifecycle.mjs';
  */
 export class DefinePageTemplate {
 	/**
+	 * @type {DefinePageTemplate}
+	 */
+	static __;
+	/**
 	 * @private
 	 * @typedef {{[templateName:string]:HTMLElement}} templateSingle
 	 * @type {{[path:string]:templateSingle}}
@@ -36,6 +40,11 @@ export class DefinePageTemplate {
 	 * - return processed path
 	 */
 	constructor({ callerAttribute, targetAttribute, targetPathRule = (path) => path }) {
+		if (DefinePageTemplate.__ instanceof DefinePageTemplate) {
+			helper.warningSingleton(DefinePageTemplate);
+			return;
+		}
+		DefinePageTemplate.__ = this;
 		this.targetAttribute = targetAttribute;
 		this.targetPathRule = targetPathRule;
 		this.callerAttribute = callerAttribute;

@@ -21,6 +21,7 @@ export class helper {
 	 * @readonly
 	 */
 	static storageIdentifier = 'virst-st';
+	static LCCBIdentifier = 'virst-lc';
 	static DCCBIdentifier = 'virst-dc';
 	static ACCBIdentifier = 'virst-ac';
 	static onViewCBIdentifier = `virst-ov`;

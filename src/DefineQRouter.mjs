@@ -3,6 +3,7 @@
 import { $ } from './$.mjs';
 import { helper } from './helper.mjs';
 import { Let } from './Let.mjs';
+import { Lifecycle } from './Lifecycle.mjs';
 import { Ping } from './Ping.mjs';
 
 /**
@@ -50,6 +51,7 @@ export class DefineQRouter {
 			const value_ = params.get(key);
 			if (value_) {
 				value = value_;
+				``;
 			}
 			this.string = Let.dataOnly(value);
 			this.clearListWhenImSet = clearQueriesWhenImSet;
@@ -62,15 +64,23 @@ export class DefineQRouter {
 	/**
 	 * @param {Object} options
 	 * @param {queryValueType} options.queries
+	 * @param {NamedQueryParam} [options.useAsNavigation]
+	 * @param {(hrefValue:string)=>string} [options.navigationPathRule]
+	 * - modify path
 	 * @param {number} [options.queryChangeThrottleMs]
 	 */
-	constructor({ queries, queryChangeThrottleMs = 300 }) {
+	constructor({
+		queries,
+		useAsNavigation = undefined,
+		navigationPathRule = undefined,
+		queryChangeThrottleMs = 300,
+	}) {
 		if (DefineQRouter.__ instanceof DefineQRouter) {
 			helper.warningSingleton(DefineQRouter);
 			return;
 		}
 		DefineQRouter.__ = this;
-		DefineQRouter.useVirstURL();
+		DefineQRouter.redirectToIndex();
 		// @ts-ignore
 		this.qRoute = {};
 		this.queryChangeThrottleMs = queryChangeThrottleMs;
@@ -79,8 +89,11 @@ export class DefineQRouter {
 		for (const key in queries) {
 			const keyQuery = new this.handler(key, queries[key]);
 			const thisQueryString = (this.qRoute[key.toString()] = keyQuery.string);
-			new $(async () => {
+			new $(async (first) => {
 				const _ = thisQueryString.value;
+				if (first) {
+					return;
+				}
 				const exceptionSet = keyQuery.clearAllWhenImSetExcept;
 				const clearListWhenImSet = keyQuery.clearListWhenImSet;
 				if (!clearListWhenImSet.length && exceptionSet) {
@@ -118,11 +131,51 @@ export class DefineQRouter {
 				DefineQRouter.historyStateMode = 'push';
 			});
 		}
+		this.useVirstURL(useAsNavigation, navigationPathRule);
 	}
 	/**
 	 * @private
+	 * @param {NamedQueryParam} [useAsNavigation]
+	 * @param {(hrefValue:string)=>string} [navigationPathRule]
 	 */
-	static useVirstURL = () => {
+	useVirstURL = (useAsNavigation, navigationPathRule) => {
+		if (useAsNavigation === undefined || !(useAsNavigation in this.qRoute)) {
+			return;
+		}
+		if (!navigationPathRule) {
+			console.error({
+				useAsNavigation,
+				message: 'useAsNavigation is filled but no navigationPathRule is given',
+			});
+			return;
+		}
+		const handlerSignal = this.qRoute[useAsNavigation];
+		new Lifecycle(
+			{
+				href: async ({ element, onConnected, onDisconnected }) => {
+					onConnected(async () => {
+						if (!(element instanceof HTMLAnchorElement)) {
+							return;
+						}
+						console.log(element);
+						element.onclick = (event) => {
+							event.preventDefault();
+							const path_ = navigationPathRule(element.getAttribute('href') ?? '');
+							handlerSignal.value = path_;
+						};
+						onDisconnected(async () => {
+							element.onclick = null;
+						});
+					});
+				},
+			},
+			true
+		);
+	};
+	/**
+	 * @private
+	 */
+	static redirectToIndex = () => {
 		const currentPath = window.location.pathname.split('/').pop();
 		if (currentPath !== 'index.html' && currentPath !== '') {
 			window.location.href = '/';
