@@ -27,5 +27,20 @@
 	"peerDependencies": {
 		"typescript": "^5.0.0"
 	},
-	"sideEffects": false
+	"sideEffects": false,
+	"keywords": [
+		"queue",
+		"auto queue",
+		"signal",
+		"reactive",
+		"component",
+		"literal",
+		"viewport",
+		"template literal",
+		"client side router",
+		"client side routing",
+		"CSR",
+		"lifecycle",
+		"attributeName"
+	]
 }

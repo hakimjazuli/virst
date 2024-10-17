@@ -160,8 +160,12 @@ export class DefineQRouter {
 						return;
 					}
 					element.onclick = (event) => {
+						let path_ = element.getAttribute('href') ?? '';
+						if (path_.startsWith('#')) {
+							return;
+						}
 						event.preventDefault();
-						const path_ = navigationPathRule(element.getAttribute('href') ?? '');
+						path_ = navigationPathRule(path_);
 						handlerSignal.value = path_;
 					};
 					onDisconnected(async () => {
