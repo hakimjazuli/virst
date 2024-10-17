@@ -285,7 +285,6 @@ export class Lifecycle {
 							Lifecycle.onParentDCWrapper(addedNode, async () => {
 								await connectedCallback();
 								this.elementCMRefed.splice(index - 1, 1);
-								addedNode.removeAttribute(helper.LCCBIdentifier);
 							});
 						});
 					},
