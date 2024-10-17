@@ -88,13 +88,13 @@ export class DefineQRouter {
 		DefineQRouter.__ = this;
 		DefineQRouter.redirectToIndex();
 		// @ts-ignore
-		this.qRoute = {};
+		this.routes = {};
 		this.queryChangeThrottleMs = queryChangeThrottleMs;
-		const thisQuery = this.qRoute;
+		const thisQuery = this.routes;
 		this.registerPopStateEventListener();
 		for (const key in queries) {
 			const keyQuery = (this.handlers[key.toString()] = new this.handler(key, queries[key]));
-			const thisQueryString = (this.qRoute[key.toString()] = keyQuery.string);
+			const thisQueryString = (this.routes[key.toString()] = keyQuery.string);
 			new $(async () => {
 				const _ = thisQueryString.value;
 				const exceptionSet = keyQuery.clearAllWhenImSetExcept;
@@ -122,7 +122,7 @@ export class DefineQRouter {
 				} else {
 					for (let i = 0; i < clearListWhenImSet.length; i++) {
 						const queryNeedToBeClear = clearListWhenImSet[i];
-						const qRotue = this.qRoute;
+						const qRotue = this.routes;
 						if (queryNeedToBeClear in qRotue) {
 							qRotue[queryNeedToBeClear].value = '';
 						}
@@ -142,7 +142,7 @@ export class DefineQRouter {
 	 * @param {(hrefValue:string)=>string} [navigationPathRule]
 	 */
 	useVirstURL = (useAsNavigation, navigationPathRule) => {
-		if (useAsNavigation === undefined || !(useAsNavigation in this.qRoute)) {
+		if (useAsNavigation === undefined || !(useAsNavigation in this.routes)) {
 			return;
 		}
 		if (!navigationPathRule) {
@@ -155,7 +155,7 @@ export class DefineQRouter {
 			});
 			return;
 		}
-		const handlerSignal = this.qRoute[useAsNavigation];
+		const handlerSignal = this.routes[useAsNavigation];
 		new Lifecycle(true, {
 			href: async ({ element, onConnected, onDisconnected }) => {
 				onConnected(async () => {
@@ -223,7 +223,7 @@ export class DefineQRouter {
 	 */
 	pushPing = new Ping(false, async () => {
 		const queryParams = {};
-		const currentQuery = this.qRoute;
+		const currentQuery = this.routes;
 		for (const key in currentQuery) {
 			const query = currentQuery[key].value;
 			if (query) {
@@ -260,7 +260,7 @@ export class DefineQRouter {
 		const entries = urlParams.entries();
 		for (const [key, value] of entries) {
 			DefineQRouter.historyStateMode = 'pop';
-			const thisQuery = this.qRoute;
+			const thisQuery = this.routes;
 			if (!(key in thisQuery)) {
 				continue;
 			}
@@ -271,5 +271,5 @@ export class DefineQRouter {
 	/**
 	 * @type {Record.<NamedQueryParam, Let<string>>}
 	 */
-	qRoute;
+	routes;
 }
