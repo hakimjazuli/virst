@@ -126,24 +126,21 @@ export class Let {
 		this.value_ = value;
 		if (attributeName) {
 			this.attr = attributeName;
-			new Lifecycle(
-				{
-					[attributeName]: async ({ element, onConnected, onDisconnected }) => {
-						onConnected(async () => {
-							const effect = new $(async () => {
-								Let.domReflector(this.value, attributeName, element, this);
-							});
-							onDisconnected(async () => {
-								this.remove$(effect);
-								if (typeof element.oninput === 'function') {
-									element.oninput = null;
-								}
-							});
+			new Lifecycle(isGlobal, {
+				[attributeName]: async ({ element, onConnected, onDisconnected }) => {
+					onConnected(async () => {
+						const effect = new $(async () => {
+							Let.domReflector(this.value, attributeName, element, this);
 						});
-					},
+						onDisconnected(async () => {
+							this.remove$(effect);
+							if (typeof element.oninput === 'function') {
+								element.oninput = null;
+							}
+						});
+					});
 				},
-				isGlobal
-			);
+			});
 		}
 	}
 	/**

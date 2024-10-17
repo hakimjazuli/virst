@@ -48,16 +48,13 @@ export class DefinePageTemplate {
 		this.targetAttribute = targetAttribute;
 		this.targetPathRule = targetPathRule;
 		this.callerAttribute = callerAttribute;
-		new Lifecycle(
-			{
-				[callerAttribute]: async ({ element, onConnected }) => {
-					onConnected(async () => {
-						await this.renderElement({ element });
-					});
-				},
+		new Lifecycle(true, {
+			[callerAttribute]: async ({ element, onConnected }) => {
+				onConnected(async () => {
+					await this.renderElement({ element });
+				});
 			},
-			true
-		);
+		});
 	}
 	/**
 	 * @private

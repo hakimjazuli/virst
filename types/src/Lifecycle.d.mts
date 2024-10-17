@@ -92,13 +92,13 @@ export class Lifecycle {
      */
     private static findDeepNested;
     /**
+     * @param {boolean} isGlobal
      * @param {attributeLifecyclesHandler} attributeLifecyclesHandler
-     * @param {boolean} [isGlobal]
      * - allow global attributeName to be handled inside nested `Lifecycle`
      */
-    constructor(attributeLifecyclesHandler: {
+    constructor(isGlobal: boolean, attributeLifecyclesHandler: {
         [attributeName: string]: (options: import("./lifecycleHandler.type.mjs").lifecycleHandler) => void;
-    }, isGlobal?: boolean);
+    });
     /**
      * @private
      * @type {documentScope}

@@ -50,11 +50,11 @@ export class _ {
 	static derivedD = (asyncCallback) => Derived.dataOnly(asyncCallback);
 	/**
 	 * singlar attribute watcher for `Lifecycle`
+	 * @param {boolean} isGlobal
 	 * @param {string} attributeName
 	 * @param {(options:import('./lifecycleHandler.type.mjs').lifecycleHandler)=>Promise<void>} lifecycleCallback
-	 * @param {boolean} [isGlobal]
 	 * @returns {Lifecycle}
 	 */
-	static lifecycle = (attributeName, lifecycleCallback, isGlobal = false) =>
-		new Lifecycle({ [attributeName]: lifecycleCallback }, isGlobal);
+	static lifecycle = (isGlobal, attributeName, lifecycleCallback) =>
+		new Lifecycle(isGlobal, { [attributeName]: lifecycleCallback });
 }

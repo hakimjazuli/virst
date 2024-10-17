@@ -37,7 +37,7 @@ export class For {
 		this.listInstance = listInstance;
 		this.attr = attributeName;
 		this.DS = documentScope;
-		new Lifecycle({
+		new Lifecycle(false, {
 			[attributeName]: async ({ element, onConnected, onDisconnected }) => {
 				onConnected(async () => {
 					const effect = new $(async () => {
@@ -91,7 +91,7 @@ export class For {
 	 * @param {lifecycleHandler["onDisconnected"]} onParentDisconnected
 	 */
 	childLifecycle = (childLifeCycleCallback, onParentDisconnected) => {
-		new Lifecycle({
+		new Lifecycle(false, {
 			[`${helper.ForChildAttributePrefix}${this.attr}`]: async ({
 				element: childElement,
 				lifecycleObserver: childLifecycleObserver,

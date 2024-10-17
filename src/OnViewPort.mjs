@@ -59,7 +59,7 @@ export class OnViewPort {
 				});
 			};
 		}
-		this.lifecycleObserver = new Lifecycle(intersectionLifecycle, true);
+		this.lifecycleObserver = new Lifecycle(false, intersectionLifecycle);
 	}
 	/**
 	 * @private

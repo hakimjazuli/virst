@@ -128,11 +128,11 @@ export class Lifecycle {
 	 */
 	isGlobal;
 	/**
+	 * @param {boolean} isGlobal
 	 * @param {attributeLifecyclesHandler} attributeLifecyclesHandler
-	 * @param {boolean} [isGlobal]
 	 * - allow global attributeName to be handled inside nested `Lifecycle`
 	 */
-	constructor(attributeLifecyclesHandler, isGlobal = false) {
+	constructor(isGlobal, attributeLifecyclesHandler) {
 		this.isGlobal = isGlobal;
 		const documentScope = helper.currentDocumentScope;
 		this.attributeLifecyclesHandler = attributeLifecyclesHandler;

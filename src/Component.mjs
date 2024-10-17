@@ -54,7 +54,7 @@ export class Component {
 		attributeName = helper.attributeIndexGenerator(),
 	}) {
 		this.attr = attributeName;
-		new Lifecycle({
+		new Lifecycle(false, {
 			[attributeName]: ({
 				element,
 				lifecycleObserver: componentLifecycle,

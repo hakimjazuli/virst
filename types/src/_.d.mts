@@ -41,12 +41,12 @@ export class _ {
     static derivedD: <V>(asyncCallback: () => Promise<V>) => Derived<V>;
     /**
      * singlar attribute watcher for `Lifecycle`
+     * @param {boolean} isGlobal
      * @param {string} attributeName
      * @param {(options:import('./lifecycleHandler.type.mjs').lifecycleHandler)=>Promise<void>} lifecycleCallback
-     * @param {boolean} [isGlobal]
      * @returns {Lifecycle}
      */
-    static lifecycle: (attributeName: string, lifecycleCallback: (options: import("./lifecycleHandler.type.mjs").lifecycleHandler) => Promise<void>, isGlobal?: boolean) => Lifecycle;
+    static lifecycle: (isGlobal: boolean, attributeName: string, lifecycleCallback: (options: import("./lifecycleHandler.type.mjs").lifecycleHandler) => Promise<void>) => Lifecycle;
 }
 import { Let } from './Let.mjs';
 import { Derived } from './Derived.mjs';

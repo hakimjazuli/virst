@@ -153,26 +153,23 @@ export class DefineQRouter {
 			return;
 		}
 		const handlerSignal = this.qRoute[useAsNavigation];
-		new Lifecycle(
-			{
-				href: async ({ element, onConnected, onDisconnected }) => {
-					onConnected(async () => {
-						if (!(element instanceof HTMLAnchorElement)) {
-							return;
-						}
-						element.onclick = (event) => {
-							event.preventDefault();
-							const path_ = navigationPathRule(element.getAttribute('href') ?? '');
-							handlerSignal.value = path_;
-						};
-						onDisconnected(async () => {
-							element.onclick = null;
-						});
+		new Lifecycle(true, {
+			href: async ({ element, onConnected, onDisconnected }) => {
+				onConnected(async () => {
+					if (!(element instanceof HTMLAnchorElement)) {
+						return;
+					}
+					element.onclick = (event) => {
+						event.preventDefault();
+						const path_ = navigationPathRule(element.getAttribute('href') ?? '');
+						handlerSignal.value = path_;
+					};
+					onDisconnected(async () => {
+						element.onclick = null;
 					});
-				},
+				});
 			},
-			true
-		);
+		});
 	};
 	/**
 	 * @private
