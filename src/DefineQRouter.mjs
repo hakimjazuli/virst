@@ -147,8 +147,11 @@ export class DefineQRouter {
 		}
 		if (!navigationPathRule) {
 			console.error({
-				useAsNavigation,
-				message: 'useAsNavigation is filled but no navigationPathRule is given',
+				message: 'there are error on DefineQRouter instantiation',
+				error: {
+					useAsNavigation: 'useAsNavigation is definied, yet navigationPathRule is not',
+					navigationPathRule,
+				},
 			});
 			return;
 		}

@@ -105,13 +105,7 @@ export class DefinePageTemplate {
 			return;
 		}
 		try {
-			const response = await fetch(path);
-			if (!response.ok) {
-				throw Error(`Error fetching: status="${response.status}"`);
-			}
-			const htmlString = await response.text();
-			const parser = new DOMParser();
-			const doc = parser.parseFromString(htmlString, 'text/html');
+			const doc = await helper.getDocument(path);
 			DefinePageTemplate.chachedTemplate[path] = {};
 			const templates = doc.querySelectorAll(`[${targetAttribute}]`);
 			let retElement;

@@ -1,7 +1,6 @@
 /**
  * @description
  * - helper class to track connected/disconnected/attributeChanged of an element;
- * - all global `signal` with dom relector that need to be available for `parent scope` should be prefixed with `g-`;
  */
 export class Lifecycle {
     /**

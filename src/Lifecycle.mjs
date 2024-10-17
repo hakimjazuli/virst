@@ -8,7 +8,6 @@ import { Ping } from './Ping.mjs';
 /**
  * @description
  * - helper class to track connected/disconnected/attributeChanged of an element;
- * - all global `signal` with dom relector that need to be available for `parent scope` should be prefixed with `g-`;
  */
 export class Lifecycle {
 	/**
@@ -234,6 +233,9 @@ export class Lifecycle {
 				node = node.parentElement;
 				continue;
 			}
+			if (node === document) {
+				return true;
+			}
 			if (node !== documentScope) {
 				return false;
 			}
@@ -250,7 +252,7 @@ export class Lifecycle {
 		if (
 			/** to eliminate repeatition on ANH call */ !(addedNode instanceof HTMLElement) ||
 			/** primary criteria */ !('hasAttribute' in addedNode) ||
-			('hasAttribute' in addedNode && !addedNode.hasAttribute(attributeName)) ||
+			!addedNode.hasAttribute(attributeName) ||
 			!this.checkValidScoping(addedNode)
 		) {
 			return;

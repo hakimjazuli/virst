@@ -18,6 +18,27 @@ export class helper {
 	 */
 	static val = 'virst-a-val';
 	/**
+	 * @param {string} path
+	 * @returns {Promise<Document>}
+	 */
+	static getDocument = async (path) => {
+		if (path in helper.cachedDocument) {
+			return helper.cachedDocument[path];
+		}
+		const response = await fetch(path);
+		if (!response.ok) {
+			throw Error(`Error fetching: status="${response.status}"`);
+		}
+		const htmlString = await response.text();
+		const parser = new DOMParser();
+		return (helper.cachedDocument[path] = parser.parseFromString(htmlString, 'text/html'));
+	};
+	/**
+	 * @private
+	 * @type {Record<string, Document>}
+	 */
+	static cachedDocument = {};
+	/**
 	 * @readonly
 	 */
 	static storageIdentifier = 'virst-st';
@@ -52,9 +73,20 @@ export class helper {
 	 */
 	static attr = null;
 	/**
+	 * using setter and getter, to avoid error when used in non clientBrowser runtime;
+	 * @private
 	 * @type {import('./documentScope.type.mjs').documentScope}
 	 */
-	static currentDocumentScope = window.document;
+	static currentDocumentScope_ = undefined;
+	static get currentDocumentScope() {
+		if (!this.currentDocumentScope_) {
+			this.currentDocumentScope_ = window.document;
+		}
+		return this.currentDocumentScope_;
+	}
+	static set currentDocumentScope(newScope) {
+		this.currentDocumentScope_ = newScope;
+	}
 	/**
 	 * @private
 	 * @type {string}

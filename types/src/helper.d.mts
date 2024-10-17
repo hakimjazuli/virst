@@ -14,6 +14,16 @@ export class helper {
      */
     static readonly val: "virst-a-val";
     /**
+     * @param {string} path
+     * @returns {Promise<Document>}
+     */
+    static getDocument: (path: string) => Promise<Document>;
+    /**
+     * @private
+     * @type {Record<string, Document>}
+     */
+    private static cachedDocument;
+    /**
      * @readonly
      */
     static readonly storageIdentifier: "virst-st";
@@ -39,9 +49,13 @@ export class helper {
      */
     static attr: string | null;
     /**
+     * using setter and getter, to avoid error when used in non clientBrowser runtime;
+     * @private
      * @type {import('./documentScope.type.mjs').documentScope}
      */
-    static currentDocumentScope: import("./documentScope.type.mjs").documentScope;
+    private static currentDocumentScope_;
+    static set currentDocumentScope(newScope: import("./documentScope.type.mjs").documentScope);
+    static get currentDocumentScope(): import("./documentScope.type.mjs").documentScope;
     /**
      * @private
      * @type {string}

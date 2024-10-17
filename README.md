@@ -211,7 +211,7 @@ use this instead of normal `eventListener` declaration for:- creating `autoqueu
 
 *) <sub>[go to exported list](#exported-api-and-type-list)</sub>
 
-- helper class to track connected/disconnected/attributeChanged of an element;- all global `signal` with dom relector that need to be available for `parent scope` should be prefixed with `g-`;
+- helper class to track connected/disconnected/attributeChanged of an element;
 
 *) <sub>[go to exported list](#exported-api-and-type-list)</sub>
 
