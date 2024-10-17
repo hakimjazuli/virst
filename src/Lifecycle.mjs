@@ -263,6 +263,14 @@ export class Lifecycle {
 		};
 		this.attributeLifecyclesHandler[attributeName]({
 			element: addedNode,
+			cloneElement: () => {
+				const clonedElement = addedNode.cloneNode(true);
+				if (!(clonedElement instanceof HTMLElement)) {
+					return;
+				}
+				clonedElement.removeAttribute(helper.LCCBIdentifier);
+				return clonedElement;
+			},
 			lifecycleObserver: this,
 			onConnected: (connectedCallback) => {
 				if (addedNode.hasAttribute(helper.LCCBIdentifier)) {
@@ -277,6 +285,7 @@ export class Lifecycle {
 							Lifecycle.onParentDCWrapper(addedNode, async () => {
 								await connectedCallback();
 								this.elementCMRefed.splice(index - 1, 1);
+								addedNode.removeAttribute(helper.LCCBIdentifier);
 							});
 						});
 					},

@@ -5,6 +5,7 @@ export type attributeChangedLifecycle = (options: {
 }) => Promise<void>;
 export type lifecycleHandler = {
     element: HTMLElement;
+    cloneElement: () => HTMLElement;
     lifecycleObserver: Lifecycle;
     onConnected: (arg0: () => Promise<void>) => void;
     onDisconnected: (arg0: () => Promise<void>) => void;
