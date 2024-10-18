@@ -52,6 +52,10 @@ export class DefineQRouter<queryValueType extends {
         queryChangeThrottleMs?: number;
     });
     /**
+     * @returns {string}
+     */
+    currentURI: () => string;
+    /**
      * @private
      * @type {Record<NamedQueryParam, DefineQRouter["handler"]>}
      */

@@ -25,6 +25,10 @@ export class DefineQRouter {
 	 */
 	static __;
 	/**
+	 * @returns {string}
+	 */
+	currentURI = () => window.location.origin + window.location.pathname + window.location.search;
+	/**
 	 * @private
 	 * @type {Record<NamedQueryParam, DefineQRouter["handler"]>}
 	 */

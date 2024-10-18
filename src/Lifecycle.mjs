@@ -288,7 +288,7 @@ export class Lifecycle {
 						const index = this.elementCMRefed.push(async () => {
 							await Lifecycle.onParentDCWrapper(addedNode, async () => {
 								const tempDocumentScope = helper.currentDocumentScope;
-								helper.currentDocumentScope = this.currentDocumentScope;
+								helper.currentDocumentScope = currentScope;
 								await connectedCallback();
 								this.elementCMRefed.splice(index - 1, 1);
 								helper.currentDocumentScope = tempDocumentScope;
