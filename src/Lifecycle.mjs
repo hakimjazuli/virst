@@ -11,23 +11,15 @@ import { Ping } from './Ping.mjs';
  */
 export class Lifecycle {
 	/**
-	 * @typedef {Object} manualScopeOptions
-	 * @property {import('./documentScope.type.mjs').documentScope} documentScope
-	 * @property {()=>Promise<void>} scopedCallback
-	 * @property {boolean} runCheckAtFirst
+	 * @param {Object} options
+	 * @param {documentScope} options.documentScope
+	 * @param {()=>Promise<void>} options.scopedCallback
 	 */
-	/**
-	 * manual scoping for lib internal functionality
-	 * @param {manualScopeOptions} options
-	 * @returns {Ping["ping"]}
-	 */
-	static manualScope = ({ documentScope, scopedCallback, runCheckAtFirst }) => {
-		return new Ping(runCheckAtFirst, async () => {
-			const currentScope = helper.currentDocumentScope;
-			helper.currentDocumentScope = documentScope;
-			await scopedCallback();
-			helper.currentDocumentScope = currentScope;
-		}).ping;
+	static tempScoped = async ({ documentScope, scopedCallback: asyncCallback }) => {
+		const tempScope_ = helper.currentDocumentScope;
+		helper.currentDocumentScope = documentScope;
+		await asyncCallback();
+		helper.currentDocumentScope = tempScope_;
 	};
 	/**
 	 * @private
@@ -45,24 +37,6 @@ export class Lifecycle {
 		Lifecycle.currentOnParentDCCB = currentOnParentDCCB;
 		await scopedCallback();
 		Lifecycle.currentOnParentDCCB = tempCurrentOnParentDCCB;
-	};
-	/**
-	 * @typedef {Object} autoScopeOptions
-	 * @property {()=>Promise<void>} scopedCallback
-	 * @property {boolean} runCheckAtFirst
-	 */
-	/**
-	 * use for handling out of scoped codeblock:
-	 * @param {autoScopeOptions} options
-	 * @return {Ping["ping"]}
-	 */
-	static autoScope = ({ scopedCallback, runCheckAtFirst }) => {
-		const documentScope = helper.currentDocumentScope;
-		return Lifecycle.manualScope({
-			documentScope,
-			scopedCallback,
-			runCheckAtFirst,
-		});
 	};
 	/**
 	 * @private
@@ -280,26 +254,27 @@ export class Lifecycle {
 					return;
 				}
 				addedNode.setAttribute(helper.LCCBIdentifier, '');
-				const currentScope = this.currentDocumentScope;
-				Lifecycle.manualScope({
-					documentScope: currentScope,
+				Ping.manualScope({
+					documentScope: addedNode,
 					runCheckAtFirst: true,
 					scopedCallback: async () => {
 						const index = this.elementCMRefed.push(async () => {
 							await Lifecycle.onParentDCWrapper(addedNode, async () => {
-								const tempDocumentScope = helper.currentDocumentScope;
-								helper.currentDocumentScope = currentScope;
-								await connectedCallback();
-								this.elementCMRefed.splice(index - 1, 1);
-								helper.currentDocumentScope = tempDocumentScope;
+								Lifecycle.tempScoped({
+									documentScope: addedNode,
+									scopedCallback: async () => {
+										await connectedCallback();
+										this.elementCMRefed.splice(index - 1, 1);
+									},
+								});
 							});
 						});
 					},
 				});
 			},
 			onDisconnected: (disconnectCallback) => {
-				Lifecycle.manualScope({
-					documentScope: this.currentDocumentScope,
+				Ping.manualScope({
+					documentScope: addedNode,
 					runCheckAtFirst: true,
 					scopedCallback: async () => {
 						await Lifecycle.onParentDCWrapper(addedNode, async () => {
@@ -309,8 +284,8 @@ export class Lifecycle {
 				});
 			},
 			onAttributeChanged: (attributeChangedCallback) => {
-				Lifecycle.manualScope({
-					documentScope: this.currentDocumentScope,
+				Ping.manualScope({
+					documentScope: addedNode,
 					runCheckAtFirst: true,
 					scopedCallback: async () => {
 						await Lifecycle.onParentDCWrapper(addedNode, async () => {

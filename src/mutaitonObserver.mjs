@@ -33,7 +33,7 @@ export class mutaitonObserver {
 		 * @type {mutationRecordSignal}
 		 */
 		// @ts-ignore
-		const documentMutations_ = new Let('');
+		const documentMutations_ = Let.dataOnly('');
 		const documentObserver = new MutationObserver((mutationList) => {
 			documentMutations_.value = mutationList;
 		});

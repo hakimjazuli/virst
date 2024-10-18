@@ -110,9 +110,6 @@ export class Let {
 	 */
 	value_;
 	call$ = () => {
-		if (!this.subscription.length) {
-			return;
-		}
 		new Ping(true, async () => {
 			await helper.handlePromiseAll(this.subscription, false);
 		});

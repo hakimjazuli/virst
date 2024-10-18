@@ -79,7 +79,7 @@ export class helper {
 	 */
 	static currentDocumentScope_ = undefined;
 	static get currentDocumentScope() {
-		if (!this.currentDocumentScope_) {
+		if (this.currentDocumentScope_ === undefined) {
 			this.currentDocumentScope_ = window.document;
 		}
 		return this.currentDocumentScope_;
@@ -149,6 +149,9 @@ export class helper {
 	 * @param {any[]} args
 	 */
 	static handlePromiseAll = async (asyncArrayFunctions, ...args) => {
+		if (!asyncArrayFunctions.length) {
+			return;
+		}
 		await Promise.all(
 			asyncArrayFunctions.map(async (callback) => {
 				try {

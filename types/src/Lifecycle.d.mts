@@ -4,41 +4,20 @@
  */
 export class Lifecycle {
     /**
-     * @typedef {Object} manualScopeOptions
-     * @property {import('./documentScope.type.mjs').documentScope} documentScope
-     * @property {()=>Promise<void>} scopedCallback
-     * @property {boolean} runCheckAtFirst
+     * @param {Object} options
+     * @param {documentScope} options.documentScope
+     * @param {()=>Promise<void>} options.scopedCallback
      */
-    /**
-     * manual scoping for lib internal functionality
-     * @param {manualScopeOptions} options
-     * @returns {Ping["ping"]}
-     */
-    static manualScope: ({ documentScope, scopedCallback, runCheckAtFirst }: {
+    static tempScoped: ({ documentScope, scopedCallback: asyncCallback }: {
         documentScope: import("./documentScope.type.mjs").documentScope;
         scopedCallback: () => Promise<void>;
-        runCheckAtFirst: boolean;
-    }) => Ping["ping"];
+    }) => Promise<void>;
     /**
      * @private
      * @param {HTMLElement} element
      * @param {()=>Promise<void>} scopedCallback
      */
     private static onParentDCWrapper;
-    /**
-     * @typedef {Object} autoScopeOptions
-     * @property {()=>Promise<void>} scopedCallback
-     * @property {boolean} runCheckAtFirst
-     */
-    /**
-     * use for handling out of scoped codeblock:
-     * @param {autoScopeOptions} options
-     * @return {Ping["ping"]}
-     */
-    static autoScope: ({ scopedCallback, runCheckAtFirst }: {
-        scopedCallback: () => Promise<void>;
-        runCheckAtFirst: boolean;
-    }) => Ping["ping"];
     /**
      * @private
      * @type {import('./lifecycleHandler.type.mjs').lifecycleHandler["onDisconnected"]} onParentDisconnected
@@ -182,4 +161,3 @@ export class Lifecycle {
      */
     private mutationDCHandler;
 }
-import { Ping } from './Ping.mjs';

@@ -4,6 +4,7 @@ import { $ } from './$.mjs';
 import { Derived } from './Derived.mjs';
 import { helper } from './helper.mjs';
 import { Lifecycle } from './Lifecycle.mjs';
+import { Ping } from './Ping.mjs';
 
 /**
  * @description
@@ -117,9 +118,8 @@ export class For {
 					// @ts-ignore
 					const derived = {};
 					for (const dataName in data) {
-						Lifecycle.manualScope({
+						Lifecycle.tempScoped({
 							documentScope: childElement,
-							runCheckAtFirst: true,
 							scopedCallback: async () => {
 								derived[dataName] = new Derived(
 									async () => data[dataName].value,

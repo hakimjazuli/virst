@@ -35,7 +35,7 @@ export class List extends Let {
 		 */
 		const dataValue = {};
 		for (const key in data) {
-			dataValue[key] = new Let(data[key]);
+			dataValue[key] = Let.dataOnly(data[key]);
 		}
 		return dataValue;
 	};
@@ -64,7 +64,7 @@ export class List extends Let {
 	/**
 	 * @type {Let<mutationType>}
 	 */
-	mutation = new Let({ type: '', args: [] });
+	mutation = Let.dataOnly({ type: '', args: [] });
 	/**
 	 * Appends new data to the end;
 	 * @param {...List_} listValue
