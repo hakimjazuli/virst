@@ -236,6 +236,9 @@ export class Lifecycle {
 	 * @returns {boolean}
 	 */
 	checkValidScoping = (node) => {
+		if (this.isGlobal) {
+			return true;
+		}
 		const documentScope = this.currentDocumentScope;
 		while (node) {
 			if (!Lifecycle.ID.has(node)) {
@@ -298,6 +301,12 @@ export class Lifecycle {
 							) {
 								addedNode[helper.removeDOM$.toString()]();
 							}
+							if (helper.DCCBIdentifier in addedNode) {
+								addedNode[helper.DCCBIdentifier] = [];
+							}
+							if (helper.ACCBIdentifier in addedNode) {
+								addedNode[helper.ACCBIdentifier] = [];
+							}
 						},
 					});
 				}
@@ -332,6 +341,7 @@ export class Lifecycle {
 				});
 			},
 			onAttributeChanged: (attributeChangedCallback) => {
+				addedNode.setAttribute(helper.ACCBIdentifier, '');
 				Lifecycle.scopedPing({
 					documentScope: addedNode,
 					runCheckAtFirst: true,
