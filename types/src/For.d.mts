@@ -7,40 +7,61 @@
  */
 export class For {
     /**
-     * @typedef {import('./lifecycleHandler.type.mjs').lifecycleHandler} lifecycleHandler
      * @typedef {import('./List.mjs').ListArg} ListArg
+     * @typedef {import('./List.mjs').List} List
+     * @typedef {Record<string, Let<string>>} ForData
+     * @typedef {import('./lifecycleHandler.type.mjs').lifecycleHandler} lifecycleHandler
      * @typedef {Object} childLifeCycleCallback
      * @property {(arg0:{childElement:HTMLElement,ForController:For})=>Promise<void>} childLifeCycleCallback.onConnected
      * @property {(arg0:{childElement:HTMLElement,ForController:For})=>Promise<void>} childLifeCycleCallback.onDisconnected
      * @property {(arg0:{childElement:HTMLElement,ForController:For,attributeName:string, newValue:string})=>Promise<void>} childLifeCycleCallback.onAttributeChanged
      */
     /**
-     * @param {import('./List.mjs').List} listInstance
-     * @param {string} attributeName
+     * @param {Object} options
+     * @param {List} options.listInstance
+     * @param {childLifeCycleCallback} options.childLifeCycleCallback
+     * @param {string} [options.attributeName]
+     * @param {number} [options.reRenderDebounceMS]
      * - parent attributeName
-     * @param {childLifeCycleCallback} childLifeCycleCallback
      */
-    constructor(listInstance: import("./List.mjs").List<any>, attributeName: string, childLifeCycleCallback: {
-        onConnected: (arg0: {
-            childElement: HTMLElement;
-            ForController: For;
-        }) => Promise<void>;
-        onDisconnected: (arg0: {
-            childElement: HTMLElement;
-            ForController: For;
-        }) => Promise<void>;
-        onAttributeChanged: (arg0: {
-            childElement: HTMLElement;
-            ForController: For;
-            attributeName: string;
-            newValue: string;
-        }) => Promise<void>;
+    constructor({ listInstance, childLifeCycleCallback, attributeName, reRenderDebounceMS, }: {
+        listInstance: import("./List.mjs").List<any>;
+        childLifeCycleCallback: {
+            onConnected: (arg0: {
+                childElement: HTMLElement;
+                ForController: For;
+            }) => Promise<void>;
+            onDisconnected: (arg0: {
+                childElement: HTMLElement;
+                ForController: For;
+            }) => Promise<void>;
+            onAttributeChanged: (arg0: {
+                childElement: HTMLElement;
+                ForController: For;
+                attributeName: string;
+                newValue: string;
+            }) => Promise<void>;
+        };
+        attributeName?: string;
+        reRenderDebounceMS?: number;
     });
-    listInstance: import("./List.mjs").List<any>;
+    /**
+     * @private
+     */
+    private listInstance;
     /**
      * @type {string}
      */
     attr: string;
+    /**
+     * @private
+     */
+    private reRenderDebounceMS;
+    /**
+     * @private
+     * @param {ListArg[]} value_
+     */
+    private reRender;
     /**
      * @private
      * @param {HTMLElement} parentElement
@@ -63,56 +84,8 @@ export class For {
      */
     private getChildElementIndex;
     /**
-     * @private
-     * @param {import('./List.mjs').mutationType} mutationValue
-     * @returns {Promise<void>}
+     * @type {ForData[]}
      */
-    private handleMutationList;
-    /**
-     * handle append/prepend
-     * @private
-     * @param {(ListArg)[]} listValue
-     * @param {'append'|'prepend'} mode
-     */
-    private pend;
-    /**
-     * @private
-     * @param {(ListArg)[]} listValue
-     */
-    private handlePush;
-    /**
-     * @private
-     * @param {(ListArg)[]} listValue
-     */
-    private handleUnshift;
-    /**
-     * @private
-     * @param {number} start
-     * @param {number} end
-     */
-    private handleSlice;
-    /**
-     * @private
-     * @param {number} start
-     * @param {number} end
-     */
-    private handleSplice;
-    /**
-     * @private
-     * @param {number} indexA
-     * @param {number} indexB
-     */
-    private handleSwap;
-    /**
-     * @private
-     * @param {number} index
-     * @param {import('./List.mjs').ListValue} listValue
-     * @returns {void}
-     */
-    private handleModify;
-    /**
-     * @private
-     * @returns {void}
-     */
-    private handleShift;
+    data: Record<string, Let<string>>[];
 }
+import { Let } from './Let.mjs';

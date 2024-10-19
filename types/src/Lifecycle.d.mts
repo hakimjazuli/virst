@@ -4,15 +4,6 @@
  */
 export class Lifecycle {
     /**
-     * @param {Object} options
-     * @param {documentScope} options.documentScope
-     * @param {()=>Promise<void>} options.scopedCallback
-     */
-    static tempScoped: ({ documentScope, scopedCallback: asyncCallback }: {
-        documentScope: import("./documentScope.type.mjs").documentScope;
-        scopedCallback: () => Promise<void>;
-    }) => Promise<void>;
-    /**
      * @private
      * @param {HTMLElement} element
      * @param {()=>Promise<void>} scopedCallback

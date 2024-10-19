@@ -16,133 +16,79 @@ import { Let } from './Let.mjs';
  */
 /**
  * @typedef {Record<string, string>} ListArg
- * @typedef {Record<string, Let<string>>} ListValue
- * @typedef {{type:'push'|'unshift'|'slice'|'splice'|'swap'|'modify'|'shift'|'',args:any[]}} mutationType
+ * @typedef {'push'|'unshift'|'splice'|'swap'|'modify'|'shift'} mutationType
  */
 /**
- * @template {ListArg} List_
- * @extends {Let<ListArg[]>}
+ * @template {ListArg} ListArg_
+ * @extends {Let<ListArg_[]>}
  */
 export class List extends Let {
 	/**
-	 * @private
-	 * @param {ListArg} data
-	 * @returns {ListValue}
-	 */
-	static convertSingle = (data) => {
-		/**
-		 * @type {ListValue}
-		 */
-		const dataValue = {};
-		for (const key in data) {
-			dataValue[key] = Let.dataOnly(data[key]);
-		}
-		return dataValue;
-	};
-	/**
-	 * @private
-	 * @param {ListArg[]} list
-	 * @returns {ListValue[]}
-	 */
-	static convert = (list) => {
-		/**
-		 * @type {ListValue[]}
-		 */
-		const listValue = [];
-		for (let i = 0; i < list.length; i++) {
-			listValue.push(List.convertSingle(list[i]));
-		}
-		return listValue;
-	};
-	/**
-	 * @param {List_[]} value
+	 * @param {ListArg_[]} value
 	 */
 	constructor(value) {
-		// @ts-ignore
-		super(List.convert(value));
+		super(value);
 	}
 	/**
-	 * @type {Let<mutationType>}
+	 * @private
+	 * @param {mutationType} mode
+	 * @param {number} end
+	 * @returns {boolean}
 	 */
-	mutation = Let.dataOnly({ type: '', args: [] });
+	checkLength = (mode, end) => {
+		const dataLength = this.value.length;
+		if (end >= dataLength) {
+			console.error({
+				mode,
+				end,
+				dataLength,
+				message: 'list modifier, end is out of dataLength',
+			});
+			return false;
+		}
+		return true;
+	};
 	/**
 	 * Appends new data to the end;
-	 * @param {...List_} listValue
+	 * @param {...ListArg_} listArg
 	 */
-	push = (...listValue) => {
-		// @ts-ignore
-		this.value.push(...List.convert(listValue));
+	push = (...listArg) => {
+		this.value.push(...listArg);
 		this.call$();
-		this.mutation.value = {
-			type: 'push',
-			args: [listValue],
-		};
 	};
 	/**
 	 * Removes the first data;
 	 */
 	shift = () => {
 		this.value.shift();
-		this.call$;
-		this.mutation.value = {
-			type: 'shift',
-			args: [],
-		};
+		this.call$();
 	};
 	/**
 	 * Inserts new data at the start;
-	 * @param  {...List_} listValue
+	 * @param  {...ListArg_} listArg
 	 */
-	unshift = (...listValue) => {
-		// @ts-ignore
-		this.value.unshift(...List.convert(listValue));
+	unshift = (...listArg) => {
+		this.value.unshift(...listArg);
 		this.call$();
-		this.mutation.value = {
-			type: 'unshift',
-			args: [listValue],
-		};
 	};
 	/**
-	 * removeEffectFromChild
-	 * @private
-	 * @param {number} index
-	 * @returns {void}
-	 */
-	removeEffectFromChild = (index) => {
-		const data = this.value[index];
-		for (const key in data) {
-			// @ts-ignore
-			data[key].unRef();
-			delete data[key];
-		}
-	};
-	/**
-	 * For both start and end, a negative index can be used to indicate an offset from the end of the data. For example, -2 refers to the second to last element of the data.
+	 * For both start and end, a negative index can be used to indicate an offset from the end of the data. For example, -2 refers to the second to last element of the data;
 	 * @param {number} [start]
 	 * The beginning index of the specified portion of the data. If start is undefined, then the slice begins at index 0.
 	 * @param {number} [end]
 	 * The end index of the specified portion of the data. This is exclusive of the element at the index 'end'. If end is undefined, then the slice extends to the end of the data.
 	 */
 	slice = (start = undefined, end = undefined) => {
-		this.value.slice(start, end);
-		start = start ?? 0;
-		end = end ?? this.value.length;
-		this.call$();
-		for (let i = start; i < end; i++) {
-			this.removeEffectFromChild(i);
-		}
-		this.mutation.value = {
-			type: 'slice',
-			args: [start, end],
-		};
+		const deleteCount = end - start + 1;
+		this.splice(start, deleteCount);
 	};
 	/**
-	 * Replace whole `List` value with new array.
-	 * @param {List_[]} newList
+	 * Replace whole `List` data with new array.
+	 * @param {ListArg_[]} listArgs
 	 * - new array in place of the deleted array.
 	 */
-	replace = (newList) => {
-		this.splice(0, this.value.length, ...newList);
+	replace = (listArgs) => {
+		this.splice(0, this.value.length, ...listArgs);
 	};
 	/**
 	 * Removes elements from an data and, if necessary, inserts new elements in their place;
@@ -150,48 +96,41 @@ export class List extends Let {
 	 * - The zero-based location in the data from which to start removing elements.
 	 * @param {number} deleteCount
 	 * -The number of elements to remove.
-	 * @param {...List_} insertNew
+	 * @param {...ListArg_} listArg
 	 * - new data in place of the deleted data.
 	 */
-	splice = (start, deleteCount, ...insertNew) => {
-		const end = start + deleteCount;
-		for (let i = start; i < end; i++) {
-			this.removeEffectFromChild(i);
+	splice = (start, deleteCount, ...listArg) => {
+		const end = start + deleteCount - 1;
+		if (!this.checkLength('splice', end)) {
+			return;
 		}
-		// @ts-ignore
-		const deletedArray = this.value.splice(start, deleteCount, ...List.convert(insertNew));
+		this.value.splice(start, deleteCount, ...listArg);
 		this.call$();
-		this.mutation.value = {
-			type: 'splice',
-			args: [start, deleteCount],
-		};
-		return deletedArray;
 	};
 	/**
+	 * Swap `List` data between two indexes;
 	 * @param {number} indexA
 	 * @param {number} indexB
-	 * @returns {void}
 	 */
 	swap = (indexA, indexB) => {
+		if (!this.checkLength('swap', indexA) || !this.checkLength('swap', indexB)) {
+			return;
+		}
 		[this.value[indexA], this.value[indexB]] = [this.value[indexB], this.value[indexA]];
 		this.call$();
-		this.mutation.value = {
-			type: 'swap',
-			args: [indexA, indexB],
-		};
 	};
 	/**
+	 * Modify `List` data at specific index;
 	 * @param {number} index
-	 * @param {Partial<List_>} listValue
-	 * @returns {void}
+	 * @param {Partial<ListArg_>} listArg
 	 */
-	modify = (index, listValue) => {
-		// @ts-ignore
-		this.value[index] = List.convertSingle(listValue);
+	modify = (index, listArg) => {
+		if (!this.checkLength('modify', index)) {
+			return;
+		}
+		for (const key in listArg) {
+			this.value[index][key] = listArg[key];
+		}
 		this.call$();
-		this.mutation.value = {
-			type: 'modify',
-			args: [index, listValue],
-		};
 	};
 }

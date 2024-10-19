@@ -5,6 +5,7 @@ import { helper } from './helper.mjs';
 import { Let } from './Let.mjs';
 import { Lifecycle } from './Lifecycle.mjs';
 import { Ping } from './Ping.mjs';
+import { queueUniqueObject } from './queueUniqueObject.mjs';
 
 /**
  * @description
@@ -83,7 +84,7 @@ export class DefineQRouter {
 		queries,
 		useAsNavigation = undefined,
 		navigationPathRule = undefined,
-		queryChangeThrottleMs = 300,
+		queryChangeThrottleMs = 0,
 	}) {
 		if (DefineQRouter.__ instanceof DefineQRouter) {
 			helper.warningSingleton(DefineQRouter);
@@ -198,24 +199,22 @@ export class DefineQRouter {
 	queryChangeThrottleMs;
 	/**
 	 * @private
-	 * @type { null|number }
-	 */
-	timeoutId = null;
-	/**
-	 * @private
 	 * @param {Ping["ping"]} ping
 	 */
 	requestChanges = async (ping) => {
-		if (this.timeoutId) {
-			clearTimeout(this.timeoutId);
-		}
-		this.timeoutId = window.setTimeout(async () => {
-			ping();
-			if (DefineQRouter.onAfterResolved) {
-				DefineQRouter.onAfterResolved();
-			}
-			DefineQRouter.onAfterResolved = null;
-		}, this.queryChangeThrottleMs);
+		helper.assignToQUnique(
+			new queueUniqueObject(
+				helper.qRouteChange,
+				async () => {
+					ping();
+					if (DefineQRouter.onAfterResolved) {
+						DefineQRouter.onAfterResolved();
+					}
+					DefineQRouter.onAfterResolved = null;
+				},
+				this.queryChangeThrottleMs
+			)
+		);
 	};
 	/**
 	 * @private

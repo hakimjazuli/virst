@@ -73,7 +73,7 @@ export class Component {
 						for (const propName in props) {
 							const value =
 								element.getAttribute(propName) ?? props[propName.toString()];
-							Lifecycle.tempScoped({
+							helper.tempScoped({
 								documentScope: element,
 								scopedCallback: async () => {
 									reactiveProps[propName.toString()] = new Let(value, propName);

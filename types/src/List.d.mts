@@ -12,57 +12,40 @@
  */
 /**
  * @typedef {Record<string, string>} ListArg
- * @typedef {Record<string, Let<string>>} ListValue
- * @typedef {{type:'push'|'unshift'|'slice'|'splice'|'swap'|'modify'|'shift'|'',args:any[]}} mutationType
+ * @typedef {'push'|'unshift'|'splice'|'swap'|'modify'|'shift'} mutationType
  */
 /**
- * @template {ListArg} List_
- * @extends {Let<ListArg[]>}
+ * @template {ListArg} ListArg_
+ * @extends {Let<ListArg_[]>}
  */
-export class List<List_ extends ListArg> extends Let<ListArg[]> {
+export class List<ListArg_ extends ListArg> extends Let<ListArg_[]> {
+    /**
+     * @param {ListArg_[]} value
+     */
+    constructor(value: ListArg_[]);
     /**
      * @private
-     * @param {ListArg} data
-     * @returns {ListValue}
+     * @param {mutationType} mode
+     * @param {number} end
+     * @returns {boolean}
      */
-    private static convertSingle;
-    /**
-     * @private
-     * @param {ListArg[]} list
-     * @returns {ListValue[]}
-     */
-    private static convert;
-    /**
-     * @param {List_[]} value
-     */
-    constructor(value: List_[]);
-    /**
-     * @type {Let<mutationType>}
-     */
-    mutation: Let<mutationType>;
+    private checkLength;
     /**
      * Appends new data to the end;
-     * @param {...List_} listValue
+     * @param {...ListArg_} listArg
      */
-    push: (...listValue: List_[]) => void;
+    push: (...listArg: ListArg_[]) => void;
     /**
      * Removes the first data;
      */
     shift: () => void;
     /**
      * Inserts new data at the start;
-     * @param  {...List_} listValue
+     * @param  {...ListArg_} listArg
      */
-    unshift: (...listValue: List_[]) => void;
+    unshift: (...listArg: ListArg_[]) => void;
     /**
-     * removeEffectFromChild
-     * @private
-     * @param {number} index
-     * @returns {void}
-     */
-    private removeEffectFromChild;
-    /**
-     * For both start and end, a negative index can be used to indicate an offset from the end of the data. For example, -2 refers to the second to last element of the data.
+     * For both start and end, a negative index can be used to indicate an offset from the end of the data. For example, -2 refers to the second to last element of the data;
      * @param {number} [start]
      * The beginning index of the specified portion of the data. If start is undefined, then the slice begins at index 0.
      * @param {number} [end]
@@ -70,38 +53,34 @@ export class List<List_ extends ListArg> extends Let<ListArg[]> {
      */
     slice: (start?: number, end?: number) => void;
     /**
-     * Replace whole `List` value with new array.
-     * @param {List_[]} newList
+     * Replace whole `List` data with new array.
+     * @param {ListArg_[]} listArgs
      * - new array in place of the deleted array.
      */
-    replace: (newList: List_[]) => void;
+    replace: (listArgs: ListArg_[]) => void;
     /**
      * Removes elements from an data and, if necessary, inserts new elements in their place;
      * @param {number} start
      * - The zero-based location in the data from which to start removing elements.
      * @param {number} deleteCount
      * -The number of elements to remove.
-     * @param {...List_} insertNew
+     * @param {...ListArg_} listArg
      * - new data in place of the deleted data.
      */
-    splice: (start: number, deleteCount: number, ...insertNew: List_[]) => ListArg[];
+    splice: (start: number, deleteCount: number, ...listArg: ListArg_[]) => void;
     /**
+     * Swap `List` data between two indexes;
      * @param {number} indexA
      * @param {number} indexB
-     * @returns {void}
      */
     swap: (indexA: number, indexB: number) => void;
     /**
+     * Modify `List` data at specific index;
      * @param {number} index
-     * @param {Partial<List_>} listValue
-     * @returns {void}
+     * @param {Partial<ListArg_>} listArg
      */
-    modify: (index: number, listValue: Partial<List_>) => void;
+    modify: (index: number, listArg: Partial<ListArg_>) => void;
 }
 export type ListArg = Record<string, string>;
-export type ListValue = Record<string, Let<string>>;
-export type mutationType = {
-    type: "push" | "unshift" | "slice" | "splice" | "swap" | "modify" | "shift" | "";
-    args: any[];
-};
+export type mutationType = "push" | "unshift" | "splice" | "swap" | "modify" | "shift";
 import { Let } from './Let.mjs';

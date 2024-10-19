@@ -86,11 +86,6 @@ export class DefineQRouter<queryValueType extends {
     private useVirstURL;
     /**
      * @private
-     * @type { null|number }
-     */
-    private timeoutId;
-    /**
-     * @private
      * @param {Ping["ping"]} ping
      */
     private requestChanges;

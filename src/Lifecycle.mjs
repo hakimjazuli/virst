@@ -11,17 +11,6 @@ import { Ping } from './Ping.mjs';
  */
 export class Lifecycle {
 	/**
-	 * @param {Object} options
-	 * @param {documentScope} options.documentScope
-	 * @param {()=>Promise<void>} options.scopedCallback
-	 */
-	static tempScoped = async ({ documentScope, scopedCallback: asyncCallback }) => {
-		const tempScope_ = helper.currentDocumentScope;
-		helper.currentDocumentScope = documentScope;
-		await asyncCallback();
-		helper.currentDocumentScope = tempScope_;
-	};
-	/**
 	 * @private
 	 * @param {HTMLElement} element
 	 * @param {()=>Promise<void>} scopedCallback
@@ -254,13 +243,13 @@ export class Lifecycle {
 					return;
 				}
 				addedNode.setAttribute(helper.LCCBIdentifier, '');
-				Ping.manualScope({
+				helper.manualScope({
 					documentScope: addedNode,
 					runCheckAtFirst: true,
 					scopedCallback: async () => {
 						const index = this.elementCMRefed.push(async () => {
 							await Lifecycle.onParentDCWrapper(addedNode, async () => {
-								Lifecycle.tempScoped({
+								helper.tempScoped({
 									documentScope: addedNode,
 									scopedCallback: async () => {
 										await connectedCallback();
@@ -273,7 +262,7 @@ export class Lifecycle {
 				});
 			},
 			onDisconnected: (disconnectCallback) => {
-				Ping.manualScope({
+				helper.manualScope({
 					documentScope: addedNode,
 					runCheckAtFirst: true,
 					scopedCallback: async () => {
@@ -284,7 +273,7 @@ export class Lifecycle {
 				});
 			},
 			onAttributeChanged: (attributeChangedCallback) => {
-				Ping.manualScope({
+				helper.manualScope({
 					documentScope: addedNode,
 					runCheckAtFirst: true,
 					scopedCallback: async () => {

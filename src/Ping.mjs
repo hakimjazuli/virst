@@ -10,25 +10,6 @@ import { queueObjectFIFO } from './queueObjectFIFO.mjs';
  */
 export class Ping {
 	/**
-	 * @typedef {Object} manualScopeOptions
-	 * @property {import('./documentScope.type.mjs').documentScope} documentScope
-	 * @property {()=>Promise<void>} scopedCallback
-	 * @property {boolean} runCheckAtFirst
-	 */
-	/**
-	 * manual scoping for lib internal functionality
-	 * @param {manualScopeOptions} options
-	 * @returns {Ping["ping"]}
-	 */
-	static manualScope = ({ documentScope, scopedCallback, runCheckAtFirst }) => {
-		return new Ping(runCheckAtFirst, async () => {
-			const currentScope = helper.currentDocumentScope;
-			helper.currentDocumentScope = documentScope;
-			await scopedCallback();
-			helper.currentDocumentScope = currentScope;
-		}).ping;
-	};
-	/**
 	 * @typedef {Object} autoScopeOptions
 	 * @property {()=>Promise<void>} scopedCallback
 	 * @property {boolean} runCheckAtFirst
@@ -40,7 +21,7 @@ export class Ping {
 	 */
 	static autoScope = ({ scopedCallback, runCheckAtFirst }) => {
 		const documentScope = helper.currentDocumentScope;
-		return Ping.manualScope({
+		return helper.manualScope({
 			documentScope,
 			scopedCallback,
 			runCheckAtFirst,
@@ -66,7 +47,7 @@ export class Ping {
 	 * @param {boolean} first
 	 */
 	ping = (first = false) => {
-		helper.queueHandler.assign(
+		helper.assignToQFIFO(
 			new queueObjectFIFO(async () => {
 				await this.asyncCallback(first);
 			}, helper.debounce)

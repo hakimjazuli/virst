@@ -1,10 +1,14 @@
 export class helper {
     /**
+     * @typedef {import('./documentScope.type.mjs').documentScope} documentScope
+     */
+    /**
      * subscriber
      * @type {null|((isAtInitialization:boolean)=>Promise<void>)}
      */
     static subscriber: null | ((isAtInitialization: boolean) => Promise<void>);
-    static queueHandler: queueFIFO;
+    static assignToQFIFO: (_queue: import("./queueObjectFIFO.mjs").queueObjectFIFO) => void;
+    static assignToQUnique: (_queue: import("./queueUniqueObject.mjs").queueUniqueObject) => void;
     /**
      * @type {number|false}
      */
@@ -13,6 +17,10 @@ export class helper {
      * @readonly
      */
     static readonly val: "virst-a-val";
+    /**
+     * @readonly
+     */
+    static readonly qRouteChange: "virst-qrc";
     /**
      * @param {string} path
      * @returns {Promise<Document>}
@@ -32,6 +40,10 @@ export class helper {
     static ACCBIdentifier: string;
     static onViewCBIdentifier: string;
     static onExitViewCBIdentifier: string;
+    /**
+     * @readonly
+     */
+    static readonly ForQPrefix: "virst-fq-";
     /**
      * @readonly
      */
@@ -91,5 +103,30 @@ export class helper {
      * @param {any[]} args
      */
     static handlePromiseAll: (asyncArrayFunctions: ((...args: any) => Promise<any>)[], ...args: any[]) => Promise<void>;
+    /**
+     * @param {Object} options
+     * @param {documentScope} options.documentScope
+     * @param {()=>Promise<void>} options.scopedCallback
+     */
+    static tempScoped: ({ documentScope, scopedCallback: asyncCallback }: {
+        documentScope: import("./documentScope.type.mjs").documentScope;
+        scopedCallback: () => Promise<void>;
+    }) => Promise<void>;
+    /**
+     * @typedef {Object} manualScopeOptions
+     * @property {import('./documentScope.type.mjs').documentScope} documentScope
+     * @property {()=>Promise<void>} scopedCallback
+     * @property {boolean} runCheckAtFirst
+     */
+    /**
+     * manual scoping for lib internal functionality
+     * @param {manualScopeOptions} options
+     * @returns {Ping["ping"]}
+     */
+    static manualScope: ({ documentScope, scopedCallback, runCheckAtFirst }: {
+        documentScope: import("./documentScope.type.mjs").documentScope;
+        scopedCallback: () => Promise<void>;
+        runCheckAtFirst: boolean;
+    }) => Ping["ping"];
 }
-import { queueFIFO } from './queueFIFO.mjs';
+import { Ping } from './Ping.mjs';

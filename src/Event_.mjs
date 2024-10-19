@@ -1,8 +1,6 @@
 // @ts-check
 
 import { helper } from './helper.mjs';
-import { Lifecycle } from './Lifecycle.mjs';
-import { Ping } from './Ping.mjs';
 
 /**
  * @description
@@ -29,7 +27,7 @@ export class Event_ {
 		 * @param {Event} event
 		 */
 		return (event) => {
-			Ping.manualScope({
+			helper.manualScope({
 				documentScope,
 				runCheckAtFirst: true,
 				scopedCallback: async () => {
