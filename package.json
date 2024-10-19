@@ -1,6 +1,6 @@
 {
 	"name": "virst",
-	"version": "0.11.6",
+	"version": "0.11.7",
 	"description": "various asynchronous signal based html first client side library",
 	"type": "module",
 	"main": "index.mjs",
