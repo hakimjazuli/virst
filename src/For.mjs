@@ -12,6 +12,7 @@ import { queueUniqueObject } from './queueUniqueObject.mjs';
  * - loped childElement:
  * > - must have `HTMLElement` as first children;
  * > - only first children will be used to loop through `List`, all other children will be deleted from the dom before `onConnected` event of parentElement;
+ * - use `ListInstance` `method` helpers to mutate the data;
  */
 export class For {
 	/**
@@ -41,7 +42,7 @@ export class For {
 		this.listInstance = listInstance;
 		this.attr = attributeName;
 		this.reRenderDebounceMS = reRenderDebounceMS;
-		new Lifecycle(false, {
+		new Lifecycle(true, {
 			[attributeName]: async ({ element, onConnected, onDisconnected }) => {
 				onConnected(async () => {
 					const effect = new $(async (first) => {
@@ -82,7 +83,7 @@ export class For {
 					for (let j = 0; j < valueLength; j++) {
 						i++;
 						if (children[j]) {
-							await helper.tempScoped({
+							await Lifecycle.shallowScope({
 								documentScope: children[j],
 								scopedCallback: async () => {
 									const value = this.listInstance.value[j];
@@ -96,7 +97,7 @@ export class For {
 						this.parentElement.appendChild(this.childElement.cloneNode(true));
 					}
 					for (let j = i; j < children.length; j++) {
-						await helper.tempScoped({
+						await Lifecycle.shallowScope({
 							documentScope: children[j],
 							scopedCallback: async () => {
 								const value = this.listInstance.value[j];
@@ -151,7 +152,7 @@ export class For {
 	 * @param {lifecycleHandler["onDisconnected"]} onParentDisconnected
 	 */
 	childLifecycle = (childLifeCycleCallback, onParentDisconnected) => {
-		new Lifecycle(true, {
+		new Lifecycle(false, {
 			[`${helper.ForChildAttributePrefix}${this.attr}`]: async ({
 				element: childElement,
 				lifecycleObserver: childLifecycleObserver,
@@ -181,7 +182,7 @@ export class For {
 						this.data[index] = {};
 					}
 					for (const dataName in data) {
-						await helper.tempScoped({
+						await Lifecycle.shallowScope({
 							documentScope: childElement,
 							scopedCallback: async () => {
 								this.data[index][dataName] = new Let(data[dataName], dataName);
@@ -227,6 +228,7 @@ export class For {
 		return index;
 	}
 	/**
+	 * @private
 	 * @type {ForData[]}
 	 */
 	data = [];

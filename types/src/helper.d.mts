@@ -16,6 +16,10 @@ export class helper {
     /**
      * @readonly
      */
+    static readonly removeDOM$: "virst-rm-dom$";
+    /**
+     * @readonly
+     */
     static readonly val: "virst-a-val";
     /**
      * @readonly
@@ -103,30 +107,4 @@ export class helper {
      * @param {any[]} args
      */
     static handlePromiseAll: (asyncArrayFunctions: ((...args: any) => Promise<any>)[], ...args: any[]) => Promise<void>;
-    /**
-     * @param {Object} options
-     * @param {documentScope} options.documentScope
-     * @param {()=>Promise<void>} options.scopedCallback
-     */
-    static tempScoped: ({ documentScope, scopedCallback: asyncCallback }: {
-        documentScope: import("./documentScope.type.mjs").documentScope;
-        scopedCallback: () => Promise<void>;
-    }) => Promise<void>;
-    /**
-     * @typedef {Object} manualScopeOptions
-     * @property {import('./documentScope.type.mjs').documentScope} documentScope
-     * @property {()=>Promise<void>} scopedCallback
-     * @property {boolean} runCheckAtFirst
-     */
-    /**
-     * manual scoping for lib internal functionality
-     * @param {manualScopeOptions} options
-     * @returns {Ping["ping"]}
-     */
-    static manualScope: ({ documentScope, scopedCallback, runCheckAtFirst }: {
-        documentScope: import("./documentScope.type.mjs").documentScope;
-        scopedCallback: () => Promise<void>;
-        runCheckAtFirst: boolean;
-    }) => Ping["ping"];
 }
-import { Ping } from './Ping.mjs';

@@ -11,6 +11,54 @@ import { Ping } from './Ping.mjs';
  */
 export class Lifecycle {
 	/**
+	 * @typedef {Object} autoScopeOptions
+	 * @property {()=>Promise<void>} scopedCallback
+	 * @property {boolean} runCheckAtFirst
+	 */
+	/**
+	 * use for handling out of scoped codeblock:
+	 * @param {autoScopeOptions} options
+	 * @return {Ping["ping"]}
+	 */
+	static autoScopedPing = ({ scopedCallback, runCheckAtFirst }) => {
+		const documentScope = helper.currentDocumentScope;
+		return Lifecycle.scopedPing({
+			documentScope,
+			scopedCallback,
+			runCheckAtFirst,
+		});
+	};
+	/**
+	 * @param {Object} options
+	 * @param {documentScope} options.documentScope
+	 * @param {()=>Promise<void>} options.scopedCallback
+	 */
+	static shallowScope = async ({ documentScope, scopedCallback: asyncCallback }) => {
+		const tempScope_ = helper.currentDocumentScope;
+		helper.currentDocumentScope = documentScope;
+		await asyncCallback();
+		helper.currentDocumentScope = tempScope_;
+	};
+	/**
+	 * @typedef {Object} manualScopeOptions
+	 * @property {import('./documentScope.type.mjs').documentScope} documentScope
+	 * @property {()=>Promise<void>} scopedCallback
+	 * @property {boolean} runCheckAtFirst
+	 */
+	/**
+	 * manual scoping for lib internal functionality
+	 * @param {manualScopeOptions} options
+	 * @returns {Ping["ping"]}
+	 */
+	static scopedPing = ({ documentScope, scopedCallback, runCheckAtFirst }) => {
+		return new Ping(runCheckAtFirst, async () => {
+			const currentScope = helper.currentDocumentScope;
+			helper.currentDocumentScope = documentScope;
+			await scopedCallback();
+			helper.currentDocumentScope = currentScope;
+		}).ping;
+	};
+	/**
 	 * @private
 	 * @param {HTMLElement} element
 	 * @param {()=>Promise<void>} scopedCallback
@@ -188,9 +236,6 @@ export class Lifecycle {
 	 * @returns {boolean}
 	 */
 	checkValidScoping = (node) => {
-		if (this.isGlobal) {
-			return true;
-		}
 		const documentScope = this.currentDocumentScope;
 		while (node) {
 			if (!Lifecycle.ID.has(node)) {
@@ -215,6 +260,7 @@ export class Lifecycle {
 	addedNodeHandler = async (addedNode, attributeName) => {
 		if (
 			/** to eliminate repeatition on ANH call */ !(addedNode instanceof HTMLElement) ||
+			/** except head resources */ document.head.contains(addedNode) ||
 			/** primary criteria */ !('hasAttribute' in addedNode) ||
 			!addedNode.hasAttribute(attributeName) ||
 			!this.checkValidScoping(addedNode)
@@ -240,16 +286,29 @@ export class Lifecycle {
 			lifecycleObserver: this,
 			onConnected: (connectedCallback) => {
 				if (addedNode.hasAttribute(helper.LCCBIdentifier)) {
-					return;
+					if (this.isGlobal) {
+						return;
+					}
+					Lifecycle.shallowScope({
+						documentScope: addedNode,
+						scopedCallback: async () => {
+							if (
+								helper.removeDOM$ in addedNode &&
+								typeof addedNode[helper.removeDOM$] == 'function'
+							) {
+								addedNode[helper.removeDOM$.toString()]();
+							}
+						},
+					});
 				}
 				addedNode.setAttribute(helper.LCCBIdentifier, '');
-				helper.manualScope({
+				Lifecycle.scopedPing({
 					documentScope: addedNode,
 					runCheckAtFirst: true,
 					scopedCallback: async () => {
 						const index = this.elementCMRefed.push(async () => {
 							await Lifecycle.onParentDCWrapper(addedNode, async () => {
-								helper.tempScoped({
+								Lifecycle.shallowScope({
 									documentScope: addedNode,
 									scopedCallback: async () => {
 										await connectedCallback();
@@ -262,7 +321,7 @@ export class Lifecycle {
 				});
 			},
 			onDisconnected: (disconnectCallback) => {
-				helper.manualScope({
+				Lifecycle.scopedPing({
 					documentScope: addedNode,
 					runCheckAtFirst: true,
 					scopedCallback: async () => {
@@ -273,7 +332,7 @@ export class Lifecycle {
 				});
 			},
 			onAttributeChanged: (attributeChangedCallback) => {
-				helper.manualScope({
+				Lifecycle.scopedPing({
 					documentScope: addedNode,
 					runCheckAtFirst: true,
 					scopedCallback: async () => {

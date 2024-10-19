@@ -129,12 +129,13 @@ export class Let {
 						const effect = new $(async () => {
 							Let.domReflector(this.value, attributeName, element, this);
 						});
-						onDisconnected(async () => {
+						element[helper.removeDOM$] = async () => {
 							this.remove$(effect);
 							if (typeof element.oninput === 'function') {
 								element.oninput = null;
 							}
-						});
+						};
+						onDisconnected(element[helper.removeDOM$]);
 					});
 				},
 			});

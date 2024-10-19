@@ -10,24 +10,6 @@ import { queueObjectFIFO } from './queueObjectFIFO.mjs';
  */
 export class Ping {
 	/**
-	 * @typedef {Object} autoScopeOptions
-	 * @property {()=>Promise<void>} scopedCallback
-	 * @property {boolean} runCheckAtFirst
-	 */
-	/**
-	 * use for handling out of scoped codeblock:
-	 * @param {autoScopeOptions} options
-	 * @return {Ping["ping"]}
-	 */
-	static autoScope = ({ scopedCallback, runCheckAtFirst }) => {
-		const documentScope = helper.currentDocumentScope;
-		return helper.manualScope({
-			documentScope,
-			scopedCallback,
-			runCheckAtFirst,
-		});
-	};
-	/**
 	 * async callback when pinged
 	 * @private
 	 * @type {(isAtInitisalization:boolean)=>Promise<void>}

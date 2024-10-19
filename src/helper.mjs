@@ -1,6 +1,5 @@
 // @ts-check
 
-import { Ping } from './Ping.mjs';
 import { queueFIFO } from './queueFIFO.mjs';
 import { queueUnique } from './queueUnique.mjs';
 
@@ -19,6 +18,10 @@ export class helper {
 	 * @type {number|false}
 	 */
 	static debounce = false;
+	/**
+	 * @readonly
+	 */
+	static removeDOM$ = 'virst-rm-dom$';
 	/**
 	 * @readonly
 	 */
@@ -178,35 +181,5 @@ export class helper {
 		).catch((error) => {
 			console.error('Promise.all failed:', error);
 		});
-	};
-	/**
-	 * @param {Object} options
-	 * @param {documentScope} options.documentScope
-	 * @param {()=>Promise<void>} options.scopedCallback
-	 */
-	static tempScoped = async ({ documentScope, scopedCallback: asyncCallback }) => {
-		const tempScope_ = helper.currentDocumentScope;
-		helper.currentDocumentScope = documentScope;
-		await asyncCallback();
-		helper.currentDocumentScope = tempScope_;
-	};
-	/**
-	 * @typedef {Object} manualScopeOptions
-	 * @property {import('./documentScope.type.mjs').documentScope} documentScope
-	 * @property {()=>Promise<void>} scopedCallback
-	 * @property {boolean} runCheckAtFirst
-	 */
-	/**
-	 * manual scoping for lib internal functionality
-	 * @param {manualScopeOptions} options
-	 * @returns {Ping["ping"]}
-	 */
-	static manualScope = ({ documentScope, scopedCallback, runCheckAtFirst }) => {
-		return new Ping(runCheckAtFirst, async () => {
-			const currentScope = helper.currentDocumentScope;
-			helper.currentDocumentScope = documentScope;
-			await scopedCallback();
-			helper.currentDocumentScope = currentScope;
-		}).ping;
 	};
 }

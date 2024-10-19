@@ -193,7 +193,7 @@ use this instead of normal `eventListener` declaration for:- creating `autoqueu
 
 *) <sub>[go to exported list](#exported-api-and-type-list)</sub>
 
-- assign element to loop through ['List'](#list) as data to render child element using class instantiation;- loped childElement:> - must have `HTMLElement` as first children;> - only first children will be used to loop through `List`, all other children will be deleted from the dom before `onConnected` event of parentElement;
+- assign element to loop through ['List'](#list) as data to render child element using class instantiation;- loped childElement:> - must have `HTMLElement` as first children;> - only first children will be used to loop through `List`, all other children will be deleted from the dom before `onConnected` event of parentElement;- use `ListInstance` `method` helpers to mutate the data;
 
 *) <sub>[go to exported list](#exported-api-and-type-list)</sub>
 
@@ -229,7 +229,7 @@ type helper for `lifecycleHandler` & `attributeChangedLifecycle`
 
 *) <sub>[go to exported list](#exported-api-and-type-list)</sub>
 
-- helper class to create list that satisfy`Array<Record<string, string>>````jsconst listExample = new List([     {key1: "test", ...keys},     {key1: "test3", ...keys},])```- usefull for `loops`;
+- helper class to create list that satisfy`Array<Record<string, string>>````jsconst listExample = new List([     {key1: "test", ...keys},     {key1: "test3", ...keys},])```- usefull for `loops`;- instance method: 'push'|'unshift'|'slice'|'splice'|'swap'|'modify'|'shift', serves as helper to mutate, and notify for `signal` for `effects`:> - `slice` uses `splice` in the background, you don't need to manually reindex when using it;
 
 *) <sub>[go to exported list](#exported-api-and-type-list)</sub>
 

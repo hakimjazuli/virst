@@ -5,20 +5,6 @@
  */
 export class Ping {
     /**
-     * @typedef {Object} autoScopeOptions
-     * @property {()=>Promise<void>} scopedCallback
-     * @property {boolean} runCheckAtFirst
-     */
-    /**
-     * use for handling out of scoped codeblock:
-     * @param {autoScopeOptions} options
-     * @return {Ping["ping"]}
-     */
-    static autoScope: ({ scopedCallback, runCheckAtFirst }: {
-        scopedCallback: () => Promise<void>;
-        runCheckAtFirst: boolean;
-    }) => Ping["ping"];
-    /**
      * @param {boolean} callsAtFirst
      * @param {(isAtInitisalization:boolean)=>Promise<void>} asyncCallbackWhenPinged
      */

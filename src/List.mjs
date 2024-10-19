@@ -13,6 +13,8 @@ import { Let } from './Let.mjs';
  * ])
  * ```
  * - usefull for `loops`;
+ * - instance method: 'push'|'unshift'|'slice'|'splice'|'swap'|'modify'|'shift', serves as helper to mutate, and notify for `signal` for `effects`:
+ * > - `slice` uses `splice` in the background, you don't need to manually reindex when using it;
  */
 /**
  * @typedef {Record<string, string>} ListArg

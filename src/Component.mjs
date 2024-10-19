@@ -3,7 +3,6 @@
 import { helper } from './helper.mjs';
 import { Let } from './Let.mjs';
 import { Lifecycle } from './Lifecycle.mjs';
-import { Ping } from './Ping.mjs';
 
 /**
  * @description
@@ -73,7 +72,7 @@ export class Component {
 						for (const propName in props) {
 							const value =
 								element.getAttribute(propName) ?? props[propName.toString()];
-							helper.tempScoped({
+							Lifecycle.shallowScope({
 								documentScope: element,
 								scopedCallback: async () => {
 									reactiveProps[propName.toString()] = new Let(value, propName);

@@ -4,6 +4,7 @@
  * - loped childElement:
  * > - must have `HTMLElement` as first children;
  * > - only first children will be used to loop through `List`, all other children will be deleted from the dom before `onConnected` event of parentElement;
+ * - use `ListInstance` `method` helpers to mutate the data;
  */
 export class For {
     /**
@@ -84,8 +85,8 @@ export class For {
      */
     private getChildElementIndex;
     /**
+     * @private
      * @type {ForData[]}
      */
-    data: Record<string, Let<string>>[];
+    private data;
 }
-import { Let } from './Let.mjs';
