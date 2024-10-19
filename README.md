@@ -73,10 +73,6 @@ bun i virst
 
 - [List](#list)
 
-- [OnViewPort](#onviewport)
-
-- [onViewPortHandler](#onviewporthandler)
-
 - [Ping](#ping)
 
 - [ShortCut](#shortcut)
@@ -230,24 +226,6 @@ type helper for `lifecycleHandler` & `attributeChangedLifecycle`
 *) <sub>[go to exported list](#exported-api-and-type-list)</sub>
 
 - helper class to create list that satisfy`Array<Record<string, string>>````jsconst listExample = new List([     {key1: "test", ...keys},     {key1: "test3", ...keys},])```- usefull for `loops`;- instance method: 'push'|'unshift'|'slice'|'splice'|'swap'|'modify'|'shift', serves as helper to mutate, and notify for `signal` for `effects`:> - `slice` uses `splice` in the background, you don't need to manually reindex when using it;
-
-*) <sub>[go to exported list](#exported-api-and-type-list)</sub>
-
-
-<h2 id="onviewport">OnViewPort</h2>
-
-*) <sub>[go to exported list](#exported-api-and-type-list)</sub>
-
-lifecycle wrapper to observe whether element is in viewport
-
-*) <sub>[go to exported list](#exported-api-and-type-list)</sub>
-
-
-<h2 id="onviewporthandler">onViewPortHandler</h2>
-
-*) <sub>[go to exported list](#exported-api-and-type-list)</sub>
-
-type helper for `onViewPortHandler`
 
 *) <sub>[go to exported list](#exported-api-and-type-list)</sub>
 

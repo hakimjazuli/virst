@@ -3,6 +3,7 @@
 import { $ } from './$.mjs';
 import { helper } from './helper.mjs';
 import { mutaitonObserver } from './mutaitonObserver.mjs';
+import { onViewPort } from './onViewPort.mjs';
 import { Ping } from './Ping.mjs';
 
 /**
@@ -277,6 +278,7 @@ export class Lifecycle {
 			Lifecycle.setDCCB(addedNode, disconnectedCallback);
 		};
 		this.attributeLifecyclesHandler[attributeName]({
+			onViewPort: (options) => new onViewPort(options),
 			element: addedNode,
 			cloneElement: () => {
 				const clonedElement = addedNode.cloneNode(true);

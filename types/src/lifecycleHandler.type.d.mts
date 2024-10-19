@@ -5,9 +5,9 @@ export type attributeChangedLifecycle = (options: {
 export type lifecycleHandler = {
     element: HTMLElement;
     cloneElement: () => HTMLElement;
-    lifecycleObserver: Lifecycle;
+    lifecycleObserver: import("./Lifecycle.mjs").Lifecycle;
     onConnected: (arg0: () => Promise<void>) => void;
     onDisconnected: (arg0: () => Promise<void>) => void;
     onAttributeChanged: (arg0: attributeChangedLifecycle) => void;
+    onViewPort: (elementsCallbacks: import("./onViewPortHandler.type.mjs").elementsCallbacks) => import("./onViewPort.mjs").onViewPort;
 };
-import { Lifecycle } from './Lifecycle.mjs';

@@ -45,6 +45,11 @@ export class helper {
     static onViewCBIdentifier: string;
     static onExitViewCBIdentifier: string;
     /**
+     * @param {HTMLElement|Element} element
+     * @returns {HTMLElement}
+     */
+    static cloneNode: (element: HTMLElement | Element) => HTMLElement;
+    /**
      * @readonly
      */
     static readonly ForQPrefix: "virst-fq-";

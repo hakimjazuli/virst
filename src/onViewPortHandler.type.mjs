@@ -1,19 +1,16 @@
 // @ts-check
 
-import { Lifecycle } from './Lifecycle.mjs';
-import { OnViewPort } from './OnViewPort.mjs';
-
 /**
- * @description
- * type helper for `onViewPortHandler`
- */
-/**
- * @typedef {Object} onViewPortHandlerDisconnector
- * @property {HTMLElement|Element} element
- * @property {OnViewPort} onViewPortObserver
- * @property {Lifecycle} lifecycleObserver
+ * @typedef {import('./onViewPort.mjs').onViewPort} onViewPortType
  * @typedef {Object} onViewPortHandler
- * @property {(options:onViewPortHandlerDisconnector)=>Promise<void>} onViewPortHandler.onViewPort
- * @property {(options:onViewPortHandlerDisconnector)=>Promise<void>} onViewPortHandler.onExitingViewPort
- * @property {(options:onViewPortHandlerDisconnector)=>Promise<void>} onViewPortHandler.onDisconnected
+ * @property {typeof import('./onViewPort.mjs').onViewPort.removeOnExitViewCallback} removeOnExitViewCallback
+ * @property {typeof import('./onViewPort.mjs').onViewPort.removeOnViewCallback} removeOnViewCallback
+ * @property {typeof import('./onViewPort.mjs').onViewPort.removeAllCallbacks} removeAllCallbacks
+ * @property {typeof import('./onViewPort.mjs').onViewPort.unobserve} unobserve
+ * @typedef {import('./lifecycleHandler.type.mjs').lifecycleHandler} onViewPortLifecycleHandler
+ * @typedef {Object} elementsCallbacks
+ * @property {HTMLElement} elementsCallbacks.element
+ * @property {(onViewCallbacksOptions:onViewPortHandler)=>Promise<void>} elementsCallbacks.onViewCallback
+ * @property {(onViewCallbacksOptions:onViewPortHandler)=>Promise<void>} elementsCallbacks.onExitViewCallback
+ * @property {onViewPortLifecycleHandler["onDisconnected"][]} elementsCallbacks.lifecyclesOnDisconnected
  */

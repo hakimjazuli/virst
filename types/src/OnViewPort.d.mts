@@ -1,61 +1,59 @@
 /**
  * @description
- * lifecycle wrapper to observe whether element is in viewport
+ * - observe element on intersecting with `viewPort`;
+ * - use inside `Lifecycle` `onConnected` scope, by instantiating this class;
+ * ```js
+ * // Lifecycle scope
+ * onConnected(async()=>{
+ * 	new OnViewPort({...options});
+ * });
+ * ```
  */
-export class OnViewPort {
-    /**
-     *  * @typedef {{
-     * [attributeName:string]:
-     * import('./onViewPortHandler.type.mjs').onViewPortHandler
-     * }} onViewPortatributesHandler
-     */
-    /**
-     * @param {onViewPortatributesHandler} attributeHandler
-     * undefined: will automatically fires unObserve callback;
-     */
-    constructor(attributeHandler: {
-        [attributeName: string]: import("./onViewPortHandler.type.mjs").onViewPortHandler;
-    });
-    /**
-     * @private
-     * @type {Lifecycle}
-     */
-    private lifecycleObserver;
-    /**
-     * @private
-     * @type {onViewPortatributesHandler}
-     */
-    private attrbuteHandler;
+export class onViewPort {
     /**
      * @private
      */
-    private observer;
+    private static observer;
     /**
      * @returns {IntersectionObserverEntry[]}
      * @see https://developer.mozilla.org/docs/Web/API/IntersectionObserver/takeRecords
      */
-    takeRecords: () => IntersectionObserverEntry[];
+    static takeRecords: () => IntersectionObserverEntry[];
     /**
      * @returns {void}
      * @see https://developer.mozilla.org/docs/Web/API/IntersectionObserver/disconnect
      */
-    disconnect: () => void;
-    root: Element | Document;
-    rootMargin: string;
+    static disconnect: () => void;
+    static get root(): Element | Document;
+    static get rootMargin(): string;
     /**
      * @param {Element|HTMLElement} element
      * @returns
      */
-    unobserve: (element: Element | HTMLElement) => void;
+    static unobserve: (element: Element | HTMLElement) => void;
     /**
-     * @private
-     * @param {HTMLElement|Element} element
-     * @return {import('./onViewPortHandler.type.mjs').onViewPortHandlerDisconnector}
+     * @param {HTMLElement} element
      */
-    private disconnectedTypeParam;
+    static removeOnViewCallback: (element: HTMLElement) => void;
+    /**
+     * @param {HTMLElement} element
+     */
+    static removeOnExitViewCallback: (element: HTMLElement) => void;
+    /**
+     * @param {HTMLElement} element
+     */
+    static removeAllCallbacks: (element: HTMLElement) => void;
+    /**
+     * @type {import('./onViewPortHandler.type.mjs').onViewPortHandler}
+     */
+    static onViewCallbacksOptions: import("./onViewPortHandler.type.mjs").onViewPortHandler;
     /**
      * @private
      * @param {IntersectionObserverEntry} entry
      */
-    private handleEntry;
+    private static handleEntry;
+    /**
+     * @param {import('./onViewPortHandler.type.mjs').elementsCallbacks} elementsCallbacks
+     */
+    constructor(elementsCallbacks: import("./onViewPortHandler.type.mjs").elementsCallbacks);
 }

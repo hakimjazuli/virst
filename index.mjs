@@ -61,7 +61,6 @@ import { For } from './src/For.mjs';
 import { Let } from './src/Let.mjs';
 import { Lifecycle } from './src/Lifecycle.mjs';
 import { List } from './src/List.mjs';
-import { OnViewPort } from './src/OnViewPort.mjs';
 import { Ping } from './src/Ping.mjs';
 import { ShortCut } from './src/ShortCut.mjs';
 import { Try_ } from './src/Try_.mjs';
@@ -85,24 +84,25 @@ import { _ } from './src/_.mjs';
  * @typedef {Object} lifecycleHandler
  * @property {HTMLElement} lifecycleHandler.element
  * @property {()=>HTMLElement} lifecycleHandler.cloneElement
- * @property {Lifecycle} lifecycleHandler.lifecycleObserver
+ * @property {import('./src/Lifecycle.mjs').Lifecycle} lifecycleHandler.lifecycleObserver
  * @property {(arg0:()=>Promise<void>)=>void} lifecycleHandler.onConnected
  * @property {(arg0:()=>Promise<void>)=>void} lifecycleHandler.onDisconnected
  * @property {(arg0:attributeChangedLifecycle)=>void} lifecycleHandler.onAttributeChanged
+ * @property {(elementsCallbacks:import('./src/onViewPortHandler.type.mjs').elementsCallbacks)=>import('./src/onViewPort.mjs').onViewPort} lifecycleHandler.onViewPort
  */
 /**
- * @description
- * type helper for `onViewPortHandler`
- */
-/**
- * @typedef {Object} onViewPortHandlerDisconnector
- * @property {HTMLElement|Element} element
- * @property {OnViewPort} onViewPortObserver
- * @property {Lifecycle} lifecycleObserver
+ * @typedef {import('./src/onViewPort.mjs').onViewPort} onViewPortType
  * @typedef {Object} onViewPortHandler
- * @property {(options:onViewPortHandlerDisconnector)=>Promise<void>} onViewPortHandler.onViewPort
- * @property {(options:onViewPortHandlerDisconnector)=>Promise<void>} onViewPortHandler.onExitingViewPort
- * @property {(options:onViewPortHandlerDisconnector)=>Promise<void>} onViewPortHandler.onDisconnected
+ * @property {typeof import('./src/onViewPort.mjs').onViewPort.removeOnExitViewCallback} removeOnExitViewCallback
+ * @property {typeof import('./src/onViewPort.mjs').onViewPort.removeOnViewCallback} removeOnViewCallback
+ * @property {typeof import('./src/onViewPort.mjs').onViewPort.removeAllCallbacks} removeAllCallbacks
+ * @property {typeof import('./src/onViewPort.mjs').onViewPort.unobserve} unobserve
+ * @typedef {import('./src/lifecycleHandler.type.mjs').lifecycleHandler} onViewPortLifecycleHandler
+ * @typedef {Object} elementsCallbacks
+ * @property {HTMLElement} elementsCallbacks.element
+ * @property {(onViewCallbacksOptions:onViewPortHandler)=>Promise<void>} elementsCallbacks.onViewCallback
+ * @property {(onViewCallbacksOptions:onViewPortHandler)=>Promise<void>} elementsCallbacks.onExitViewCallback
+ * @property {onViewPortLifecycleHandler["onDisconnected"][]} elementsCallbacks.lifecyclesOnDisconnected
  */
 
-export { $, App, Component, CRUD, DefinePageTemplate, DefineQRouter, DefineShortCuts, DefineStorage, Derived, Event_, For, Let, Lifecycle, List, OnViewPort, Ping, ShortCut, Try_, WorkerMainThread, WorkerThread, _ };
+export { $, App, Component, CRUD, DefinePageTemplate, DefineQRouter, DefineShortCuts, DefineStorage, Derived, Event_, For, Let, Lifecycle, List, Ping, ShortCut, Try_, WorkerMainThread, WorkerThread, _ };

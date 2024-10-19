@@ -94,7 +94,8 @@ export class For {
 							});
 							continue;
 						}
-						this.parentElement.appendChild(this.childElement.cloneNode(true));
+						const childElement_ = helper.cloneNode(this.childElement);
+						this.parentElement.appendChild(childElement_);
 					}
 					for (let j = i; j < children.length; j++) {
 						await Lifecycle.shallowScope({
@@ -113,6 +114,7 @@ export class For {
 			)
 		);
 	};
+
 	/**
 	 * @private
 	 * @param {HTMLElement} parentElement
@@ -139,10 +141,7 @@ export class For {
 		parentElement.innerHTML = '';
 		this.childLifecycle(childLifeCycleCallback, onParentDisconnected);
 		for (let i = 0; i < listValue.length; i++) {
-			const childElement_ = this.childElement.cloneNode(true);
-			if (!(childElement_ instanceof HTMLElement)) {
-				continue;
-			}
+			const childElement_ = helper.cloneNode(this.childElement);
 			parentElement.appendChild(childElement_);
 		}
 	};

@@ -1,7 +1,5 @@
 // @ts-check
 
-import { Lifecycle } from './Lifecycle.mjs';
-
 /**
  * @description
  * type helper for `lifecycleHandler` & `attributeChangedLifecycle`
@@ -11,8 +9,9 @@ import { Lifecycle } from './Lifecycle.mjs';
  * @typedef {Object} lifecycleHandler
  * @property {HTMLElement} lifecycleHandler.element
  * @property {()=>HTMLElement} lifecycleHandler.cloneElement
- * @property {Lifecycle} lifecycleHandler.lifecycleObserver
+ * @property {import('./Lifecycle.mjs').Lifecycle} lifecycleHandler.lifecycleObserver
  * @property {(arg0:()=>Promise<void>)=>void} lifecycleHandler.onConnected
  * @property {(arg0:()=>Promise<void>)=>void} lifecycleHandler.onDisconnected
  * @property {(arg0:attributeChangedLifecycle)=>void} lifecycleHandler.onAttributeChanged
+ * @property {(elementsCallbacks:import('./onViewPortHandler.type.mjs').elementsCallbacks)=>import('./onViewPort.mjs').onViewPort} lifecycleHandler.onViewPort
  */

@@ -61,6 +61,20 @@ export class helper {
 	static onViewCBIdentifier = `virst-ov`;
 	static onExitViewCBIdentifier = `virst-oxv`;
 	/**
+	 * @param {HTMLElement|Element} element
+	 * @returns {HTMLElement}
+	 */
+	static cloneNode = (element) => {
+		const childElement_ = element.cloneNode(true);
+		if (!(childElement_ instanceof HTMLElement)) {
+			return;
+		}
+		childElement_.removeAttribute(helper.LCCBIdentifier);
+		childElement_.removeAttribute(helper.onViewCBIdentifier);
+		childElement_.removeAttribute(helper.onExitViewCBIdentifier);
+		return childElement_;
+	};
+	/**
 	 * @readonly
 	 */
 	static ForQPrefix = `virst-fq-`;
