@@ -27,26 +27,26 @@ export class onViewPort {
     static get root(): Element | Document;
     static get rootMargin(): string;
     /**
+     * @private
      * @param {Element|HTMLElement} element
      * @returns
      */
-    static unobserve: (element: Element | HTMLElement) => void;
+    private static unobserve;
     /**
-     * @param {HTMLElement} element
+     * @private
+     * @param {Element|HTMLElement} element
      */
-    static removeOnViewCallback: (element: HTMLElement) => void;
+    private static removeOnViewCallback;
     /**
-     * @param {HTMLElement} element
+     * @private
+     * @param {Element|HTMLElement} element
      */
-    static removeOnExitViewCallback: (element: HTMLElement) => void;
+    private static removeOnExitViewCallback;
     /**
-     * @param {HTMLElement} element
+     * @private
+     * @type {(element:Element|HTMLElement)=>import('./onViewPortHandler.type.mjs').onViewPortHandler}
      */
-    static removeAllCallbacks: (element: HTMLElement) => void;
-    /**
-     * @type {import('./onViewPortHandler.type.mjs').onViewPortHandler}
-     */
-    static onViewCallbacksOptions: import("./onViewPortHandler.type.mjs").onViewPortHandler;
+    private static onViewCallbacksOptions;
     /**
      * @private
      * @param {IntersectionObserverEntry} entry
@@ -56,4 +56,9 @@ export class onViewPort {
      * @param {import('./onViewPortHandler.type.mjs').elementsCallbacks} elementsCallbacks
      */
     constructor(elementsCallbacks: import("./onViewPortHandler.type.mjs").elementsCallbacks);
+    /**
+     * @param {Element|HTMLElement} element
+     * @returns {import('./onViewPortHandler.type.mjs').onViewPortHandler}
+     */
+    handlers: (element: Element | HTMLElement) => import("./onViewPortHandler.type.mjs").onViewPortHandler;
 }

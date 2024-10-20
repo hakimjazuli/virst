@@ -1,13 +1,14 @@
 export type onViewPortType = import("./onViewPort.mjs").onViewPort;
 export type onViewPortHandler = {
-    removeOnExitViewCallback: typeof import("./onViewPort.mjs").onViewPort.removeOnExitViewCallback;
-    removeOnViewCallback: typeof import("./onViewPort.mjs").onViewPort.removeOnViewCallback;
-    removeAllCallbacks: typeof import("./onViewPort.mjs").onViewPort.removeAllCallbacks;
-    unobserve: typeof import("./onViewPort.mjs").onViewPort.unobserve;
+    removeOnExitViewCallback: () => void;
+    removeOnViewCallback: () => void;
+    unobserveElement: () => void;
 };
 export type onViewPortLifecycleHandler = import("./lifecycleHandler.type.mjs").lifecycleHandler;
-export type elementsCallbacks = {
+export type elementsCallbacks = elementsLCCallbacks & {
     element: HTMLElement;
+};
+export type elementsLCCallbacks = {
     onViewCallback: (onViewCallbacksOptions: onViewPortHandler) => Promise<void>;
     onExitViewCallback: (onViewCallbacksOptions: onViewPortHandler) => Promise<void>;
     lifecyclesOnDisconnected: onViewPortLifecycleHandler["onDisconnected"][];

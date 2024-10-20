@@ -278,7 +278,7 @@ export class Lifecycle {
 			Lifecycle.setDCCB(addedNode, disconnectedCallback);
 		};
 		this.attributeLifecyclesHandler[attributeName]({
-			onViewPort: (options) => new onViewPort(options),
+			onViewPort: (options) => new onViewPort({ element: addedNode, ...options }),
 			element: addedNode,
 			cloneElement: () => {
 				const clonedElement = addedNode.cloneNode(true);

@@ -26,7 +26,7 @@ export class onViewPort {
 		element[helper.onExitViewCBIdentifier] = onExitViewCallback;
 		for (let i = 0; i < lifecyclesOnDisconnected.length; i++) {
 			lifecyclesOnDisconnected[i](async () => {
-				onViewPort.removeAllCallbacks(element);
+				onViewPort.unobserve(element);
 			});
 		}
 	}
@@ -60,12 +60,14 @@ export class onViewPort {
 		return this.observer.rootMargin;
 	}
 	/**
+	 * @private
 	 * @param {Element|HTMLElement} element
 	 * @returns
 	 */
 	static unobserve = (element) => this.observer.unobserve(element);
 	/**
-	 * @param {HTMLElement} element
+	 * @private
+	 * @param {Element|HTMLElement} element
 	 */
 	static removeOnViewCallback = (element) => {
 		if (helper.onViewCBIdentifier in element) {
@@ -73,7 +75,8 @@ export class onViewPort {
 		}
 	};
 	/**
-	 * @param {HTMLElement} element
+	 * @private
+	 * @param {Element|HTMLElement} element
 	 */
 	static removeOnExitViewCallback = (element) => {
 		delete element[helper.onExitViewCBIdentifier];
@@ -81,20 +84,22 @@ export class onViewPort {
 		}
 	};
 	/**
-	 * @param {HTMLElement} element
+	 * @private
+	 * @type {(element:Element|HTMLElement)=>import('./onViewPortHandler.type.mjs').onViewPortHandler}
 	 */
-	static removeAllCallbacks = (element) => {
-		this.removeOnViewCallback(element);
-		this.removeOnExitViewCallback(element);
+	static onViewCallbacksOptions = (element) => {
+		return {
+			removeOnViewCallback: () => onViewPort.removeOnViewCallback(element),
+			removeOnExitViewCallback: () => onViewPort.removeOnExitViewCallback(element),
+			unobserveElement: () => onViewPort.unobserve(element),
+		};
 	};
 	/**
-	 * @type {import('./onViewPortHandler.type.mjs').onViewPortHandler}
+	 * @param {Element|HTMLElement} element
+	 * @returns {import('./onViewPortHandler.type.mjs').onViewPortHandler}
 	 */
-	static onViewCallbacksOptions = {
-		removeOnViewCallback: onViewPort.removeOnViewCallback,
-		removeOnExitViewCallback: onViewPort.removeOnExitViewCallback,
-		removeAllCallbacks: onViewPort.removeAllCallbacks,
-		unobserve: onViewPort.unobserve,
+	handlers = (element) => {
+		return onViewPort.onViewCallbacksOptions(element);
 	};
 	/**
 	 * @private
@@ -103,10 +108,12 @@ export class onViewPort {
 	static handleEntry = async (entry) => {
 		const element = entry.target;
 		if (entry.isIntersecting && helper.onViewCBIdentifier in element) {
-			await element[helper.onViewCBIdentifier](onViewPort.onViewCallbacksOptions);
+			await element[helper.onViewCBIdentifier](onViewPort.onViewCallbacksOptions(element));
 		}
 		if (!entry.isIntersecting && helper.onExitViewCBIdentifier in element) {
-			await element[helper.onExitViewCBIdentifier](onViewPort.onViewCallbacksOptions);
+			await element[helper.onExitViewCBIdentifier](
+				onViewPort.onViewCallbacksOptions(element)
+			);
 		}
 	};
 }

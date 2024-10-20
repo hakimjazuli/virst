@@ -8,7 +8,7 @@
  * @description
  * ## about virst
  * virst is:
- * - spelled `/fɜrst/` ("technically" pun of first `/fɜrst/` and burst `/bɜrst/`);
+ * - pronounced `/fɜrst/` ("technically" pun of first `/fɜrst/` and burst `/bɜrst/`);
  * - new repo/library based on `@html_first/simple_signal`;
  * > - which itself are inspired by `solidJS` `signal` based `reactivity`
  * > > - which then `simple_signal` will be discontinued effective immediately;
@@ -88,21 +88,20 @@ import { _ } from './src/_.mjs';
  * @property {(arg0:()=>Promise<void>)=>void} lifecycleHandler.onConnected
  * @property {(arg0:()=>Promise<void>)=>void} lifecycleHandler.onDisconnected
  * @property {(arg0:attributeChangedLifecycle)=>void} lifecycleHandler.onAttributeChanged
- * @property {(elementsCallbacks:import('./src/onViewPortHandler.type.mjs').elementsCallbacks)=>import('./src/onViewPort.mjs').onViewPort} lifecycleHandler.onViewPort
+ * @property {(elementsCallbacks:import('./src/onViewPortHandler.type.mjs').elementsLCCallbacks)=>import('./src/onViewPort.mjs').onViewPort} lifecycleHandler.onViewPort
  */
 /**
  * @typedef {import('./src/onViewPort.mjs').onViewPort} onViewPortType
  * @typedef {Object} onViewPortHandler
- * @property {typeof import('./src/onViewPort.mjs').onViewPort.removeOnExitViewCallback} removeOnExitViewCallback
- * @property {typeof import('./src/onViewPort.mjs').onViewPort.removeOnViewCallback} removeOnViewCallback
- * @property {typeof import('./src/onViewPort.mjs').onViewPort.removeAllCallbacks} removeAllCallbacks
- * @property {typeof import('./src/onViewPort.mjs').onViewPort.unobserve} unobserve
+ * @property {()=>void} removeOnExitViewCallback
+ * @property {()=>void} removeOnViewCallback
+ * @property {()=>void} unobserveElement
  * @typedef {import('./src/lifecycleHandler.type.mjs').lifecycleHandler} onViewPortLifecycleHandler
- * @typedef {Object} elementsCallbacks
- * @property {HTMLElement} elementsCallbacks.element
- * @property {(onViewCallbacksOptions:onViewPortHandler)=>Promise<void>} elementsCallbacks.onViewCallback
- * @property {(onViewCallbacksOptions:onViewPortHandler)=>Promise<void>} elementsCallbacks.onExitViewCallback
- * @property {onViewPortLifecycleHandler["onDisconnected"][]} elementsCallbacks.lifecyclesOnDisconnected
+ * @typedef {elementsLCCallbacks & { element: HTMLElement }} elementsCallbacks
+ * @typedef {Object} elementsLCCallbacks
+ * @property {(onViewCallbacksOptions: onViewPortHandler) => Promise<void>} onViewCallback
+ * @property {(onViewCallbacksOptions: onViewPortHandler) => Promise<void>} onExitViewCallback
+ * @property {onViewPortLifecycleHandler["onDisconnected"][]} lifecyclesOnDisconnected
  */
 
 export { $, App, Component, CRUD, DefinePageTemplate, DefineQRouter, DefineShortCuts, DefineStorage, Derived, Event_, For, Let, Lifecycle, List, Ping, ShortCut, Try_, WorkerMainThread, WorkerThread, _ };
