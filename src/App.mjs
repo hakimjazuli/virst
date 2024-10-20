@@ -26,13 +26,13 @@ export class App {
 	 * @param {import('./DefinePageTemplate.mjs').DefinePageTemplate} [options.definePageTemplate]
 	 */
 	constructor({
-		lifecycles,
-		forS,
-		rootComponent,
-		defineShortcuts: definedShortcuts,
-		defineQRouter: definedQRouter,
-		defineStorage: definedStorage,
-		definePageTemplate,
+		lifecycles: _0,
+		forS: _1,
+		rootComponent: _2,
+		defineShortcuts: _3,
+		defineQRouter: _4,
+		defineStorage: _5,
+		definePageTemplate: _6,
 	}) {
 		if (App.__ instanceof App) {
 			helper.warningSingleton(App);

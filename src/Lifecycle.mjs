@@ -28,11 +28,9 @@ export class Lifecycle {
 	 * @return {documentScopedReturn}
 	 */
 	static createMutationObserver = (documentScope) => {
-		const ret = Lifecycle.registeredDocumentScope.filter(
-			([MutationObserver, MutationRecordSignal, documentScope_]) => {
-				return documentScope_ === documentScope;
-			}
-		)[0];
+		const ret = Lifecycle.registeredDocumentScope.filter((res) => {
+			return res[2] /** documentScope */ === documentScope;
+		})[0];
 		if (ret) {
 			return ret;
 		}
@@ -407,7 +405,7 @@ export class Lifecycle {
 		/**
 		 * already `autoQueued` using `$` in `this.$`
 		 */
-		await helper.handlePromiseAll(this.elementCMRefed);
+		await helper.handlePromiseAll(this, this.elementCMRefed);
 	};
 	/**
 	 * @private
@@ -521,7 +519,7 @@ export class Lifecycle {
 			}
 		}
 		if (disconnectedCallbacks.length) {
-			await helper.handlePromiseAll(disconnectedCallbacks);
+			await helper.handlePromiseAll(this, disconnectedCallbacks);
 		}
 	};
 	/**

@@ -1,8 +1,5 @@
 export class helper {
     /**
-     * @typedef {import('./documentScope.type.mjs').documentScope} documentScope
-     */
-    /**
      * subscriber
      * @type {null|((isAtInitialization:boolean)=>Promise<void>)}
      */
@@ -106,8 +103,9 @@ export class helper {
      */
     static validAttributeNameSelector: (attributeName: string) => string;
     /**
+     * @param {Object} source
      * @param {((...args:any)=>Promise<any>)[]} asyncArrayFunctions
      * @param {any[]} args
      */
-    static handlePromiseAll: (asyncArrayFunctions: ((...args: any) => Promise<any>)[], ...args: any[]) => Promise<void>;
+    static handlePromiseAll: (source: any, asyncArrayFunctions: ((...args: any) => Promise<any>)[], ...args: any[]) => Promise<void>;
 }

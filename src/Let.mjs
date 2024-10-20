@@ -111,7 +111,7 @@ export class Let {
 	value_;
 	call$ = () => {
 		new Ping(true, async () => {
-			await helper.handlePromiseAll(this.subscription, false);
+			await helper.handlePromiseAll(this, this.subscription, false);
 		});
 	};
 	/**

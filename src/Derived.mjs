@@ -47,7 +47,7 @@ export class Derived extends Let {
 	get value() {
 		return super.value;
 	}
-	set value(v) {
+	set value(_) {
 		console.warn('you are not allowed to change Derived value manually');
 	}
 }

@@ -2,9 +2,6 @@
 
 export class helper {
 	/**
-	 * @typedef {import('./documentScope.type.mjs').documentScope} documentScope
-	 */
-	/**
 	 * subscriber
 	 * @type {null|((isAtInitialization:boolean)=>Promise<void>)}
 	 */
@@ -172,10 +169,11 @@ export class helper {
 		attributeName.toLowerCase().replaceAll(':', '\\:');
 
 	/**
+	 * @param {Object} source
 	 * @param {((...args:any)=>Promise<any>)[]} asyncArrayFunctions
 	 * @param {any[]} args
 	 */
-	static handlePromiseAll = async (asyncArrayFunctions, ...args) => {
+	static handlePromiseAll = async (source, asyncArrayFunctions, ...args) => {
 		if (!asyncArrayFunctions.length) {
 			return;
 		}
@@ -184,12 +182,12 @@ export class helper {
 				try {
 					return await callback(...args);
 				} catch (error) {
-					console.error('Error in callback:', error);
+					console.error({ source, message: 'Error in callback', error });
 					throw error;
 				}
 			})
 		).catch((error) => {
-			console.error('Promise.all failed:', error);
+			console.error({ source, message: 'Promise.all failed:', error });
 		});
 	};
 }

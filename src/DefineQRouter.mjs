@@ -102,7 +102,7 @@ export class DefineQRouter {
 			const keyQuery = (this.handlers[key.toString()] = new this.handler(key, queries[key]));
 			const thisQueryString = (this.routes[key.toString()] = keyQuery.string);
 			new $(async () => {
-				const _ = thisQueryString.value;
+				thisQueryString.value;
 				const exceptionSet = keyQuery.clearAllWhenImSetExcept;
 				const clearListWhenImSet = keyQuery.clearListWhenImSet;
 				DefineQRouter.onAfterResolved = keyQuery.onAfterResolved;
