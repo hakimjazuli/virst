@@ -62,23 +62,17 @@ export class Component {
 				onConnected,
 				onDisconnected,
 			}) => {
-				if (onConnectedCallback) {
-					onConnected(async () => {
-						/**
-						 * @type {onConnectedOptions["reactiveProps"]}
-						 */
-						// @ts-ignore
-						const reactiveProps = {};
-						for (const propName in props) {
-							const value =
-								element.getAttribute(propName) ?? props[propName.toString()];
-							Lifecycle.shallowScope({
-								documentScope: element,
-								scopedCallback: async () => {
-									reactiveProps[propName.toString()] = new Let(value, propName);
-								},
-							});
-						}
+				onConnected(async () => {
+					/**
+					 * @type {onConnectedOptions["reactiveProps"]}
+					 */
+					// @ts-ignore
+					const reactiveProps = {};
+					for (const propName in props) {
+						const value = element.getAttribute(propName) ?? props[propName.toString()];
+						reactiveProps[propName.toString()] = new Let(value, propName, false);
+					}
+					if (onConnectedCallback) {
 						await onConnectedCallback({
 							reactiveProps,
 							attr: attributeName,
@@ -98,14 +92,14 @@ export class Component {
 							},
 							componentLifecycle,
 						});
-						onAttributeChanged(async ({ attributeName, newValue }) => {
-							if (!(attributeName in props)) {
-								return;
-							}
-							reactiveProps[attributeName].value = newValue;
-						});
+					}
+					onAttributeChanged(async ({ attributeName, newValue }) => {
+						if (!(attributeName in props)) {
+							return;
+						}
+						reactiveProps[attributeName].value = newValue;
 					});
-				}
+				});
 			},
 		});
 		/**

@@ -12,7 +12,7 @@ import { Lifecycle } from './Lifecycle.mjs';
  * ```js
  * // on Component scope
  * onConnected(async()=>{
- * 	const data = _.let('test');
+ * 	const data = _.l('test');
  * 	html`<div ${data.attr}="innerText"></div>`
  * })
  * ```
@@ -24,7 +24,7 @@ export class _ {
 	 * @param {V} value
 	 * @param {boolean} [isGlobal]
 	 */
-	static let = (value, isGlobal = false) =>
+	static l = (value, isGlobal = false) =>
 		new Let(value, helper.attributeIndexGenerator(), isGlobal);
 	/**
 	 * syntax sugar for `Let.dataOnly`
@@ -32,14 +32,14 @@ export class _ {
 	 * @param {D} data
 	 * @returns {Let<D>}
 	 */
-	static letD = (data) => Let.dataOnly(data);
+	static lD = (data) => Let.dataOnly(data);
 	/**
 	 * auto `attributeName` assign for `Derived`
 	 * @template V
 	 * @param {()=>Promise<V>} asyncCallback
 	 * @param {boolean} [isGlobal]
 	 */
-	static derived = (asyncCallback, isGlobal = false) =>
+	static d = (asyncCallback, isGlobal = false) =>
 		new Derived(asyncCallback, helper.attributeIndexGenerator(), isGlobal);
 	/**
 	 * syntax sugar for `Derived.dataOnly`
@@ -47,14 +47,13 @@ export class _ {
 	 * @param {()=>Promise<V>} asyncCallback
 	 * @returns {Derived<V>}
 	 */
-	static derivedD = (asyncCallback) => Derived.dataOnly(asyncCallback);
+	static dD = (asyncCallback) => Derived.dataOnly(asyncCallback);
 	/**
-	 * singlar attribute watcher for `Lifecycle`
+	 * auto `attributeName` assign for `Lifecycle`
 	 * @param {boolean} isGlobal
-	 * @param {string} attributeName
 	 * @param {(options:import('./lifecycleHandler.type.mjs').lifecycleHandler)=>Promise<void>} lifecycleCallback
 	 * @returns {Lifecycle}
 	 */
-	static lifecycle = (isGlobal, attributeName, lifecycleCallback) =>
-		new Lifecycle(isGlobal, { [attributeName]: lifecycleCallback });
+	static lc = (isGlobal, lifecycleCallback) =>
+		new Lifecycle(isGlobal, { [helper.attributeIndexGenerator()]: lifecycleCallback });
 }

@@ -21,10 +21,12 @@ export class WorkerThread {
 	 */
 	/**
 	 * Creates a worker thread with provided handlers.
-	 * @param {Object} options - Configuration options for the worker thread.
-	 * @param {(options:optionsOnMessage) => void} options.onMessage - A callback function to handle incoming messages in the worker thread.
+	 * @param {(options:optionsOnMessage) => void} onMessage - A callback function to handle incoming messages in the worker thread.
 	 */
-	constructor({ onMessage }) {
+	constructor(onMessage) {
+		/**
+		 * @param {MessageEvent} event
+		 */
 		self.onmessage = (event) => onMessage({ event, postMessage: self.postMessage });
 	}
 }

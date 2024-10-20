@@ -16,13 +16,14 @@ import { Ping } from './Ping.mjs';
  */
 export class CRUD {
 	/**
-	 * @typedef {{asyncCallback:()=>Promise<void>,refreshSignal:boolean}} asyncCallback
+	 * @typedef {{asyncCallback:()=>Promise<void>,refreshSignalWithRead:boolean}} asyncCallback
 	 * @param {Object} options
 	 * @param {Let<V>} options.signal
 	 * @param {()=>Promise<V>} options.read
 	 * @param {asyncCallback} [options.create]
 	 * @param {asyncCallback} [options.update]
 	 * @param {asyncCallback} [options.delete_]
+	 * - uses `delete_`, `delete` is reserved on `destructured` `object`
 	 */
 	constructor({ signal, read, create = undefined, update = undefined, delete_ = undefined }) {
 		if (signal instanceof List) {
@@ -50,7 +51,7 @@ export class CRUD {
 				this[name] = new Ping(false, async () => {
 					const source = mapped[name];
 					await source.asyncCallback();
-					if (source.refreshSignal) {
+					if (source.refreshSignalWithRead) {
 						this.read();
 					}
 				}).ping;

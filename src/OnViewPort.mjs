@@ -109,8 +109,13 @@ export class onViewPort {
 		const element = entry.target;
 		if (entry.isIntersecting && helper.onViewCBIdentifier in element) {
 			await element[helper.onViewCBIdentifier](onViewPort.onViewCallbacksOptions(element));
+			element.setAttribute(helper.onViewCBIdentifier, '');
 		}
-		if (!entry.isIntersecting && helper.onExitViewCBIdentifier in element) {
+		if (
+			!entry.isIntersecting &&
+			helper.onExitViewCBIdentifier in element &&
+			element.hasAttribute(helper.onViewCBIdentifier)
+		) {
 			await element[helper.onExitViewCBIdentifier](
 				onViewPort.onViewCallbacksOptions(element)
 			);
