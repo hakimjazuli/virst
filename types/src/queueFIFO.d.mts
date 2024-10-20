@@ -1,5 +1,9 @@
 export class queueFIFO {
     /**
+     * @param {queueObjectFIFO} _queue
+     */
+    static assign: (_queue: import("./queueObjectFIFO.mjs").queueObjectFIFO) => void;
+    /**
      * @typedef {import('./queueObjectFIFO.mjs').queueObjectFIFO} queueObjectFIFO
      */
     /**
@@ -13,9 +17,10 @@ export class queueFIFO {
      */
     private isRunning;
     /**
+     * @private
      * @param {queueObjectFIFO} _queue
      */
-    assign: (_queue: import("./queueObjectFIFO.mjs").queueObjectFIFO) => void;
+    private assign_;
     /**
      * @private
      * @param {queueObjectFIFO} _queue

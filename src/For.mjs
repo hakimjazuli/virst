@@ -4,6 +4,7 @@ import { $ } from './$.mjs';
 import { helper } from './helper.mjs';
 import { Let } from './Let.mjs';
 import { Lifecycle } from './Lifecycle.mjs';
+import { queueUnique } from './queueUnique.mjs';
 import { queueUniqueObject } from './queueUniqueObject.mjs';
 
 /**
@@ -73,7 +74,7 @@ export class For {
 	 * @param {ListArg[]} value_
 	 */
 	reRender = (value_) => {
-		helper.assignToQUnique(
+		queueUnique.assign(
 			new queueUniqueObject(
 				`${helper.ForChildAttributePrefix}${this.attr}`,
 				async () => {

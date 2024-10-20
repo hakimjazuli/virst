@@ -1,6 +1,7 @@
 // @ts-check
 
 import { helper } from './helper.mjs';
+import { queueFIFO } from './queueFIFO.mjs';
 import { queueObjectFIFO } from './queueObjectFIFO.mjs';
 
 /**
@@ -29,7 +30,7 @@ export class Ping {
 	 * @param {boolean} first
 	 */
 	ping = (first = false) => {
-		helper.assignToQFIFO(
+		queueFIFO.assign(
 			new queueObjectFIFO(async () => {
 				await this.asyncCallback(first);
 			}, helper.debounce)

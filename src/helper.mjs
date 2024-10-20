@@ -1,8 +1,5 @@
 // @ts-check
 
-import { queueFIFO } from './queueFIFO.mjs';
-import { queueUnique } from './queueUnique.mjs';
-
 export class helper {
 	/**
 	 * @typedef {import('./documentScope.type.mjs').documentScope} documentScope
@@ -12,8 +9,7 @@ export class helper {
 	 * @type {null|((isAtInitialization:boolean)=>Promise<void>)}
 	 */
 	static subscriber = null;
-	static assignToQFIFO = new queueFIFO().assign;
-	static assignToQUnique = new queueUnique().assign;
+
 	/**
 	 * @type {number|false}
 	 */

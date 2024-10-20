@@ -1,5 +1,9 @@
 export class queueUnique {
     /**
+     * @param {queueUniqueObject} _queue
+     */
+    static assign: (_queue: queueUniqueObject) => void;
+    /**
      * @private
      * @type {queueUniqueObject|{}}
      */
@@ -8,12 +12,12 @@ export class queueUnique {
      * @private
      * @type {boolean}
      */
-    private is_running;
+    private isRunning;
     /**
-     * @public
+     * @private
      * @param {queueUniqueObject} _queue
      */
-    public assign: (_queue: queueUniqueObject) => void;
+    private assign_;
     /**
      * @private
      * @param {queueUniqueObject} _queue

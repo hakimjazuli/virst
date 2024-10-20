@@ -4,6 +4,24 @@
  */
 export class Lifecycle {
     /**
+     * @typedef {import('./documentScope.type.mjs').documentScope} documentScope
+     * @typedef {import('./Let.mjs').Let<MutationRecord[]>} mutationRecordSignal
+     * @typedef {[MutationObserver,
+     * mutationRecordSignal,
+     * documentScope,
+     * ]} documentScopedReturn
+     */
+    /**
+     * @private
+     * @type {documentScopedReturn[]}
+     */
+    private static registeredDocumentScope;
+    /**
+     * @param {documentScope} documentScope
+     * @return {documentScopedReturn}
+     */
+    static createMutationObserver: (documentScope: import("./documentScope.type.mjs").documentScope) => [MutationObserver, import("./Let.mjs").Let<MutationRecord[]>, import("./documentScope.type.mjs").documentScope];
+    /**
      * @typedef {Object} autoScopeOptions
      * @property {()=>Promise<void>} scopedCallback
      * @property {boolean} runCheckAtFirst
@@ -58,7 +76,6 @@ export class Lifecycle {
      * [attributeName:string]:
      * (options:import('./lifecycleHandler.type.mjs').lifecycleHandler)=>void
      * }} attributeLifecyclesHandler
-     * @typedef {import('./documentScope.type.mjs').documentScope} documentScope
      */
     /**
      * attributeIdentification

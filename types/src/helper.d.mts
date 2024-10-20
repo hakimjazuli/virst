@@ -7,8 +7,6 @@ export class helper {
      * @type {null|((isAtInitialization:boolean)=>Promise<void>)}
      */
     static subscriber: null | ((isAtInitialization: boolean) => Promise<void>);
-    static assignToQFIFO: (_queue: import("./queueObjectFIFO.mjs").queueObjectFIFO) => void;
-    static assignToQUnique: (_queue: import("./queueUniqueObject.mjs").queueUniqueObject) => void;
     /**
      * @type {number|false}
      */

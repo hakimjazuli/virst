@@ -6,6 +6,10 @@ import { helper } from './helper.mjs';
 export class queueUnique {
 	/**
 	 * @private
+	 */
+	constructor() {}
+	/**
+	 * @private
 	 * @type {queueUniqueObject|{}}
 	 */
 	queue = {};
@@ -13,17 +17,21 @@ export class queueUnique {
 	 * @private
 	 * @type {boolean}
 	 */
-	is_running = false;
+	isRunning = false;
 	/**
-	 * @public
+	 * @private
 	 * @param {queueUniqueObject} _queue
 	 */
-	assign = (_queue) => {
+	assign_ = (_queue) => {
 		this.push(_queue);
-		if (!this.is_running) {
+		if (!this.isRunning) {
 			this.run();
 		}
 	};
+	/**
+	 * @param {queueUniqueObject} _queue
+	 */
+	static assign = new queueUnique().assign_;
 	/**
 	 * @private
 	 * @param {queueUniqueObject} _queue
@@ -34,7 +42,7 @@ export class queueUnique {
 	};
 	/** @private */
 	run = async () => {
-		this.is_running = true;
+		this.isRunning = true;
 		while (Object.keys(this.queue).length !== 0) {
 			for (const current_key in this.queue) {
 				const { callback, debounce: debounce_ms } = this.queue[current_key];
@@ -50,6 +58,6 @@ export class queueUnique {
 				break;
 			}
 		}
-		this.is_running = false;
+		this.isRunning = false;
 	};
 }

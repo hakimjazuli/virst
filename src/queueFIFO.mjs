@@ -4,6 +4,10 @@ import { helper } from './helper.mjs';
 
 export class queueFIFO {
 	/**
+	 * @private
+	 */
+	constructor() {}
+	/**
 	 * @typedef {import('./queueObjectFIFO.mjs').queueObjectFIFO} queueObjectFIFO
 	 */
 	/**
@@ -17,14 +21,19 @@ export class queueFIFO {
 	 */
 	isRunning = false;
 	/**
+	 * @private
 	 * @param {queueObjectFIFO} _queue
 	 */
-	assign = (_queue) => {
+	assign_ = (_queue) => {
 		this.push(_queue);
 		if (!this.isRunning) {
 			this.run();
 		}
 	};
+	/**
+	 * @param {queueObjectFIFO} _queue
+	 */
+	static assign = new queueFIFO().assign_;
 	/**
 	 * @private
 	 * @param {queueObjectFIFO} _queue

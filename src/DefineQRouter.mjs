@@ -5,6 +5,7 @@ import { helper } from './helper.mjs';
 import { Let } from './Let.mjs';
 import { Lifecycle } from './Lifecycle.mjs';
 import { Ping } from './Ping.mjs';
+import { queueUnique } from './queueUnique.mjs';
 import { queueUniqueObject } from './queueUniqueObject.mjs';
 
 /**
@@ -202,7 +203,7 @@ export class DefineQRouter {
 	 * @param {Ping["ping"]} ping
 	 */
 	requestChanges = async (ping) => {
-		helper.assignToQUnique(
+		queueUnique.assign(
 			new queueUniqueObject(
 				helper.qRouteChange,
 				async () => {

@@ -2,7 +2,6 @@
 
 import { $ } from './$.mjs';
 import { helper } from './helper.mjs';
-import { mutaitonObserver } from './mutaitonObserver.mjs';
 import { onViewPort } from './onViewPort.mjs';
 import { Ping } from './Ping.mjs';
 
@@ -11,6 +10,52 @@ import { Ping } from './Ping.mjs';
  * - helper class to track connected/disconnected/attributeChanged of an element;
  */
 export class Lifecycle {
+	/**
+	 * @typedef {import('./documentScope.type.mjs').documentScope} documentScope
+	 * @typedef {import('./Let.mjs').Let<MutationRecord[]>} mutationRecordSignal
+	 * @typedef {[MutationObserver,
+	 * mutationRecordSignal,
+	 * documentScope,
+	 * ]} documentScopedReturn
+	 */
+	/**
+	 * @private
+	 * @type {documentScopedReturn[]}
+	 */
+	static registeredDocumentScope = [];
+	/**
+	 * @param {documentScope} documentScope
+	 * @return {documentScopedReturn}
+	 */
+	static createMutationObserver = (documentScope) => {
+		const ret = Lifecycle.registeredDocumentScope.filter(
+			([MutationObserver, MutationRecordSignal, documentScope_]) => {
+				return documentScope_ === documentScope;
+			}
+		)[0];
+		if (ret) {
+			return ret;
+		}
+		/**
+		 * @type {mutationRecordSignal}
+		 */
+		// @ts-ignore
+		const documentMutations_ = Let.dataOnly('');
+		const documentObserver = new MutationObserver((mutationList) => {
+			documentMutations_.value = mutationList;
+		});
+		documentObserver.observe(documentScope, {
+			childList: true,
+			subtree: true,
+			attributes: true,
+		});
+		/**
+		 * @type {documentScopedReturn}
+		 */
+		const ret_ = [documentObserver, documentMutations_, documentScope];
+		Lifecycle.registeredDocumentScope.push(ret_);
+		return ret_;
+	};
 	/**
 	 * @typedef {Object} autoScopeOptions
 	 * @property {()=>Promise<void>} scopedCallback
@@ -86,7 +131,6 @@ export class Lifecycle {
 	 * [attributeName:string]:
 	 * (options:import('./lifecycleHandler.type.mjs').lifecycleHandler)=>void
 	 * }} attributeLifecyclesHandler
-	 * @typedef {import('./documentScope.type.mjs').documentScope} documentScope
 	 */
 	/**
 	 * attributeIdentification
@@ -149,7 +193,7 @@ export class Lifecycle {
 		const documentScope = manualScope ?? helper.currentDocumentScope;
 		this.attributeLifecyclesHandler = attributeLifecyclesHandler;
 		this.currentDocumentScope = documentScope;
-		const [mObs, mLet] = mutaitonObserver.create(documentScope);
+		const [mObs, mLet] = Lifecycle.createMutationObserver(documentScope);
 		this.mutationObserver = mObs;
 		this.mutationSignal = mLet;
 		this.takeRecords = mObs.takeRecords;
