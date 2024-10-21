@@ -20,7 +20,7 @@ export class Lifecycle {
      * @param {documentScope} documentScope
      * @return {documentScopedReturn}
      */
-    static createMutationObserver: (documentScope: import("./documentScope.type.mjs").documentScope) => [MutationObserver, import("./Let.mjs").Let<MutationRecord[]>, import("./documentScope.type.mjs").documentScope];
+    static createMutationObserver: (documentScope: import("./documentScope.type.mjs").documentScope) => [MutationObserver, Let<MutationRecord[]>, import("./documentScope.type.mjs").documentScope];
     /**
      * @typedef {Object} autoScopeOptions
      * @property {()=>Promise<void>} scopedCallback
@@ -208,4 +208,5 @@ export class Lifecycle {
      */
     private mutationDCHandler;
 }
+import { Let } from './Let.mjs';
 import { Ping } from './Ping.mjs';
