@@ -7,8 +7,10 @@ export class Ping {
     /**
      * @param {boolean} callsAtFirst
      * @param {(isAtInitisalization:boolean)=>Promise<void>} asyncCallbackWhenPinged
+     * @param {'fifo'|'unique'} [mode]
+     * @param {any} [uniqueID]
      */
-    constructor(callsAtFirst: boolean, asyncCallbackWhenPinged: (isAtInitisalization: boolean) => Promise<void>);
+    constructor(callsAtFirst: boolean, asyncCallbackWhenPinged: (isAtInitisalization: boolean) => Promise<void>, mode?: "fifo" | "unique", uniqueID?: any);
     /**
      * async callback when pinged
      * @private
@@ -18,5 +20,10 @@ export class Ping {
     /**
      * @param {boolean} first
      */
-    ping: (first?: boolean) => void;
+    fifo: (first?: boolean) => void;
+    /**
+     * @param {any} uniqueID
+     * @param {boolean} first
+     */
+    unique: (uniqueID: any, first?: boolean) => void;
 }

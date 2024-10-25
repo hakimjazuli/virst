@@ -13,7 +13,7 @@ export class ShortCut {
 	 * @param {(isAtInitisalization:boolean)=>Promise<void>} options.asyncCallback
 	 */
 	constructor({ triggerCheck: action, asyncCallback }) {
-		this.ping = new Ping(false, asyncCallback).ping;
+		this.ping = new Ping(false, asyncCallback).fifo;
 		this.action = action;
 		window.addEventListener('keydown', this.event);
 	}

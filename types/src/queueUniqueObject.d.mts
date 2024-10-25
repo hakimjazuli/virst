@@ -1,15 +1,15 @@
 export class queueUniqueObject {
     /**
-     * @param {string} id
+     * @param {any} id
      * @param {()=>(any|Promise<any>)} callback
-     * @param {number|false} [debounce]
+     * @param {number} [debounce]
      * - in ms
      */
-    constructor(id: string, callback: () => (any | Promise<any>), debounce?: number | false);
-    /** @type {string} */
-    id: string;
+    constructor(id: any, callback: () => (any | Promise<any>), debounce?: number);
+    /** @type {any} */
+    id: any;
     /** @type {()=>(any|Promise<any>)} */
     callback: () => (any | Promise<any>);
-    /** @type {number|false} */
-    debounce: number | false;
+    /** @type {number} */
+    debounce: number;
 }

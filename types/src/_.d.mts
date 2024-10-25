@@ -12,12 +12,20 @@
  */
 export class _ {
     /**
+     * @typedef {import('./documentScope.type.mjs').documentScope} documentScope
+     */
+    /**
      * auto `attributeName` assign for `Let`
      * @template V
      * @param {V} value
-     * @param {boolean} [isGlobal]
+     * @param {Object} [options]
+     * @param {documentScope} [options.documentScope]
+     * @param {boolean} [options.bypassNested]
      */
-    static l: <V>(value: V, isGlobal?: boolean) => Let<V>;
+    static l: <V>(value: V, options?: {
+        documentScope?: import("./documentScope.type.mjs").documentScope;
+        bypassNested?: boolean;
+    }) => Let<V>;
     /**
      * syntax sugar for `Let.dataOnly`
      * @template D
@@ -29,9 +37,14 @@ export class _ {
      * auto `attributeName` assign for `Derived`
      * @template V
      * @param {()=>Promise<V>} asyncCallback
-     * @param {boolean} [isGlobal]
+     * @param {Object} [options]
+     * @param {documentScope} [options.documentScope]
+     * @param {boolean} [options.bypassNested]
      */
-    static d: <V>(asyncCallback: () => Promise<V>, isGlobal?: boolean) => Derived<V>;
+    static d: <V>(asyncCallback: () => Promise<V>, options?: {
+        documentScope?: import("./documentScope.type.mjs").documentScope;
+        bypassNested?: boolean;
+    }) => Derived<V>;
     /**
      * syntax sugar for `Derived.dataOnly`
      * @template V
@@ -39,14 +52,6 @@ export class _ {
      * @returns {Derived<V>}
      */
     static dD: <V>(asyncCallback: () => Promise<V>) => Derived<V>;
-    /**
-     * auto `attributeName` assign for `Lifecycle`
-     * @param {boolean} isGlobal
-     * @param {(options:import('./lifecycleHandler.type.mjs').lifecycleHandler)=>Promise<void>} lifecycleCallback
-     * @returns {Lifecycle}
-     */
-    static lc: (isGlobal: boolean, lifecycleCallback: (options: import("./lifecycleHandler.type.mjs").lifecycleHandler) => Promise<void>) => Lifecycle;
 }
 import { Let } from './Let.mjs';
 import { Derived } from './Derived.mjs';
-import { Lifecycle } from './Lifecycle.mjs';

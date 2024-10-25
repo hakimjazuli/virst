@@ -13,38 +13,43 @@ export class For {
      * @typedef {Record<string, Let<string>>} ForData
      * @typedef {import('./lifecycleHandler.type.mjs').lifecycleHandler} lifecycleHandler
      * @typedef {Object} childLifeCycleCallback
-     * @property {(arg0:{childElement:HTMLElement,ForController:For})=>Promise<void>} childLifeCycleCallback.onConnected
-     * @property {(arg0:{childElement:HTMLElement,ForController:For})=>Promise<void>} childLifeCycleCallback.onDisconnected
-     * @property {(arg0:{childElement:HTMLElement,ForController:For,attributeName:string, newValue:string})=>Promise<void>} childLifeCycleCallback.onAttributeChanged
+     * @property {(arg0:{element:HTMLElement,ForInstance:For})=>Promise<void>} [childLifeCycleCallback.onConnected]
+     * @property {(arg0:{element:HTMLElement,ForInstance:For})=>Promise<void>} [childLifeCycleCallback.onDisconnected]
+     * @property {(arg0:{element:HTMLElement,ForInstance:For,attributeName:string, newValue:string})=>Promise<void>} [childLifeCycleCallback.onAttributeChanged]
      */
     /**
      * @param {Object} options
      * @param {List} options.listInstance
-     * @param {childLifeCycleCallback} options.childLifeCycleCallback
+     * @param {childLifeCycleCallback} [options.childLifeCycleCallback]
      * @param {string} [options.attributeName]
-     * @param {number} [options.reRenderDebounceMS]
-     * - parent attributeName
+     * @param {boolean} [options.incrementalRender]
+     * handling mode for how to render (when component is increasing the child number)
+     * - false `default`: render all at once, it's fast however have problem of large `Cumulative Layout Shifts`;
+     * - true: update things, incrementally, slightly slower, optimal for:
+     * > - lower number;
+     * > - `paginated` style page;
+     * > - infinite scroll, where you load only few at a times incrementally;
      */
-    constructor({ listInstance, childLifeCycleCallback, attributeName, reRenderDebounceMS, }: {
+    constructor({ listInstance, childLifeCycleCallback, attributeName, incrementalRender, }: {
         listInstance: import("./List.mjs").List<any>;
-        childLifeCycleCallback: {
-            onConnected: (arg0: {
-                childElement: HTMLElement;
-                ForController: For;
+        childLifeCycleCallback?: {
+            onConnected?: (arg0: {
+                element: HTMLElement;
+                ForInstance: For;
             }) => Promise<void>;
-            onDisconnected: (arg0: {
-                childElement: HTMLElement;
-                ForController: For;
+            onDisconnected?: (arg0: {
+                element: HTMLElement;
+                ForInstance: For;
             }) => Promise<void>;
-            onAttributeChanged: (arg0: {
-                childElement: HTMLElement;
-                ForController: For;
+            onAttributeChanged?: (arg0: {
+                element: HTMLElement;
+                ForInstance: For;
                 attributeName: string;
                 newValue: string;
             }) => Promise<void>;
         };
         attributeName?: string;
-        reRenderDebounceMS?: number;
+        incrementalRender?: boolean;
     });
     /**
      * @private
@@ -57,7 +62,12 @@ export class For {
     /**
      * @private
      */
-    private reRenderDebounceMS;
+    private incrementalRender;
+    /**
+     * @private
+     * @type {HTMLElement}
+     */
+    private childElement;
     /**
      * @private
      * @param {ListArg[]} value_
@@ -71,7 +81,6 @@ export class For {
      */
     private onParentConnected;
     parentElement: HTMLElement;
-    childElement: Element;
     /**
      * @private
      * @param {childLifeCycleCallback} childLifeCycleCallback

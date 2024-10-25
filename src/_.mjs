@@ -3,7 +3,6 @@
 import { Let } from './Let.mjs';
 import { Derived } from './Derived.mjs';
 import { helper } from './helper.mjs';
-import { Lifecycle } from './Lifecycle.mjs';
 
 /**
  * @description
@@ -19,13 +18,17 @@ import { Lifecycle } from './Lifecycle.mjs';
  */
 export class _ {
 	/**
+	 * @typedef {import('./documentScope.type.mjs').documentScope} documentScope
+	 */
+	/**
 	 * auto `attributeName` assign for `Let`
 	 * @template V
 	 * @param {V} value
-	 * @param {boolean} [isGlobal]
+	 * @param {Object} [options]
+	 * @param {documentScope} [options.documentScope]
+	 * @param {boolean} [options.bypassNested]
 	 */
-	static l = (value, isGlobal = false) =>
-		new Let(value, helper.attributeIndexGenerator(), isGlobal);
+	static l = (value, options) => new Let(value, helper.attributeIndexGenerator(), options);
 	/**
 	 * syntax sugar for `Let.dataOnly`
 	 * @template D
@@ -37,10 +40,12 @@ export class _ {
 	 * auto `attributeName` assign for `Derived`
 	 * @template V
 	 * @param {()=>Promise<V>} asyncCallback
-	 * @param {boolean} [isGlobal]
+	 * @param {Object} [options]
+	 * @param {documentScope} [options.documentScope]
+	 * @param {boolean} [options.bypassNested]
 	 */
-	static d = (asyncCallback, isGlobal = false) =>
-		new Derived(asyncCallback, helper.attributeIndexGenerator(), isGlobal);
+	static d = (asyncCallback, options) =>
+		new Derived(asyncCallback, helper.attributeIndexGenerator(), options);
 	/**
 	 * syntax sugar for `Derived.dataOnly`
 	 * @template V
@@ -48,12 +53,4 @@ export class _ {
 	 * @returns {Derived<V>}
 	 */
 	static dD = (asyncCallback) => Derived.dataOnly(asyncCallback);
-	/**
-	 * auto `attributeName` assign for `Lifecycle`
-	 * @param {boolean} isGlobal
-	 * @param {(options:import('./lifecycleHandler.type.mjs').lifecycleHandler)=>Promise<void>} lifecycleCallback
-	 * @returns {Lifecycle}
-	 */
-	static lc = (isGlobal, lifecycleCallback) =>
-		new Lifecycle(isGlobal, { [helper.attributeIndexGenerator()]: lifecycleCallback });
 }

@@ -9,6 +9,10 @@ import { Ping } from './Ping.mjs';
 /**
  * @description
  * - helper class to track connected/disconnected/attributeChanged of an element;
+ * - if there are global `attributeName` `test` are inside nested `Lifecycle`, add `virst-gs` and list of the names of the global `attributeName`, with semicolon `;` as separator;
+ * ```html
+ * <div test="innerText" virst-gs="test;"></div>
+ * ```
  */
 export class Lifecycle {
 	/**
@@ -19,6 +23,10 @@ export class Lifecycle {
 	 * documentScope,
 	 * ]} documentScopedReturn
 	 */
+	/**
+	 * @type {string}
+	 */
+	attr;
 	/**
 	 * @private
 	 * @type {documentScopedReturn[]}
@@ -56,24 +64,6 @@ export class Lifecycle {
 		return ret_;
 	};
 	/**
-	 * @typedef {Object} autoScopeOptions
-	 * @property {()=>Promise<void>} scopedCallback
-	 * @property {boolean} runCheckAtFirst
-	 */
-	/**
-	 * use for handling out of scoped codeblock:
-	 * @param {autoScopeOptions} options
-	 * @return {Ping["ping"]}
-	 */
-	static autoScopedPing = ({ scopedCallback, runCheckAtFirst }) => {
-		const documentScope = helper.currentDocumentScope;
-		return Lifecycle.scopedPing({
-			documentScope,
-			scopedCallback,
-			runCheckAtFirst,
-		});
-	};
-	/**
 	 * @param {Object} options
 	 * @param {documentScope} options.documentScope
 	 * @param {()=>Promise<void>} options.scopedCallback
@@ -93,16 +83,15 @@ export class Lifecycle {
 	/**
 	 * manual scoping for lib internal functionality
 	 * @param {manualScopeOptions} options
-	 * @returns {Ping["ping"]}
+	 * @returns {Ping["fifo"]}
 	 */
-	static scopedPing = ({ documentScope, scopedCallback, runCheckAtFirst }) => {
-		return new Ping(runCheckAtFirst, async () => {
+	static scopedPing = ({ documentScope, scopedCallback, runCheckAtFirst }) =>
+		new Ping(runCheckAtFirst, async () => {
 			const currentScope = helper.currentDocumentScope;
 			helper.currentDocumentScope = documentScope;
 			await scopedCallback();
 			helper.currentDocumentScope = currentScope;
-		}).ping;
-	};
+		}).fifo;
 	/**
 	 * @private
 	 * @param {HTMLElement} element
@@ -126,15 +115,12 @@ export class Lifecycle {
 	 */
 	static currentOnParentDCCB = undefined;
 	/**
-	 * @typedef {{
-	 * [attributeName:string]:
-	 * (options:import('./lifecycleHandler.type.mjs').lifecycleHandler)=>void
-	 * }} attributeLifecyclesHandler
+	 * @typedef {(options:import('./lifecycleHandler.type.mjs').lifecycleHandler)=>void} attributeLifecyclesHandler
 	 */
 	/**
 	 * attributeIdentification
 	 * @private
-	 * @type {Map<documentScope,attributeLifecyclesHandler>}
+	 * @type {Map<documentScope,{[attributeName:string]:attributeLifecyclesHandler}>}
 	 */
 	static ID = new Map();
 	/**
@@ -175,28 +161,50 @@ export class Lifecycle {
 	 * @private
 	 * @type {attributeLifecyclesHandler}
 	 */
-	attributeLifecyclesHandler;
+	onConnected;
 	/**
 	 * @private
-	 * @type {boolean}
 	 */
-	isGlobal;
+	assignBypass = () => {
+		const attributeName = this.attr;
+		const documentScope = this.currentDocumentScope;
+		const ref = Lifecycle.bypassNest.get(documentScope);
+		if (!ref) {
+			Lifecycle.bypassNest.set(documentScope, [attributeName]);
+		} else {
+			ref.push(attributeName);
+		}
+	};
 	/**
-	 * @param {boolean} isGlobal
-	 * @param {attributeLifecyclesHandler} attributeLifecyclesHandler
-	 * - allow global attributeName to be handled inside nested `Lifecycle`
-	 * @param {documentScope} [manualScope]
+	 * @private
+	 * @type {Map<documentScope, string[]>}
 	 */
-	constructor(isGlobal, attributeLifecyclesHandler, manualScope = undefined) {
-		this.isGlobal = isGlobal;
-		const documentScope = manualScope ?? helper.currentDocumentScope;
-		this.attributeLifecyclesHandler = attributeLifecyclesHandler;
+	static bypassNest = new Map();
+	/**
+	 * @param {Object} options
+	 * @param {attributeLifecyclesHandler} options.onConnected
+	 * @param {string} [options.attributeName]
+	 * - allow global attributeName to be handled inside nested `Lifecycle`
+	 * @param {documentScope} [options.documentScope]
+	 * @param {boolean} [options.bypassNested]
+	 */
+	constructor({
+		onConnected,
+		attributeName = helper.attributeIndexGenerator(),
+		documentScope = helper.currentDocumentScope,
+		bypassNested = false,
+	}) {
+		this.attr = attributeName;
+		this.onConnected = onConnected;
 		this.currentDocumentScope = documentScope;
+		if (bypassNested) {
+			this.assignBypass();
+		}
 		const [mObs, mLet] = Lifecycle.createMutationObserver(documentScope);
 		this.mutationObserver = mObs;
 		this.mutationSignal = mLet;
 		this.takeRecords = mObs.takeRecords;
-		const registeredAttribute = this.isRegisteredMap();
+		const registeredAttribute = this.isScopeMapped();
 		const onParentDisconnceted = Lifecycle.currentOnParentDCCB;
 		if (onParentDisconnceted) {
 			onParentDisconnceted(async () => {
@@ -208,7 +216,7 @@ export class Lifecycle {
 			 * uses `switch case` over `guard clause` in case of source update that requires additional
 			 * check that are making it not possible for early returns
 			 */
-			case 'whole':
+			case 'newScope':
 				this.effect = new $(async (first) => {
 					const mutationList = mLet.value;
 					if (first) {
@@ -218,9 +226,13 @@ export class Lifecycle {
 					await this.mutationHandler(mutationList);
 				});
 				break;
-			case 'partial':
-				new Ping(true, async () => {
-					await this.initiator();
+			case 'addToScope':
+				Lifecycle.scopedPing({
+					documentScope,
+					runCheckAtFirst: true,
+					scopedCallback: async () => {
+						await this.initiator();
+					},
 				});
 				break;
 			default:
@@ -234,70 +246,96 @@ export class Lifecycle {
 	}
 	/**
 	 * @private
-	 * @return {"partial"|"whole"|string}
+	 * @return {"addToScope"|"newScope"|string}
 	 */
-	isRegisteredMap = () => {
-		const attributeLifecyclesHandler = this.attributeLifecyclesHandler;
+	isScopeMapped = () => {
 		const documentScope = this.currentDocumentScope;
 		if (!Lifecycle.ID.has(documentScope)) {
-			Lifecycle.ID.set(documentScope, attributeLifecyclesHandler);
-			return 'whole';
+			Lifecycle.ID.set(documentScope, {
+				[this.attr]: this.onConnected,
+			});
+			return 'newScope';
 		}
-		const scopedAttribute = Lifecycle.ID.get(documentScope);
-		for (const attributeName in attributeLifecyclesHandler) {
-			if (!(attributeName in scopedAttribute)) {
-				scopedAttribute[attributeName] = attributeLifecyclesHandler[attributeName];
-				continue;
-			}
-			return attributeName;
+		if (this.attr in Lifecycle.ID.get(documentScope)) {
+			return this.attr;
 		}
-		return 'partial';
+		Lifecycle.ID.get(documentScope)[this.attr] = this.onConnected;
+		return 'addToScope';
 	};
 	/**
 	 * @private
 	 * @returns {Promise<void>}
 	 */
 	initiator = async () => {
-		const attributeLifecyclesHandler = this.attributeLifecyclesHandler;
-		const documentScope = this.currentDocumentScope;
-		for (const attributeName in attributeLifecyclesHandler) {
-			const validAttributeSelector = helper.validAttributeNameSelector(attributeName);
-			const elements = documentScope.querySelectorAll(`[${validAttributeSelector}]`);
-			for (let i = 0; i < elements.length; i++) {
-				await this.addedNodeHandler(elements[i], attributeName);
-			}
-		}
-		await this.callConnectedCallback();
+		await this.checkNestedAddedNodes(this.currentDocumentScope, this.attr);
 	};
 	/**
 	 * @private
-	 * @type {(()=>Promise<void>)[]}
-	 */
-	elementCMRefed = [];
-	/**
-	 * @private
 	 * @param {documentScope} node
+	 * @param {string} attributeName
 	 * @returns {boolean}
 	 */
-	checkValidScoping = (node) => {
-		if (this.isGlobal) {
-			return true;
+	checkValidScoping = (node, attributeName) => {
+		const tempNode = node;
+		if (!(node instanceof HTMLElement)) {
+			return false;
 		}
 		const documentScope = this.currentDocumentScope;
+		let isAssigned = false;
+		const docRef = Lifecycle.bypassNest.get(documentScope);
+		if (docRef) {
+			if (docRef.includes(attributeName)) {
+				node.setAttribute(helper.docScopeElement, '');
+				return true;
+			}
+		}
 		while (node) {
-			if (!Lifecycle.ID.has(node)) {
+			if ('hasAttribute' in node && !node.hasAttribute(helper.docScopeElement)) {
+				if (!isAssigned && tempNode === node) {
+					isAssigned = true;
+					tempNode.setAttribute(helper.docScopeElement, '');
+				}
 				node = node.parentElement;
 				continue;
 			}
-			if (node === document) {
+			if (node === documentScope) {
 				return true;
 			}
-			if (node !== documentScope) {
-				return false;
-			}
-			return true;
+			return false;
 		}
+		/**
+		 * this is document node
+		 */
 		return true;
+	};
+	/**
+	 * @param {HTMLElement} element
+	 * @param {TemplateStringsArray} strings
+	 * @param  {...string} values
+	 */
+	static html = (element, strings, ...values) => {
+		const result = [];
+		for (let i = 0; i < strings.length; i++) {
+			result.push(strings[i]);
+			if (i < values.length) {
+				result.push(values[i]);
+			}
+		}
+		element.innerHTML = result.join('');
+	};
+	/**
+	 * @private
+	 * @param {HTMLElement} documentScope
+	 * @param {()=>Promise<any>} scopedCallback
+	 */
+	static addedNodeScoper = (documentScope, scopedCallback) => {
+		Lifecycle.scopedPing({
+			documentScope,
+			runCheckAtFirst: true,
+			scopedCallback: async () => {
+				Lifecycle.onParentDCWrapper(documentScope, scopedCallback);
+			},
+		});
 	};
 	/**
 	 * @private
@@ -305,108 +343,48 @@ export class Lifecycle {
 	 * @param {string} attributeName
 	 */
 	addedNodeHandler = async (addedNode, attributeName) => {
+		if (!(addedNode instanceof HTMLElement)) {
+			return;
+		}
 		if (
-			/** to eliminate repeatition on ANH call */ !(addedNode instanceof HTMLElement) ||
 			/** except head resources */ document.head.contains(addedNode) ||
-			/** primary criteria */ !('hasAttribute' in addedNode) ||
+			!('hasAttribute' in addedNode) ||
 			!addedNode.hasAttribute(attributeName) ||
-			!this.checkValidScoping(addedNode)
+			!this.checkValidScoping(addedNode, attributeName)
 		) {
 			return;
 		}
-		/**
-		 * @type {import('./lifecycleHandler.type.mjs').lifecycleHandler["onDisconnected"]}
-		 */
-		const currentOnParentDCCB = (disconnectedCallback) => {
-			Lifecycle.setDCCB(addedNode, disconnectedCallback);
-		};
-		this.attributeLifecyclesHandler[attributeName]({
-			onViewPort: (options) => new onViewPort({ element: addedNode, ...options }),
-			element: addedNode,
-			cloneElement: () => {
-				const clonedElement = addedNode.cloneNode(true);
-				if (!(clonedElement instanceof HTMLElement)) {
-					return;
-				}
-				clonedElement.removeAttribute(helper.LCCBIdentifier);
-				return clonedElement;
-			},
-			lifecycleObserver: this,
-			onConnected: (connectedCallback) => {
-				if (addedNode.hasAttribute(helper.LCCBIdentifier)) {
-					if (this.isGlobal) {
-						return;
-					}
-					Lifecycle.shallowScope({
-						documentScope: addedNode,
-						scopedCallback: async () => {
-							if (
-								helper.removeDOM$ in addedNode &&
-								typeof addedNode[helper.removeDOM$] == 'function'
-							) {
-								addedNode[helper.removeDOM$.toString()]();
-							}
-							if (helper.DCCBIdentifier in addedNode) {
-								addedNode[helper.DCCBIdentifier] = [];
-							}
-							if (helper.ACCBIdentifier in addedNode) {
-								addedNode[helper.ACCBIdentifier] = [];
-							}
-						},
-					});
-				}
-				addedNode.setAttribute(helper.LCCBIdentifier, '');
-				Lifecycle.scopedPing({
-					documentScope: addedNode,
-					runCheckAtFirst: true,
-					scopedCallback: async () => {
-						const index = this.elementCMRefed.push(async () => {
-							await Lifecycle.onParentDCWrapper(addedNode, async () => {
-								Lifecycle.shallowScope({
-									documentScope: addedNode,
-									scopedCallback: async () => {
-										await connectedCallback();
-										this.elementCMRefed.splice(index - 1, 1);
-									},
-								});
+		if (addedNode.hasAttribute(helper.LCCBIdentifier)) {
+			return;
+		}
+		addedNode.setAttribute(helper.LCCBIdentifier, '');
+		const handler = Lifecycle.ID.get(this.currentDocumentScope)[attributeName];
+		Lifecycle.addedNodeScoper(addedNode, async () => {
+			if (addedNode.parentElement) {
+				handler({
+					onViewPort: (options) => new onViewPort({ element: addedNode, ...options }),
+					element: addedNode,
+					html: (strings, ...values) => {
+						Lifecycle.html(addedNode, strings, ...values);
+					},
+					lifecycleObserver: this,
+					onDisconnected: (disconnectCallback) => {
+						Lifecycle.setDCCB(addedNode, async () => {
+							Lifecycle.addedNodeScoper(addedNode, async () => {
+								await disconnectCallback();
+							});
+						});
+					},
+					onAttributeChanged: (attributeChangedCallback) => {
+						Lifecycle.setACCB(addedNode, async (options) => {
+							Lifecycle.addedNodeScoper(addedNode, async () => {
+								await attributeChangedCallback(options);
 							});
 						});
 					},
 				});
-			},
-			onDisconnected: (disconnectCallback) => {
-				Lifecycle.scopedPing({
-					documentScope: addedNode,
-					runCheckAtFirst: true,
-					scopedCallback: async () => {
-						await Lifecycle.onParentDCWrapper(addedNode, async () => {
-							currentOnParentDCCB(disconnectCallback);
-						});
-					},
-				});
-			},
-			onAttributeChanged: (attributeChangedCallback) => {
-				addedNode.setAttribute(helper.ACCBIdentifier, '');
-				Lifecycle.scopedPing({
-					documentScope: addedNode,
-					runCheckAtFirst: true,
-					scopedCallback: async () => {
-						await Lifecycle.onParentDCWrapper(addedNode, async () => {
-							Lifecycle.setACCB(addedNode, attributeChangedCallback);
-						});
-					},
-				});
-			},
+			}
 		});
-	};
-	/**
-	 * @private
-	 */
-	callConnectedCallback = async () => {
-		/**
-		 * already `autoQueued` using `$` in `this.$`
-		 */
-		await helper.handlePromiseAll(this, this.elementCMRefed);
 	};
 	/**
 	 * @private
@@ -469,20 +447,40 @@ export class Lifecycle {
 	};
 	/**
 	 * @private
+	 * @param {documentScope} documentScope
+	 * @param {string} attributeName
+	 */
+	checkNestedAddedNodes = async (documentScope, attributeName) => {
+		const validAttributeSelector = helper.validAttributeNameSelector(attributeName);
+		if ('querySelectorAll' in documentScope) {
+			/**
+			 * bypass for browser native/other library behaviour,
+			 * including but not limited to:
+			 * - show link on the corner of the document are creating `[href]` which interfere with `virst` `Lifecycle` instances;
+			 */
+			const elements = documentScope.querySelectorAll(`[${validAttributeSelector}]`);
+			for (let i = 0; i < elements.length; i++) {
+				await this.addedNodeHandler(elements[i], attributeName);
+			}
+		}
+	};
+	/**
+	 * @private
 	 * @param {MutationRecord[]} mutationList
 	 */
 	mutationHandler = async (mutationList) => {
-		const attributesLifecycle = Lifecycle.ID.get(this.currentDocumentScope);
+		const handler = Lifecycle.ID.get(this.currentDocumentScope);
 		for (let i = 0; i < mutationList.length; i++) {
 			const mutation = mutationList[i];
 			if (mutation.addedNodes) {
 				for (let j = 0; j < mutation.addedNodes.length; j++) {
 					const addedNode = mutation.addedNodes[j];
-					for (const attributeName in attributesLifecycle) {
+					for (const attributeName in handler) {
 						await this.addedNodeHandler(addedNode, attributeName);
+						// @ts-ignore
+						await this.checkNestedAddedNodes(addedNode, attributeName);
 					}
 				}
-				await this.callConnectedCallback();
 			}
 			if (mutation.removedNodes) {
 				for (let j = 0; j < mutation.removedNodes.length; j++) {
@@ -504,6 +502,17 @@ export class Lifecycle {
 	};
 	/**
 	 * @private
+	 * @param {HTMLElement} element
+	 */
+	removeParentOfNestedLCDCCB = (element) => {
+		if (Lifecycle.ID.has(element)) {
+			element[helper.DCCBIdentifier].push(async () => {
+				Lifecycle.ID.delete(element);
+			});
+		}
+	};
+	/**
+	 * @private
 	 * @param {HTMLElement}removedNode
 	 */
 	mutationDCHandler = async (removedNode) => {
@@ -514,14 +523,13 @@ export class Lifecycle {
 			if (!(element instanceof HTMLElement)) {
 				continue;
 			}
+			this.removeParentOfNestedLCDCCB(element);
 			const disconnectCallback = Lifecycle.getDCCB(element);
 			if (disconnectCallback) {
 				disconnectedCallbacks.push(...disconnectCallback);
 			}
 		}
-		if (disconnectedCallbacks.length) {
-			await helper.handlePromiseAll(this, disconnectedCallbacks);
-		}
+		await helper.handlePromiseAll(this, disconnectedCallbacks);
 	};
 	/**
 	 * @private

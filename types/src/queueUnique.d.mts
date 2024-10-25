@@ -1,11 +1,15 @@
 export class queueUnique {
     /**
-     * @param {queueUniqueObject} _queue
+     * @private
      */
-    static assign: (_queue: queueUniqueObject) => void;
+    private static _;
+    /**
+     * @type {(queueUniqueObject:queueUniqueObject)=>void}
+     */
+    static assign: (queueUniqueObject: import("./queueUniqueObject.mjs").queueUniqueObject) => void;
     /**
      * @private
-     * @type {queueUniqueObject|{}}
+     * @type {Map<any, [()=>Promise<any>,number]>}
      */
     private queue;
     /**
@@ -26,4 +30,3 @@ export class queueUnique {
     /** @private */
     private run;
 }
-import { queueUniqueObject } from './queueUniqueObject.mjs';

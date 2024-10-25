@@ -26,6 +26,11 @@ export class onViewPort {
 		element[helper.onExitViewCBIdentifier] = onExitViewCallback;
 		for (let i = 0; i < lifecyclesOnDisconnected.length; i++) {
 			lifecyclesOnDisconnected[i](async () => {
+				onViewPort.removeOnViewCallback(element);
+				await element[helper.onExitViewCBIdentifier](
+					onViewPort.onViewCallbacksOptions(element)
+				);
+				onViewPort.removeOnExitViewCallback(element);
 				onViewPort.unobserve(element);
 			});
 		}
@@ -79,8 +84,8 @@ export class onViewPort {
 	 * @param {Element|HTMLElement} element
 	 */
 	static removeOnExitViewCallback = (element) => {
-		delete element[helper.onExitViewCBIdentifier];
 		if (helper.onExitViewCBIdentifier in element) {
+			delete element[helper.onExitViewCBIdentifier];
 		}
 	};
 	/**

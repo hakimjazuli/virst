@@ -24,7 +24,7 @@ export class WorkerMainThread {
     });
     worker: Worker;
     /**
-     * @type {(message:MessageEvent)=>void}
+     * @type {(message: any, options?: StructuredSerializeOptions)=>void}
      */
-    postMessage: (message: MessageEvent) => void;
+    postMessage: (message: any, options?: StructuredSerializeOptions) => void;
 }

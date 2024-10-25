@@ -1,16 +1,12 @@
 /**
  * @description
  * - helper class to track connected/disconnected/attributeChanged of an element;
+ * - if there are global `attributeName` `test` are inside nested `Lifecycle`, add `virst-gs` and list of the names of the global `attributeName`, with semicolon `;` as separator;
+ * ```html
+ * <div test="innerText" virst-gs="test;"></div>
+ * ```
  */
 export class Lifecycle {
-    /**
-     * @typedef {import('./documentScope.type.mjs').documentScope} documentScope
-     * @typedef {import('./Let.mjs').Let<MutationRecord[]>} mutationRecordSignal
-     * @typedef {[MutationObserver,
-     * mutationRecordSignal,
-     * documentScope,
-     * ]} documentScopedReturn
-     */
     /**
      * @private
      * @type {documentScopedReturn[]}
@@ -21,20 +17,6 @@ export class Lifecycle {
      * @return {documentScopedReturn}
      */
     static createMutationObserver: (documentScope: import("./documentScope.type.mjs").documentScope) => [MutationObserver, Let<MutationRecord[]>, import("./documentScope.type.mjs").documentScope];
-    /**
-     * @typedef {Object} autoScopeOptions
-     * @property {()=>Promise<void>} scopedCallback
-     * @property {boolean} runCheckAtFirst
-     */
-    /**
-     * use for handling out of scoped codeblock:
-     * @param {autoScopeOptions} options
-     * @return {Ping["ping"]}
-     */
-    static autoScopedPing: ({ scopedCallback, runCheckAtFirst }: {
-        scopedCallback: () => Promise<void>;
-        runCheckAtFirst: boolean;
-    }) => Ping["ping"];
     /**
      * @param {Object} options
      * @param {documentScope} options.documentScope
@@ -53,13 +35,13 @@ export class Lifecycle {
     /**
      * manual scoping for lib internal functionality
      * @param {manualScopeOptions} options
-     * @returns {Ping["ping"]}
+     * @returns {Ping["fifo"]}
      */
     static scopedPing: ({ documentScope, scopedCallback, runCheckAtFirst }: {
         documentScope: import("./documentScope.type.mjs").documentScope;
         scopedCallback: () => Promise<void>;
         runCheckAtFirst: boolean;
-    }) => Ping["ping"];
+    }) => Ping["fifo"];
     /**
      * @private
      * @param {HTMLElement} element
@@ -72,17 +54,31 @@ export class Lifecycle {
      */
     private static currentOnParentDCCB;
     /**
-     * @typedef {{
-     * [attributeName:string]:
-     * (options:import('./lifecycleHandler.type.mjs').lifecycleHandler)=>void
-     * }} attributeLifecyclesHandler
+     * @typedef {(options:import('./lifecycleHandler.type.mjs').lifecycleHandler)=>void} attributeLifecyclesHandler
      */
     /**
      * attributeIdentification
      * @private
-     * @type {Map<documentScope,attributeLifecyclesHandler>}
+     * @type {Map<documentScope,{[attributeName:string]:attributeLifecyclesHandler}>}
      */
     private static ID;
+    /**
+     * @private
+     * @type {Map<documentScope, string[]>}
+     */
+    private static bypassNest;
+    /**
+     * @param {HTMLElement} element
+     * @param {TemplateStringsArray} strings
+     * @param  {...string} values
+     */
+    static html: (element: HTMLElement, strings: TemplateStringsArray, ...values: string[]) => void;
+    /**
+     * @private
+     * @param {HTMLElement} documentScope
+     * @param {()=>Promise<any>} scopedCallback
+     */
+    private static addedNodeScoper;
     /**
      * @private
      * @param {HTMLElement} element
@@ -117,14 +113,31 @@ export class Lifecycle {
      */
     private static findDeepNested;
     /**
-     * @param {boolean} isGlobal
-     * @param {attributeLifecyclesHandler} attributeLifecyclesHandler
+     * @param {Object} options
+     * @param {attributeLifecyclesHandler} options.onConnected
+     * @param {string} [options.attributeName]
      * - allow global attributeName to be handled inside nested `Lifecycle`
-     * @param {documentScope} [manualScope]
+     * @param {documentScope} [options.documentScope]
+     * @param {boolean} [options.bypassNested]
      */
-    constructor(isGlobal: boolean, attributeLifecyclesHandler: {
-        [attributeName: string]: (options: import("./lifecycleHandler.type.mjs").lifecycleHandler) => void;
-    }, manualScope?: import("./documentScope.type.mjs").documentScope);
+    constructor({ onConnected, attributeName, documentScope, bypassNested, }: {
+        onConnected: (options: import("./lifecycleHandler.type.mjs").lifecycleHandler) => void;
+        attributeName?: string;
+        documentScope?: import("./documentScope.type.mjs").documentScope;
+        bypassNested?: boolean;
+    });
+    /**
+     * @typedef {import('./documentScope.type.mjs').documentScope} documentScope
+     * @typedef {import('./Let.mjs').Let<MutationRecord[]>} mutationRecordSignal
+     * @typedef {[MutationObserver,
+     * mutationRecordSignal,
+     * documentScope,
+     * ]} documentScopedReturn
+     */
+    /**
+     * @type {string}
+     */
+    attr: string;
     /**
      * @private
      * @type {documentScope}
@@ -154,17 +167,16 @@ export class Lifecycle {
      * @private
      * @type {attributeLifecyclesHandler}
      */
-    private attributeLifecyclesHandler;
+    private onConnected;
     /**
      * @private
-     * @type {boolean}
      */
-    private isGlobal;
+    private assignBypass;
     /**
      * @private
-     * @return {"partial"|"whole"|string}
+     * @return {"addToScope"|"newScope"|string}
      */
-    private isRegisteredMap;
+    private isScopeMapped;
     /**
      * @private
      * @returns {Promise<void>}
@@ -172,12 +184,8 @@ export class Lifecycle {
     private initiator;
     /**
      * @private
-     * @type {(()=>Promise<void>)[]}
-     */
-    private elementCMRefed;
-    /**
-     * @private
      * @param {documentScope} node
+     * @param {string} attributeName
      * @returns {boolean}
      */
     private checkValidScoping;
@@ -189,19 +197,26 @@ export class Lifecycle {
     private addedNodeHandler;
     /**
      * @private
-     */
-    private callConnectedCallback;
-    /**
-     * @private
      * @param {HTMLElement|Element} element
      * @param {string} attributeName
      */
     private callACCB;
     /**
      * @private
+     * @param {documentScope} documentScope
+     * @param {string} attributeName
+     */
+    private checkNestedAddedNodes;
+    /**
+     * @private
      * @param {MutationRecord[]} mutationList
      */
     private mutationHandler;
+    /**
+     * @private
+     * @param {HTMLElement} element
+     */
+    private removeParentOfNestedLCDCCB;
     /**
      * @private
      * @param {HTMLElement}removedNode

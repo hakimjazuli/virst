@@ -2,20 +2,20 @@
 
 export class queueUniqueObject {
 	/**
-	 * @param {string} id
+	 * @param {any} id
 	 * @param {()=>(any|Promise<any>)} callback
-	 * @param {number|false} [debounce]
+	 * @param {number} [debounce]
 	 * - in ms
 	 */
-	constructor(id, callback, debounce = false) {
+	constructor(id, callback, debounce = 0) {
 		this.id = id;
 		this.callback = callback;
 		this.debounce = debounce;
 	}
-	/** @type {string} */
+	/** @type {any} */
 	id;
 	/** @type {()=>(any|Promise<any>)} */
 	callback;
-	/** @type {number|false} */
+	/** @type {number} */
 	debounce;
 }

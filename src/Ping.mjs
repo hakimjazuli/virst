@@ -3,6 +3,8 @@
 import { helper } from './helper.mjs';
 import { queueFIFO } from './queueFIFO.mjs';
 import { queueObjectFIFO } from './queueObjectFIFO.mjs';
+import { queueUnique } from './queueUnique.mjs';
+import { queueUniqueObject } from './queueUniqueObject.mjs';
 
 /**
  * @description
@@ -19,21 +21,45 @@ export class Ping {
 	/**
 	 * @param {boolean} callsAtFirst
 	 * @param {(isAtInitisalization:boolean)=>Promise<void>} asyncCallbackWhenPinged
+	 * @param {'fifo'|'unique'} [mode]
+	 * @param {any} [uniqueID]
 	 */
-	constructor(callsAtFirst, asyncCallbackWhenPinged) {
+	constructor(callsAtFirst, asyncCallbackWhenPinged, mode = 'fifo', uniqueID = undefined) {
 		this.asyncCallback = asyncCallbackWhenPinged;
 		if (callsAtFirst) {
-			this.ping(true);
+			switch (mode) {
+				case 'fifo':
+					this[mode](true);
+					break;
+				case 'unique':
+					this[mode](uniqueID, true);
+					break;
+			}
 		}
 	}
 	/**
 	 * @param {boolean} first
 	 */
-	ping = (first = false) => {
+	fifo = (first = false) => {
 		queueFIFO.assign(
 			new queueObjectFIFO(async () => {
 				await this.asyncCallback(first);
 			}, helper.debounce)
+		);
+	};
+	/**
+	 * @param {any} uniqueID
+	 * @param {boolean} first
+	 */
+	unique = (uniqueID, first = false) => {
+		queueUnique.assign(
+			new queueUniqueObject(
+				uniqueID,
+				async () => {
+					await this.asyncCallback(first);
+				},
+				helper.debounce
+			)
 		);
 	};
 }

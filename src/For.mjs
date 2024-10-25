@@ -22,49 +22,62 @@ export class For {
 	 * @typedef {Record<string, Let<string>>} ForData
 	 * @typedef {import('./lifecycleHandler.type.mjs').lifecycleHandler} lifecycleHandler
 	 * @typedef {Object} childLifeCycleCallback
-	 * @property {(arg0:{childElement:HTMLElement,ForController:For})=>Promise<void>} childLifeCycleCallback.onConnected
-	 * @property {(arg0:{childElement:HTMLElement,ForController:For})=>Promise<void>} childLifeCycleCallback.onDisconnected
-	 * @property {(arg0:{childElement:HTMLElement,ForController:For,attributeName:string, newValue:string})=>Promise<void>} childLifeCycleCallback.onAttributeChanged
+	 * @property {(arg0:{element:HTMLElement,ForInstance:For})=>Promise<void>} [childLifeCycleCallback.onConnected]
+	 * @property {(arg0:{element:HTMLElement,ForInstance:For})=>Promise<void>} [childLifeCycleCallback.onDisconnected]
+	 * @property {(arg0:{element:HTMLElement,ForInstance:For,attributeName:string, newValue:string})=>Promise<void>} [childLifeCycleCallback.onAttributeChanged]
 	 */
 	/**
 	 * @param {Object} options
 	 * @param {List} options.listInstance
-	 * @param {childLifeCycleCallback} options.childLifeCycleCallback
+	 * @param {childLifeCycleCallback} [options.childLifeCycleCallback]
 	 * @param {string} [options.attributeName]
-	 * @param {number} [options.reRenderDebounceMS]
-	 * - parent attributeName
+	 * @param {boolean} [options.incrementalRender]
+	 * handling mode for how to render (when component is increasing the child number)
+	 * - false `default`: render all at once, it's fast however have problem of large `Cumulative Layout Shifts`;
+	 * - true: update things, incrementally, slightly slower, optimal for:
+	 * > - lower number;
+	 * > - `paginated` style page;
+	 * > - infinite scroll, where you load only few at a times incrementally;
 	 */
 	constructor({
 		listInstance,
-		childLifeCycleCallback,
+		childLifeCycleCallback = {},
 		attributeName = helper.attributeIndexGenerator(),
-		reRenderDebounceMS = 0,
+		incrementalRender = false,
 	}) {
 		this.listInstance = listInstance;
 		this.attr = attributeName;
-		this.reRenderDebounceMS = reRenderDebounceMS;
-		new Lifecycle(true, {
-			[attributeName]: async ({ element, onConnected, onDisconnected }) => {
-				onConnected(async () => {
-					const effect = new $(async (first) => {
-						const value = listInstance.value;
-						if (first) {
-							return;
-						}
-						this.reRender(value);
-					});
-					onDisconnected(async () => {
-						listInstance.remove$(effect);
-					});
-					this.onParentConnected(element, childLifeCycleCallback, onDisconnected);
+		this.incrementalRender = incrementalRender;
+		new Lifecycle({
+			attributeName,
+			onConnected: async ({ element, onDisconnected }) => {
+				const effect = new $(async (first) => {
+					const value = listInstance.value;
+					if (first) {
+						await this.onParentConnected(
+							element,
+							childLifeCycleCallback,
+							onDisconnected
+						);
+						return;
+					}
+					this.reRender(value);
+				});
+				onDisconnected(async () => {
+					listInstance.remove$(effect);
 				});
 			},
 		});
 	}
 	/**
 	 * @private
+	 * @type {HTMLElement}
 	 */
-	reRenderDebounceMS;
+	childElement;
+	/**
+	 * @private
+	 */
+	incrementalRender;
 	/**
 	 * @private
 	 */
@@ -84,19 +97,20 @@ export class For {
 					for (let j = 0; j < valueLength; j++) {
 						i++;
 						if (children[j]) {
-							await Lifecycle.shallowScope({
-								documentScope: children[j],
-								scopedCallback: async () => {
-									const value = this.listInstance.value[j];
-									for (const key in this.data[j]) {
-										this.data[j][key].value = value[key];
-									}
-								},
-							});
+							if (this.data[j]) {
+								const value = this.listInstance.value[j];
+								const data = this.data[j];
+								for (const key in data) {
+									this.data[j][key].value = value[key];
+								}
+							}
 							continue;
 						}
 						const childElement_ = helper.cloneNode(this.childElement);
 						this.parentElement.appendChild(childElement_);
+						if (this.incrementalRender) {
+							await helper.timeout(0);
+						}
 					}
 					for (let j = i; j < children.length; j++) {
 						await Lifecycle.shallowScope({
@@ -111,19 +125,19 @@ export class For {
 						});
 					}
 				},
-				this.reRenderDebounceMS
+				0
 			)
 		);
 	};
-
 	/**
 	 * @private
 	 * @param {HTMLElement} parentElement
 	 * @param {childLifeCycleCallback} childLifeCycleCallback
 	 * @param {lifecycleHandler["onDisconnected"]} onParentDisconnected
 	 */
-	onParentConnected = (parentElement, childLifeCycleCallback, onParentDisconnected) => {
+	onParentConnected = async (parentElement, childLifeCycleCallback, onParentDisconnected) => {
 		this.parentElement = parentElement;
+		// @ts-ignore
 		this.childElement = parentElement.children[0];
 		if (!this.childElement) {
 			console.error({
@@ -134,17 +148,10 @@ export class For {
 			});
 			return;
 		}
-		/**
-		 * @type {ListArg[]}
-		 */
-		const listValue = this.listInstance.value;
 		this.childElement.setAttribute(`${helper.ForChildAttributePrefix}${this.attr}`, '');
-		parentElement.innerHTML = '';
 		this.childLifecycle(childLifeCycleCallback, onParentDisconnected);
-		for (let i = 0; i < listValue.length; i++) {
-			const childElement_ = helper.cloneNode(this.childElement);
-			parentElement.appendChild(childElement_);
-		}
+		this.childElement.remove();
+		this.listInstance.replace(this.listInstance.value);
 	};
 	/**
 	 * @private
@@ -152,50 +159,53 @@ export class For {
 	 * @param {lifecycleHandler["onDisconnected"]} onParentDisconnected
 	 */
 	childLifecycle = (childLifeCycleCallback, onParentDisconnected) => {
-		new Lifecycle(false, {
-			[`${helper.ForChildAttributePrefix}${this.attr}`]: async ({
+		new Lifecycle({
+			bypassNested: true,
+			attributeName: `${helper.ForChildAttributePrefix}${this.attr}`,
+			documentScope: this.parentElement,
+			onConnected: async ({
 				element: childElement,
 				lifecycleObserver: childLifecycleObserver,
-				onConnected,
 				onDisconnected,
 				onAttributeChanged,
 			}) => {
-				onAttributeChanged(async ({ attributeName, newValue }) => {
-					await childLifeCycleCallback.onAttributeChanged({
-						childElement,
-						ForController: this,
-						attributeName,
-						newValue,
-					});
-				});
-				onConnected(async () => {
-					await childLifeCycleCallback.onConnected({
-						childElement,
-						ForController: this,
-					});
-					const index = this.getChildElementIndex(childElement);
-					/**
-					 * @type {ListArg}
-					 */
-					const data = this.listInstance.value[index];
-					if (!this.data[index]) {
-						this.data[index] = {};
-					}
-					for (const dataName in data) {
-						await Lifecycle.shallowScope({
-							documentScope: childElement,
-							scopedCallback: async () => {
-								this.data[index][dataName] = new Let(data[dataName], dataName);
-								new $(async () => {
-									data[dataName] = this.data[index][dataName].value;
-								});
-							},
+				if (childLifeCycleCallback.onAttributeChanged) {
+					onAttributeChanged(async ({ attributeName, newValue }) => {
+						await childLifeCycleCallback.onAttributeChanged({
+							element: childElement,
+							ForInstance: this,
+							attributeName,
+							newValue,
 						});
-					}
+					});
+				}
+				if (childLifeCycleCallback.onConnected) {
+					await childLifeCycleCallback.onConnected({
+						element: childElement,
+						ForInstance: this,
+					});
+				}
+				const index = this.getChildElementIndex(childElement);
+				/**
+				 * @type {ListArg}
+				 */
+				const data = this.listInstance.value[index];
+				if (!this.data[index]) {
+					this.data[index] = {};
+				}
+				for (const dataName in data) {
+					this.data[index][dataName] = new Let(data[dataName], dataName, {
+						documentScope: childElement,
+					});
+					new $(async () => {
+						data[dataName] = this.data[index][dataName].value;
+					});
+				}
+				if (childLifeCycleCallback.onDisconnected) {
 					onDisconnected(async () => {
 						await childLifeCycleCallback.onDisconnected({
-							childElement,
-							ForController: this,
+							element: childElement,
+							ForInstance: this,
 						});
 						/**
 						 * - prever to handle unreferencing at data level;
@@ -206,9 +216,9 @@ export class For {
 						// }
 						 */
 					});
-					onParentDisconnected(async () => {
-						childLifecycleObserver.disconnect();
-					});
+				}
+				onParentDisconnected(async () => {
+					childLifecycleObserver.disconnect();
 				});
 			},
 		});

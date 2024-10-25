@@ -4,13 +4,12 @@
  * - `signal` will be updated from returned value of `read`;
  * - `read` will be called after calling `thisInstance`.`create`/`update`/`delete_`,
  *    that have `true` `refreshSignal`;
- *
 /**
  * @template V
  */
 export class CRUD<V> {
     /**
-     * @typedef {{asyncCallback:()=>Promise<void>,refreshSignalWithRead:boolean}} asyncCallback
+     * @typedef {{asyncCallback:()=>Promise<void>,updateRead:boolean}} asyncCallback
      * @param {Object} options
      * @param {Let<V>} options.signal
      * @param {()=>Promise<V>} options.read
@@ -24,33 +23,33 @@ export class CRUD<V> {
         read: () => Promise<V>;
         create?: {
             asyncCallback: () => Promise<void>;
-            refreshSignalWithRead: boolean;
+            updateRead: boolean;
         };
         update?: {
             asyncCallback: () => Promise<void>;
-            refreshSignalWithRead: boolean;
+            updateRead: boolean;
         };
         delete_?: {
             asyncCallback: () => Promise<void>;
-            refreshSignalWithRead: boolean;
+            updateRead: boolean;
         };
     });
     /**
-     * @type {Ping["ping"]}
+     * @type {Ping["fifo"]}
      */
-    read: Ping["ping"];
+    read: Ping["fifo"];
     /**
-     * @type {Ping["ping"]}
+     * @type {Ping["fifo"]}
      */
-    create: Ping["ping"];
+    create: Ping["fifo"];
     /**
-     * @type {Ping["ping"]}
+     * @type {Ping["fifo"]}
      */
-    update: Ping["ping"];
+    update: Ping["fifo"];
     /**
-     * @type {Ping["ping"]}
+     * @type {Ping["fifo"]}
      */
-    delete: Ping["ping"];
+    delete: Ping["fifo"];
 }
 import { Ping } from './Ping.mjs';
 import { Let } from './Let.mjs';

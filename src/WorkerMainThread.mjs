@@ -27,9 +27,9 @@ export class WorkerMainThread {
 		};
 	}
 	/**
-	 * @type {(message:MessageEvent)=>void}
+	 * @type {(message: any, options?: StructuredSerializeOptions)=>void}
 	 */
-	postMessage = (message) => {
-		this.worker.postMessage(message);
+	postMessage = (message, options) => {
+		this.worker.postMessage(message, options);
 	};
 }

@@ -14,7 +14,7 @@
 export class WorkerThread {
     /**
      * @typedef {Object} optionsOnMessage
-     * @property {MessageEvent} event
+     * @property {MessageEvent<any>} event
      * @property {(message:any)=>void} postMessage
      */
     /**
@@ -22,7 +22,7 @@ export class WorkerThread {
      * @param {(options:optionsOnMessage) => void} onMessage - A callback function to handle incoming messages in the worker thread.
      */
     constructor(onMessage: (options: {
-        event: MessageEvent;
+        event: MessageEvent<any>;
         postMessage: (message: any) => void;
     }) => void);
 }

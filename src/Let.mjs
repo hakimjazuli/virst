@@ -28,6 +28,9 @@ import { Ping } from './Ping.mjs';
  */
 export class Let {
 	/**
+	 * @typedef {import('./documentScope.type.mjs').documentScope} documentScope
+	 */
+	/**
 	 * @private
 	 * @param {any} val
 	 * @param {string} attributeName
@@ -117,32 +120,36 @@ export class Let {
 	/**
 	 * @param {V} value
 	 * @param {string} [attributeName]
-	 * @param {boolean} [isGlobal]
+	 * @param {Object} [options]
+	 * @param {documentScope} [options.documentScope]
+	 * @param {boolean} [options.bypassNested]
 	 */
-	constructor(value, attributeName = undefined, isGlobal = false) {
+	constructor(value, attributeName = undefined, options = {}) {
 		this.value_ = value;
 		if (attributeName) {
 			this.attr = attributeName;
-			new Lifecycle(isGlobal, {
-				[attributeName]: async ({ element, onConnected, onDisconnected }) => {
-					onConnected(async () => {
-						const effect = new $(async () => {
-							Let.domReflector(this.value, attributeName, element, this);
-						});
-						element[helper.removeDOM$] = async () => {
-							this.remove$(effect);
-							if (typeof element.oninput === 'function') {
-								element.oninput = null;
-							}
-						};
-						onDisconnected(element[helper.removeDOM$]);
+			const { bypassNested = true, documentScope = undefined } = options;
+			new Lifecycle({
+				documentScope,
+				attributeName,
+				bypassNested: bypassNested,
+				onConnected: async ({ element, onDisconnected }) => {
+					const effect = new $(async () => {
+						Let.domReflector(this.value, attributeName, element, this);
 					});
+					element[helper.removeDOM$] = async () => {
+						this.remove$(effect);
+						if (typeof element.oninput === 'function') {
+							element.oninput = null;
+						}
+					};
+					onDisconnected(element[helper.removeDOM$]);
 				},
 			});
 		}
 	}
 	/**
-	 * @type {undefined|string}
+	 * @type {string}
 	 */
 	attr = undefined;
 	/**

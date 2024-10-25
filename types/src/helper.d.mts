@@ -5,9 +5,9 @@ export class helper {
      */
     static subscriber: null | ((isAtInitialization: boolean) => Promise<void>);
     /**
-     * @type {number|false}
+     * @type {number}
      */
-    static debounce: number | false;
+    static debounce: number;
     /**
      * @readonly
      */
@@ -30,10 +30,8 @@ export class helper {
      * @type {Record<string, Document>}
      */
     private static cachedDocument;
-    /**
-     * @readonly
-     */
-    static readonly storageIdentifier: "virst-st";
+    static docScopeElement: string;
+    static storageIdentifier: string;
     static LCCBIdentifier: string;
     static DCCBIdentifier: string;
     static ACCBIdentifier: string;
@@ -78,18 +76,14 @@ export class helper {
      */
     private static attrPrefix;
     /**
+     * @param {boolean} [forced]
      * @return {string|null}
      */
-    static attributeIndexGenerator: () => string | null;
+    static attributeIndexGenerator: (forced?: boolean) => string | null;
     /**
      * @param {number} ms
      */
     static timeout: (ms: number) => Promise<any>;
-    /**
-     * is_async
-     * @param {CallableFunction} callback
-     */
-    static isAsync: (callback: CallableFunction) => boolean;
     /**
      * split with escape string `\`
      * @param {string} string

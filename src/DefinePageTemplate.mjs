@@ -48,11 +48,11 @@ export class DefinePageTemplate {
 		this.targetAttribute = targetAttribute;
 		this.targetPathRule = targetPathRule;
 		this.callerAttribute = callerAttribute;
-		new Lifecycle(true, {
-			[callerAttribute]: async ({ element, onConnected }) => {
-				onConnected(async () => {
-					await this.renderElement({ element });
-				});
+		new Lifecycle({
+			attributeName: callerAttribute,
+			bypassNested: true,
+			onConnected: async ({ element }) => {
+				await this.renderElement({ element });
 			},
 		});
 	}
@@ -100,7 +100,7 @@ export class DefinePageTemplate {
 		const path = this.targetPathRule(path_);
 		const fromCache = DefinePageTemplate.chachedTemplate[path]?.[templateName];
 		if (fromCache) {
-			const template_ = fromCache.cloneNode(true);
+			const template_ = helper.cloneNode(fromCache);
 			element.replaceWith(template_);
 			return;
 		}
@@ -125,7 +125,7 @@ export class DefinePageTemplate {
 					`couldn't find '[${targetAttribute}="${templateName}"]' in the ${path}`
 				);
 			}
-			const template_ = retElement.cloneNode(true);
+			const template_ = helper.cloneNode(retElement);
 			element.replaceWith(template_);
 		} catch (error) {
 			console.error(error);

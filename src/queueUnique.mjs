@@ -1,18 +1,23 @@
 // @ts-check
 
-import { queueUniqueObject } from './queueUniqueObject.mjs';
 import { helper } from './helper.mjs';
 
 export class queueUnique {
 	/**
-	 * @private
+	 * @typedef {import('./queueUniqueObject.mjs').queueUniqueObject} queueUniqueObject
 	 */
-	constructor() {}
 	/**
 	 * @private
-	 * @type {queueUniqueObject|{}}
 	 */
-	queue = {};
+	constructor() {
+		window['virst'] = window['virst'] || {};
+		window['virst']['QUnique'] = window['virst']['QUnique'] || this.assign_;
+	}
+	/**
+	 * @private
+	 * @type {Map<any, [()=>Promise<any>,number]>}
+	 */
+	queue = new Map();
 	/**
 	 * @private
 	 * @type {boolean}
@@ -29,34 +34,39 @@ export class queueUnique {
 		}
 	};
 	/**
-	 * @param {queueUniqueObject} _queue
+	 * @private
 	 */
-	static assign = new queueUnique().assign_;
+	// @ts-ignore
+	static _ = new queueUnique();
+	/**
+	 * @type {(queueUniqueObject:queueUniqueObject)=>void}
+	 */
+	static assign = window['virst']['QUnique'];
 	/**
 	 * @private
 	 * @param {queueUniqueObject} _queue
 	 */
 	push = (_queue) => {
-		const { callback, debounce } = _queue;
-		this.queue[_queue.id] = { callback, debounce };
+		const { callback, debounce, id } = _queue;
+		this.queue.set(id, [callback, debounce ? debounce : 0]);
 	};
 	/** @private */
 	run = async () => {
 		this.isRunning = true;
-		while (Object.keys(this.queue).length !== 0) {
-			for (const current_key in this.queue) {
-				const { callback, debounce: debounce_ms } = this.queue[current_key];
-				delete this.queue[current_key];
-				if (debounce_ms) {
-					await helper.timeout(debounce_ms);
-				}
-				if (helper.isAsync(callback)) {
-					await callback();
-					break;
-				}
-				callback();
-				break;
-			}
+		const keysIterator = this.queue.keys();
+		let result = keysIterator.next();
+		while (!result.done) {
+			const key = result.value;
+			const [callback, debounce] = this.queue.get(key);
+			this.queue.delete(key);
+			/**
+			 * debounce anyway;
+			 * queue with unique id have characteristic of messing up when have no debouncer;
+			 * especially when request comes too fast;
+			 */
+			await helper.timeout(debounce);
+			await callback();
+			result = keysIterator.next();
 		}
 		this.isRunning = false;
 	};

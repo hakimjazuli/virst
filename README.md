@@ -10,9 +10,7 @@ virst is:
 > > - `signal` based asyncrhonous reactivity, which supports:
 > > > - `dataOnly`;
 > > > - with `domReflect` (using `attributeName="...attributeValues;"`);
-> > - optional templating using:
-> > > - `html` page based template;
-> > > - our `Component` instances;
+> > - templating using `html` page based template;
 > - client side JS library that are relying on `attributeName` to track the element lifecycle, using our `Lifecyle` class api:
 > > - you can use it to create your own `HATEOAS` (like `htmx`) client side library, to interprete returned `htmlString` which have certain `attributeName`;
 > > - handle non editable `static site generated` exports/publish such as:
@@ -20,6 +18,7 @@ virst is:
 > > > - `pinegrow`;
 > > > - `WYSIWYG web builder`;
 > > > - or bassically any kind of `SSG` software;
+> > - added globals in window object `window["virst"]["QUnique"]` and `window["virst"]["QFIFO"]` so any library that, targets client side bundled and, are written using `virst` `Lifecycle` will share the same queue handler;
 - comes with `asyncQueue` handler in the background;
 > - no need to scratch your head too much for `async` processes;
 - all of our class api are `typed` with `jsdoc`:
@@ -37,6 +36,9 @@ bun i virst
 ## v0.^9.x
 - drop supports for `Animation`
 > - it's better to use more dedicated library like [animeJS](https://animejs.com/)
+## v0.^12.x
+- drop supports for `Component`
+> - we don't have support for scoped styling out of the box, it's possible using workarround using selector `Lifecycle` `onConnected` `attr` parameter as css selector inside `html` callback parameter with style tag, which we decided this workarround would be counter productive, therefore we drop it;
 
 
 <h2 id="exported-api-and-type-list">exported-api-and-type-list</h2>
@@ -44,8 +46,6 @@ bun i virst
 - [$](#$)
 
 - [App](#app)
-
-- [Component](#component)
 
 - [CRUD](#crud)
 
@@ -99,15 +99,6 @@ generate side effect for `signal` based reactivity such as for:- [Let](#let)``
 *) <sub>[go to exported list](#exported-api-and-type-list)</sub>
 
 `App` starter helper for module environtment:- the sole purpose is just to auto import the necessary global file in your main js file;- if it's `elementScoped` `instances`/`statics methods`, it will be better to just leave it for the `parentModule` to import it accordingly;
-
-*) <sub>[go to exported list](#exported-api-and-type-list)</sub>
-
-
-<h2 id="component">Component</h2>
-
-*) <sub>[go to exported list](#exported-api-and-type-list)</sub>
-
-component creation helper using class initiation;behaviour:- it rendered directly to real DOM;> - library like `bootstrap` `css` and it's `js` parts can select your `elements` for it's functionality;> - you have to manually scope your style by```js// on Component scopehtml`<style>	[${thisInstance.attr}]{		...nestedCSSRules	}</style>...````> - also you might need to explicitly use ">" `directChildOf` selector, as when you try to render `childComponent`> - it could also be accidentally selected;- render method:> - you put returned value of `thisInstance.attr` on an html element, which> - it will be rendered as it's `innerHTML` at the `onConnected` event, then> - it will used `MutationObserver` to look for changes;
 
 *) <sub>[go to exported list](#exported-api-and-type-list)</sub>
 
@@ -207,7 +198,7 @@ use this instead of normal `eventListener` declaration for:- creating `autoqueu
 
 *) <sub>[go to exported list](#exported-api-and-type-list)</sub>
 
-- helper class to track connected/disconnected/attributeChanged of an element;
+- helper class to track connected/disconnected/attributeChanged of an element;- if there are global `attributeName` `test` are inside nested `Lifecycle`, add `virst-gs` and list of the names of the global `attributeName`, with semicolon `;` as separator;```html<div test="innerText" virst-gs="test;"></div>```
 
 *) <sub>[go to exported list](#exported-api-and-type-list)</sub>
 

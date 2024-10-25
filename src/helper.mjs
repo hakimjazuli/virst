@@ -8,9 +8,9 @@ export class helper {
 	static subscriber = null;
 
 	/**
-	 * @type {number|false}
+	 * @type {number}
 	 */
-	static debounce = false;
+	static debounce = 0;
 	/**
 	 * @readonly
 	 */
@@ -44,9 +44,7 @@ export class helper {
 	 * @type {Record<string, Document>}
 	 */
 	static cachedDocument = {};
-	/**
-	 * @readonly
-	 */
+	static docScopeElement = 'virst-sc';
 	static storageIdentifier = 'virst-st';
 	static LCCBIdentifier = 'virst-lc';
 	static DCCBIdentifier = 'virst-dc';
@@ -117,10 +115,11 @@ export class helper {
 	 */
 	static attrPrefix = 'virst-ap-';
 	/**
+	 * @param {boolean} [forced]
 	 * @return {string|null}
 	 */
-	static attributeIndexGenerator = () => {
-		if (helper.currentDocumentScope == window.document) {
+	static attributeIndexGenerator = (forced = false) => {
+		if (helper.currentDocumentScope == window.document && !forced) {
 			return (this.attr = null);
 		}
 		return (this.attr = `${helper.attrPrefix}${this.generateUniqueString()}`);
@@ -129,11 +128,6 @@ export class helper {
 	 * @param {number} ms
 	 */
 	static timeout = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-	/**
-	 * is_async
-	 * @param {CallableFunction} callback
-	 */
-	static isAsync = (callback) => callback.constructor.name === 'AsyncFunction';
 	/**
 	 * split with escape string `\`
 	 * @param {string} string
@@ -174,20 +168,19 @@ export class helper {
 	 * @param {any[]} args
 	 */
 	static handlePromiseAll = async (source, asyncArrayFunctions, ...args) => {
-		if (!asyncArrayFunctions.length) {
+		if (!asyncArrayFunctions) {
 			return;
 		}
 		await Promise.all(
 			asyncArrayFunctions.map(async (callback) => {
 				try {
-					return await callback(...args);
+					await callback(...args);
 				} catch (error) {
-					console.error({ source, message: 'Error in callback', error });
-					throw error;
+					console.error({ callback, source, message: 'Error in callback', error });
 				}
 			})
 		).catch((error) => {
-			console.error({ source, message: 'Promise.all failed:', error });
+			console.error({ asyncArrayFunctions, source, message: 'Promise.all failed:', error });
 		});
 	};
 }

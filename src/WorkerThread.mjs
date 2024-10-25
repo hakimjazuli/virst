@@ -16,7 +16,7 @@
 export class WorkerThread {
 	/**
 	 * @typedef {Object} optionsOnMessage
-	 * @property {MessageEvent} event
+	 * @property {MessageEvent<any>} event
 	 * @property {(message:any)=>void} postMessage
 	 */
 	/**
@@ -24,9 +24,8 @@ export class WorkerThread {
 	 * @param {(options:optionsOnMessage) => void} onMessage - A callback function to handle incoming messages in the worker thread.
 	 */
 	constructor(onMessage) {
-		/**
-		 * @param {MessageEvent} event
-		 */
-		self.onmessage = (event) => onMessage({ event, postMessage: self.postMessage });
+		self.onmessage = (event, _) => {
+			onMessage({ event, postMessage: self.postMessage });
+		};
 	}
 }

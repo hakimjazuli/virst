@@ -10,13 +10,12 @@ import { Ping } from './Ping.mjs';
  * - `signal` will be updated from returned value of `read`;
  * - `read` will be called after calling `thisInstance`.`create`/`update`/`delete_`,
  *    that have `true` `refreshSignal`;
- *
 /**
  * @template V
  */
 export class CRUD {
 	/**
-	 * @typedef {{asyncCallback:()=>Promise<void>,refreshSignalWithRead:boolean}} asyncCallback
+	 * @typedef {{asyncCallback:()=>Promise<void>,updateRead:boolean}} asyncCallback
 	 * @param {Object} options
 	 * @param {Let<V>} options.signal
 	 * @param {()=>Promise<V>} options.read
@@ -30,11 +29,11 @@ export class CRUD {
 			this.read = new Ping(false, async () => {
 				// @ts-ignore
 				signal.replace(await read());
-			}).ping;
+			}).fifo;
 		} else if (signal instanceof Let) {
 			this.read = new Ping(false, async () => {
 				signal.value = await read();
-			}).ping;
+			}).fifo;
 		} else {
 			return;
 		}
@@ -50,11 +49,12 @@ export class CRUD {
 			if (mapped[name]) {
 				this[name] = new Ping(false, async () => {
 					const source = mapped[name];
+					console.log(name, mapped[name].asyncCallback);
 					await source.asyncCallback();
-					if (source.refreshSignalWithRead) {
+					if (source.updateRead) {
 						this.read();
 					}
-				}).ping;
+				}).fifo;
 			} else {
 				this[name] = () => {
 					console.warn({
@@ -65,19 +65,19 @@ export class CRUD {
 		}
 	}
 	/**
-	 * @type {Ping["ping"]}
+	 * @type {Ping["fifo"]}
 	 */
 	read;
 	/**
-	 * @type {Ping["ping"]}
+	 * @type {Ping["fifo"]}
 	 */
 	create;
 	/**
-	 * @type {Ping["ping"]}
+	 * @type {Ping["fifo"]}
 	 */
 	update;
 	/**
-	 * @type {Ping["ping"]}
+	 * @type {Ping["fifo"]}
 	 */
 	delete;
 }

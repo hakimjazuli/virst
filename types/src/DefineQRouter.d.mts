@@ -25,6 +25,11 @@ export class DefineQRouter<queryValueType extends {
     static __: DefineQRouter<any, any>;
     /**
      * @private
+     * @param {HTMLAnchorElement} element
+     */
+    private static smoothScroll;
+    /**
+     * @private
      */
     private static redirectToIndex;
     /**
@@ -34,7 +39,7 @@ export class DefineQRouter<queryValueType extends {
     private static historyStateMode;
     /**
      * @private
-     * @type {Ping["ping"]}
+     * @type {Ping["fifo"]}
      */
     private static onAfterResolved;
     /**
@@ -74,10 +79,9 @@ export class DefineQRouter<queryValueType extends {
      */
     routes: Record<NamedQueryParam, Let<string>>;
     /**
-     * @private
-     * @param {Ping["ping"]} ping
+     * @param {Ping["fifo"]} ping
      */
-    private queryChangeThrottleMs;
+    queryChangeThrottleMs: number;
     /**
      * @private
      * @param {NamedQueryParam} [useAsNavigation]
@@ -86,7 +90,7 @@ export class DefineQRouter<queryValueType extends {
     private useVirstURL;
     /**
      * @private
-     * @param {Ping["ping"]} ping
+     * @param {Ping["fifo"]} ping
      */
     private requestChanges;
     /**

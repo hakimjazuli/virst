@@ -5,9 +5,11 @@ export type attributeChangedLifecycle = (options: {
 }) => Promise<void>;
 export type lifecycleHandler = {
     element: HTMLElement;
-    cloneElement: () => HTMLElement;
+    /**
+     * - use to modify the innerHTML of the `LifeCycleInstance` element;
+     */
+    html: (strings: TemplateStringsArray, ...values: string[]) => void;
     lifecycleObserver: import("./src/Lifecycle.mjs").Lifecycle;
-    onConnected: (arg0: () => Promise<void>) => void;
     onDisconnected: (arg0: () => Promise<void>) => void;
     onAttributeChanged: (arg0: attributeChangedLifecycle) => void;
     onViewPort: (elementsCallbacks: import("./src/onViewPortHandler.type.mjs").elementsLCCallbacks) => import("./src/onViewPort.mjs").onViewPort;
@@ -29,7 +31,6 @@ export type elementsLCCallbacks = {
 };
 import { $ } from './src/$.mjs';
 import { App } from './src/App.mjs';
-import { Component } from './src/Component.mjs';
 import { CRUD } from './src/CRUD.mjs';
 import { DefinePageTemplate } from './src/DefinePageTemplate.mjs';
 import { DefineQRouter } from './src/DefineQRouter.mjs';
@@ -47,4 +48,4 @@ import { Try_ } from './src/Try_.mjs';
 import { WorkerMainThread } from './src/WorkerMainThread.mjs';
 import { WorkerThread } from './src/WorkerThread.mjs';
 import { _ } from './src/_.mjs';
-export { $, App, Component, CRUD, DefinePageTemplate, DefineQRouter, DefineShortCuts, DefineStorage, Derived, Event_, For, Let, Lifecycle, List, Ping, ShortCut, Try_, WorkerMainThread, WorkerThread, _ };
+export { $, App, CRUD, DefinePageTemplate, DefineQRouter, DefineShortCuts, DefineStorage, Derived, Event_, For, Let, Lifecycle, List, Ping, ShortCut, Try_, WorkerMainThread, WorkerThread, _ };

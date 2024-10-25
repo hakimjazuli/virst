@@ -18,9 +18,7 @@
  * > > - `signal` based asyncrhonous reactivity, which supports:
  * > > > - `dataOnly`;
  * > > > - with `domReflect` (using `attributeName="...attributeValues;"`);
- * > > - optional templating using:
- * > > > - `html` page based template;
- * > > > - our `Component` instances;
+ * > > - templating using `html` page based template;
  * > - client side JS library that are relying on `attributeName` to track the element lifecycle, using our `Lifecyle` class api:
  * > > - you can use it to create your own `HATEOAS` (like `htmx`) client side library, to interprete returned `htmlString` which have certain `attributeName`;
  * > > - handle non editable `static site generated` exports/publish such as:
@@ -28,6 +26,7 @@
  * > > > - `pinegrow`;
  * > > > - `WYSIWYG web builder`;
  * > > > - or bassically any kind of `SSG` software;
+ * > > - added globals in window object `window["virst"]["QUnique"]` and `window["virst"]["QFIFO"]` so any library that, targets client side bundled and, are written using `virst` `Lifecycle` will share the same queue handler;
  * - comes with `asyncQueue` handler in the background;
  * > - no need to scratch your head too much for `async` processes;
  * - all of our class api are `typed` with `jsdoc`:
@@ -45,11 +44,13 @@
  * ## v0.^9.x
  * - drop supports for `Animation`
  * > - it's better to use more dedicated library like [animeJS](https://animejs.com/)
+ * ## v0.^12.x
+ * - drop supports for `Component`
+ * > - we don't have support for scoped styling out of the box, it's possible using workarround using selector `Lifecycle` `onConnected` `attr` parameter as css selector inside `html` callback parameter with style tag, which we decided this workarround would be counter productive, therefore we drop it;
  */
 
 import { $ } from './src/$.mjs';
 import { App } from './src/App.mjs';
-import { Component } from './src/Component.mjs';
 import { CRUD } from './src/CRUD.mjs';
 import { DefinePageTemplate } from './src/DefinePageTemplate.mjs';
 import { DefineQRouter } from './src/DefineQRouter.mjs';
@@ -83,9 +84,9 @@ import { _ } from './src/_.mjs';
  * @typedef {(options:{attributeName:string, newValue:string})=>Promise<void>} attributeChangedLifecycle
  * @typedef {Object} lifecycleHandler
  * @property {HTMLElement} lifecycleHandler.element
- * @property {()=>HTMLElement} lifecycleHandler.cloneElement
+ * @property {(strings:TemplateStringsArray,...values:string[])=>void} lifecycleHandler.html
+ * - use to modify the innerHTML of the `LifeCycleInstance` element;
  * @property {import('./src/Lifecycle.mjs').Lifecycle} lifecycleHandler.lifecycleObserver
- * @property {(arg0:()=>Promise<void>)=>void} lifecycleHandler.onConnected
  * @property {(arg0:()=>Promise<void>)=>void} lifecycleHandler.onDisconnected
  * @property {(arg0:attributeChangedLifecycle)=>void} lifecycleHandler.onAttributeChanged
  * @property {(elementsCallbacks:import('./src/onViewPortHandler.type.mjs').elementsLCCallbacks)=>import('./src/onViewPort.mjs').onViewPort} lifecycleHandler.onViewPort
@@ -104,4 +105,4 @@ import { _ } from './src/_.mjs';
  * @property {onViewPortLifecycleHandler["onDisconnected"][]} lifecyclesOnDisconnected
  */
 
-export { $, App, Component, CRUD, DefinePageTemplate, DefineQRouter, DefineShortCuts, DefineStorage, Derived, Event_, For, Let, Lifecycle, List, Ping, ShortCut, Try_, WorkerMainThread, WorkerThread, _ };
+export { $, App, CRUD, DefinePageTemplate, DefineQRouter, DefineShortCuts, DefineStorage, Derived, Event_, For, Let, Lifecycle, List, Ping, ShortCut, Try_, WorkerMainThread, WorkerThread, _ };

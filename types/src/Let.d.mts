@@ -21,6 +21,9 @@
  */
 export class Let<V> {
     /**
+     * @typedef {import('./documentScope.type.mjs').documentScope} documentScope
+     */
+    /**
      * @private
      * @param {any} val
      * @param {string} attributeName
@@ -38,9 +41,14 @@ export class Let<V> {
     /**
      * @param {V} value
      * @param {string} [attributeName]
-     * @param {boolean} [isGlobal]
+     * @param {Object} [options]
+     * @param {documentScope} [options.documentScope]
+     * @param {boolean} [options.bypassNested]
      */
-    constructor(value: V, attributeName?: string, isGlobal?: boolean);
+    constructor(value: V, attributeName?: string, options?: {
+        documentScope?: import("./documentScope.type.mjs").documentScope;
+        bypassNested?: boolean;
+    });
     /**
      * remove all effects
      * @return {void}
@@ -67,9 +75,9 @@ export class Let<V> {
      */
     private value_;
     /**
-     * @type {undefined|string}
+     * @type {string}
      */
-    attr: undefined | string;
+    attr: string;
     call$: () => void;
     /**
      * @param {V} newValue

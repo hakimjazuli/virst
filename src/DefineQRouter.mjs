@@ -5,8 +5,6 @@ import { helper } from './helper.mjs';
 import { Let } from './Let.mjs';
 import { Lifecycle } from './Lifecycle.mjs';
 import { Ping } from './Ping.mjs';
-import { queueUnique } from './queueUnique.mjs';
-import { queueUniqueObject } from './queueUniqueObject.mjs';
 
 /**
  * @description
@@ -63,13 +61,12 @@ export class DefineQRouter {
 			const value_ = params.get(key);
 			if (value_) {
 				value = value_;
-				``;
 			}
 			this.string = Let.dataOnly(value);
 			this.clearListWhenImSet = clearQueriesWhenImSet;
 			this.clearAllWhenImSetExcept = clearAllWhenImSetExcept;
 			if (onAfterResolved) {
-				this.onAfterResolved = new Ping(false, onAfterResolved).ping;
+				this.onAfterResolved = new Ping(false, onAfterResolved).fifo;
 			}
 		}
 	};
@@ -162,27 +159,41 @@ export class DefineQRouter {
 			return;
 		}
 		const handlerSignal = this.routes[useAsNavigation];
-		new Lifecycle(true, {
-			href: async ({ element, onConnected, onDisconnected }) => {
-				onConnected(async () => {
-					if (!(element instanceof HTMLAnchorElement)) {
+		new Lifecycle({
+			attributeName: 'href',
+			bypassNested: true,
+			onConnected: async ({ element, onDisconnected }) => {
+				if (!(element instanceof HTMLAnchorElement)) {
+					return;
+				}
+				element.onclick = (event) => {
+					event.preventDefault();
+					let path_ = element.getAttribute('href') ?? '';
+					if (path_.startsWith('#')) {
+						DefineQRouter.smoothScroll(element);
 						return;
 					}
-					element.onclick = (event) => {
-						let path_ = element.getAttribute('href') ?? '';
-						if (path_.startsWith('#')) {
-							return;
-						}
-						event.preventDefault();
-						path_ = navigationPathRule(path_);
-						handlerSignal.value = path_;
-					};
-					onDisconnected(async () => {
-						element.onclick = null;
-					});
+					path_ = navigationPathRule(path_);
+					handlerSignal.value = path_;
+				};
+				onDisconnected(async () => {
+					element.onclick = null;
 				});
 			},
 		});
+	};
+	/**
+	 * @private
+	 * @param {HTMLAnchorElement} element
+	 */
+	static smoothScroll = (element) => {
+		const targetId = element.getAttribute('href').slice(1);
+		const targetElement = document.getElementById(targetId);
+		if (targetElement) {
+			targetElement.scrollIntoView({ behavior: 'smooth' });
+			return;
+		}
+		window.scrollTo({ top: 0, behavior: 'smooth' });
 	};
 	/**
 	 * @private
@@ -194,27 +205,25 @@ export class DefineQRouter {
 		}
 	};
 	/**
-	 * @private
-	 * @param {Ping["ping"]} ping
+	 * @param {Ping["fifo"]} ping
 	 */
 	queryChangeThrottleMs;
 	/**
 	 * @private
-	 * @param {Ping["ping"]} ping
+	 * @param {Ping["fifo"]} ping
 	 */
 	requestChanges = async (ping) => {
-		queueUnique.assign(
-			new queueUniqueObject(
-				helper.qRouteChange,
-				async () => {
-					ping();
-					if (DefineQRouter.onAfterResolved) {
-						DefineQRouter.onAfterResolved();
-					}
-					DefineQRouter.onAfterResolved = null;
-				},
-				this.queryChangeThrottleMs
-			)
+		new Ping(
+			true,
+			async () => {
+				ping();
+				if (DefineQRouter.onAfterResolved) {
+					DefineQRouter.onAfterResolved();
+				}
+				DefineQRouter.onAfterResolved = null;
+			},
+			'unique',
+			helper.qRouteChange
 		);
 	};
 	/**
@@ -244,7 +253,7 @@ export class DefineQRouter {
 			return;
 		}
 		window.history.pushState({}, '', url);
-	}).ping;
+	}).fifo;
 	/**
 	 * @private
 	 */
@@ -253,7 +262,7 @@ export class DefineQRouter {
 	};
 	/**
 	 * @private
-	 * @type {Ping["ping"]}
+	 * @type {Ping["fifo"]}
 	 */
 	static onAfterResolved;
 	/**
@@ -271,7 +280,7 @@ export class DefineQRouter {
 			DefineQRouter.onAfterResolved = this.handlers[key].onAfterResolved;
 			thisQuery[key].value = value;
 		}
-	}).ping;
+	}).fifo;
 	/**
 	 * @type {Record.<NamedQueryParam, Let<string>>}
 	 */

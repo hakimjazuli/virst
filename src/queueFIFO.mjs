@@ -4,12 +4,15 @@ import { helper } from './helper.mjs';
 
 export class queueFIFO {
 	/**
-	 * @private
-	 */
-	constructor() {}
-	/**
 	 * @typedef {import('./queueObjectFIFO.mjs').queueObjectFIFO} queueObjectFIFO
 	 */
+	/**
+	 * @private
+	 */
+	constructor() {
+		window['virst'] = window['virst'] ?? {};
+		window['virst']['QFIFO'] = window['virst']['QFIFO'] ?? this.assign_;
+	}
 	/**
 	 * @private
 	 * @type {queueObjectFIFO['details'][]}
@@ -31,9 +34,14 @@ export class queueFIFO {
 		}
 	};
 	/**
-	 * @param {queueObjectFIFO} _queue
+	 * @private
 	 */
-	static assign = new queueFIFO().assign_;
+	// @ts-ignore
+	static _ = new queueFIFO();
+	/**
+	 * @param {(queueObjectFIFO:queueObjectFIFO)=>void} _queue
+	 */
+	static assign = window['virst']['QFIFO'];
 	/**
 	 * @private
 	 * @param {queueObjectFIFO} _queue
@@ -47,19 +55,16 @@ export class queueFIFO {
 	run = async () => {
 		this.isRunning = true;
 		while (this.queue.length !== 0) {
-			for (let i = 0; i < this.queue.length; i++) {
-				const [callback, debounce_ms] = this.queue[i];
-				this.queue.shift();
-				if (debounce_ms) {
-					await helper.timeout(debounce_ms);
-				}
-				if (helper.isAsync(callback)) {
-					await callback();
-					break;
-				}
-				callback();
-				break;
+			const [callback, debounceMs] = this.queue[0];
+			this.queue.shift();
+			/**
+			 * conditional debounce;
+			 * queue FIFO messing up when have debouncer while `debounceMS` are set to 0;
+			 */
+			if (debounceMs) {
+				await helper.timeout(debounceMs);
 			}
+			await callback();
 		}
 		this.isRunning = false;
 	};
