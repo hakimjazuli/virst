@@ -9,7 +9,7 @@ import { Ping } from './Ping.mjs';
  * CRUD wrapper class;
  * - `signal` will be updated from returned value of `read`;
  * - `read` will be called after calling `thisInstance`.`create`/`update`/`delete_`,
- *    that have `true` `refreshSignal`;
+ *    that have `true` `updateRead`;
 /**
  * @template V
  */

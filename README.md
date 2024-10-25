@@ -107,7 +107,7 @@ generate side effect for `signal` based reactivity such as for:- [Let](#let)``
 
 *) <sub>[go to exported list](#exported-api-and-type-list)</sub>
 
-CRUD wrapper class;- `signal` will be updated from returned value of `read`;- `read` will be called after calling `thisInstance`.`create`/`update`/`delete_`,   that have `true` `refreshSignal`;
+CRUD wrapper class;- `signal` will be updated from returned value of `read`;- `read` will be called after calling `thisInstance`.`create`/`update`/`delete_`,   that have `true` `updateRead`;
 /**@template V
 
 *) <sub>[go to exported list](#exported-api-and-type-list)</sub>
