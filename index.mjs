@@ -92,6 +92,10 @@ import { _ } from './src/_.mjs';
  * @property {(elementsCallbacks:import('./src/onViewPortHandler.type.mjs').elementsLCCallbacks)=>import('./src/onViewPort.mjs').onViewPort} lifecycleHandler.onViewPort
  */
 /**
+ * @description
+ * - `typehelper` for onViewPort
+ */
+/**
  * @typedef {import('./src/onViewPort.mjs').onViewPort} onViewPortType
  * @typedef {Object} onViewPortHandler
  * @property {()=>void} removeOnExitViewCallback

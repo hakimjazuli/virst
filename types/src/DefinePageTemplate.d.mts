@@ -1,19 +1,18 @@
 /**
  * @description
- * - instantiate this class to opt in page templating,
- *  by saving html template string on a html document page;
+ * - instantiate this class to opt in page templating, by saving html template string on a html document page;
+ * - html implementation:
  * ```html
  * // main page
- * <div ${templateName}="${path};${selector}"></div>
+ * <div ${templateName}="${path};${templateName};${mode}"></div>
+ * // mode = 'inner' | 'outer'
  * ```
  * ```html
  * // template document
  * <div ${targetAttribute}="${selector}"></div>
  * ```
  * - how it works:
- * > - the class itself register a `Lifecycle` for `templateName`,
- *     which then upon connected, it will fetch the `path` then selects `targetAttribute`="`selector`"
- *     as template that then replace main page element with selected element from template;
+ * > - the class itself register a `Lifecycle` for `templateName`,  which then upon connected, it will fetch the `path` then selects `targetAttribute`="`selector`" as template that then replace main page `innerHTML` with selected element `innerHTML` from template;
  * > - fetched page will be then be cached, along with any `[targetAttribute]` on that page
  */
 export class DefinePageTemplate {
@@ -23,10 +22,20 @@ export class DefinePageTemplate {
     static __: DefinePageTemplate;
     /**
      * @private
-     * @typedef {{[templateName:string]:HTMLElement}} templateSingle
+     * @typedef {{[templateName:string]:[element:HTMLElement,innerHTML:string]}} templateSingle
      * @type {{[path:string]:templateSingle}}
      */
     private static chachedTemplate;
+    /**
+     * @typedef {'inner'|'outer'|string} renderMode
+     */
+    /**
+     * @private
+     * @param {HTMLElement} element
+     * @param {[HTMLElement,string]} fromCache
+     * @param {renderMode} mode
+     */
+    private static replace;
     /**
      * @param {Object} options
      * @param {string} options.callerAttribute
@@ -56,7 +65,7 @@ export class DefinePageTemplate {
      * @param {string} options.path
      * @param {string} options.templateName
      */
-    swap: ({ element, path, templateName }: {
+    swap: (options: {
         element: HTMLElement;
         path: string;
         templateName: string;
@@ -67,6 +76,7 @@ export class DefinePageTemplate {
      * @param {HTMLElement} options.element
      * @param {string} [options.path]
      * @param {string} [options.templateName]
+     * @param {renderMode} [options.mode]
      */
     private renderElement;
 }

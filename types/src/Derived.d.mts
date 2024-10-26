@@ -15,7 +15,7 @@
  * const dataOnlyExample = Derived.dataOnly(asyncCallback);
  * ```
  * > - this will automatically opt you out from `domReflector`;
- * - make sure to check `argument` documentation in your `IDE` `typehint`;
+ * - make sure to check `argument` documentation in your `IDE` `typeHint`;
  */
 /**
  * @template V

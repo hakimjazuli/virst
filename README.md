@@ -73,6 +73,8 @@ bun i virst
 
 - [List](#list)
 
+- [onViewPortHandler](#onviewporthandler)
+
 - [Ping](#ping)
 
 - [ShortCut](#shortcut)
@@ -107,7 +109,7 @@ generate side effect for `signal` based reactivity such as for:- [Let](#let)``
 
 *) <sub>[go to exported list](#exported-api-and-type-list)</sub>
 
-CRUD wrapper class;- `signal` will be updated from returned value of `read`;- `read` will be called after calling `thisInstance`.`create`/`update`/`delete_`,   that have `true` `updateRead`;
+CRUD wrapper class;- `signal` will be updated from returned value of `read`;- `read` will be called after calling `thisInstance`.`create`/`update`/`delete_` that have `true` `updateRead`;
 /**@template V
 
 *) <sub>[go to exported list](#exported-api-and-type-list)</sub>
@@ -117,7 +119,7 @@ CRUD wrapper class;- `signal` will be updated from returned value of `read`;- 
 
 *) <sub>[go to exported list](#exported-api-and-type-list)</sub>
 
-- instantiate this class to opt in page templating, by saving html template string on a html document page;```html// main page<div ${templateName}="${path};${selector}"></div>``````html// template document<div ${targetAttribute}="${selector}"></div>```- how it works:> - the class itself register a `Lifecycle` for `templateName`,    which then upon connected, it will fetch the `path` then selects `targetAttribute`="`selector`"    as template that then replace main page element with selected element from template;> - fetched page will be then be cached, along with any `[targetAttribute]` on that page
+- instantiate this class to opt in page templating, by saving html template string on a html document page;- html implementation:```html// main page<div ${templateName}="${path};${templateName};${mode}"></div>// mode = 'inner' | 'outer'``````html// template document<div ${targetAttribute}="${selector}"></div>```- how it works:> - the class itself register a `Lifecycle` for `templateName`,  which then upon connected, it will fetch the `path` then selects `targetAttribute`="`selector`" as template that then replace main page `innerHTML` with selected element `innerHTML` from template;> - fetched page will be then be cached, along with any `[targetAttribute]` on that page
 
 *) <sub>[go to exported list](#exported-api-and-type-list)</sub>
 
@@ -153,7 +155,7 @@ create named storage (`localStorage` or `sessionStorage`) through class instanti
 
 *) <sub>[go to exported list](#exported-api-and-type-list)</sub>
 
-- this class is extended from `Let` [`Let`](#let)-`signal` based reactivity, wich value are derived from reacting to [`Let<T>.value`](#let) effects that are called in the `asyncCallback` this class instantiation;```js// @ts-checkconst letSingle = new Let(1);const doubleExample = new Derived(async()=>{	const value = letSingle.value; // autoscubscribed to `letSingle` value changes;return value * 2; // returned value are to be derivedValue});```- `dataOnly`:```jsconst dataOnlyExample = Derived.dataOnly(asyncCallback);```> - this will automatically opt you out from `domReflector`;- make sure to check `argument` documentation in your `IDE` `typehint`;
+- this class is extended from `Let` [`Let`](#let)-`signal` based reactivity, wich value are derived from reacting to [`Let<T>.value`](#let) effects that are called in the `asyncCallback` this class instantiation;```js// @ts-checkconst letSingle = new Let(1);const doubleExample = new Derived(async()=>{	const value = letSingle.value; // autoscubscribed to `letSingle` value changes;return value * 2; // returned value are to be derivedValue});```- `dataOnly`:```jsconst dataOnlyExample = Derived.dataOnly(asyncCallback);```> - this will automatically opt you out from `domReflector`;- make sure to check `argument` documentation in your `IDE` `typeHint`;
 
 *) <sub>[go to exported list](#exported-api-and-type-list)</sub>
 
@@ -221,6 +223,15 @@ type helper for `lifecycleHandler` & `attributeChangedLifecycle`
 *) <sub>[go to exported list](#exported-api-and-type-list)</sub>
 
 
+<h2 id="onviewporthandler">onViewPortHandler</h2>
+
+*) <sub>[go to exported list](#exported-api-and-type-list)</sub>
+
+- `typehelper` for onViewPort
+
+*) <sub>[go to exported list](#exported-api-and-type-list)</sub>
+
+
 <h2 id="ping">Ping</h2>
 
 *) <sub>[go to exported list](#exported-api-and-type-list)</sub>
@@ -243,7 +254,7 @@ trigger based callback integrated to the internal library  queue handler;can be
 
 *) <sub>[go to exported list](#exported-api-and-type-list)</sub>
 
-error handling helper;method(s):- async;- sync;
+error as value helper;method(s):- async;- sync;
 
 *) <sub>[go to exported list](#exported-api-and-type-list)</sub>
 

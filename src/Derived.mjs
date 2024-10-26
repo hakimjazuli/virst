@@ -20,7 +20,7 @@ import { Let } from './Let.mjs';
  * const dataOnlyExample = Derived.dataOnly(asyncCallback);
  * ```
  * > - this will automatically opt you out from `domReflector`;
- * - make sure to check `argument` documentation in your `IDE` `typehint`;
+ * - make sure to check `argument` documentation in your `IDE` `typeHint`;
  */
 /**
  * @template V
@@ -40,12 +40,8 @@ export class Derived extends Let {
 	 * @param {import('./documentScope.type.mjs').documentScope} [options.documentScope]
 	 * @param {boolean} [options.bypassNested]
 	 */
-	constructor(
-		asyncCallback,
-		attributeName = undefined,
-		options
-	) {
-		super('', attributeName,options);
+	constructor(asyncCallback, attributeName = undefined, options) {
+		super('', attributeName, options);
 		new $(async () => {
 			super.value = await asyncCallback();
 		});

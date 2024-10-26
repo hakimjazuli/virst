@@ -1,6 +1,10 @@
 // @ts-check
 
 /**
+ * @description
+ * - `typehelper` for onViewPort
+ */
+/**
  * @typedef {import('./onViewPort.mjs').onViewPort} onViewPortType
  * @typedef {Object} onViewPortHandler
  * @property {()=>void} removeOnExitViewCallback

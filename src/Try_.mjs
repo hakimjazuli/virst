@@ -2,7 +2,7 @@
 
 /**
  * @description
- * error handling helper;
+ * error as value helper;
  * method(s):
  * - async;
  * - sync;
