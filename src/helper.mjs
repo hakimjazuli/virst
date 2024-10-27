@@ -160,7 +160,7 @@ export class helper {
 	 * @returns {string}
 	 */
 	static validAttributeNameSelector = (attributeName) =>
-		attributeName.toLowerCase().replaceAll(':', '\\:');
+		attributeName.toLowerCase().replace(/:/g, '\\:');
 
 	/**
 	 * @param {Object} source

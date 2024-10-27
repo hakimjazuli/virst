@@ -64,11 +64,13 @@ export class DefinePageTemplate {
      * @param {HTMLElement} options.element
      * @param {string} options.path
      * @param {string} options.templateName
+     * @param {renderMode} options.mode
      */
     swap: (options: {
         element: HTMLElement;
         path: string;
         templateName: string;
+        mode: string;
     }) => void;
     /**
      * @private
