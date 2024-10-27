@@ -70,6 +70,7 @@ export class DefinePageTemplate {
 	 * @param {HTMLElement} options.element
 	 * @param {string} options.path
 	 * @param {string} options.templateName
+	 * @param {renderMode} options.mode
 	 */
 	swap = (options) => {
 		this.renderElement(options);
@@ -103,8 +104,7 @@ export class DefinePageTemplate {
 	 * @param {string} [options.templateName]
 	 * @param {renderMode} [options.mode]
 	 */
-	renderElement = async ({ element, path: path_, templateName }) => {
-		let mode = 'inner';
+	renderElement = async ({ element, path: path_, templateName, mode = 'inner' }) => {
 		if (!path_ || !templateName) {
 			const callerAttribute = this.callerAttribute;
 			const templateSelector = element.getAttribute(callerAttribute);
