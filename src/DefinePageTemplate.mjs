@@ -116,7 +116,7 @@ export class DefinePageTemplate {
 				});
 				return;
 			}
-			[path_, templateName, mode] = templateSelector.split(helper.separator);
+			[path_, templateName, mode = 'inner'] = templateSelector.split(helper.separator);
 		}
 		const targetAttribute = this.targetAttribute;
 		const path = this.targetPathRule(path_);
