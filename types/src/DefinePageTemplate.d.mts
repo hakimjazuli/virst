@@ -59,7 +59,11 @@ export class DefinePageTemplate {
      * @type {(path:string)=>string}
      */
     private targetPathRule;
-    callerAttribute: string;
+    /**
+     * @private
+     * @type {string}
+     */
+    private callerAttribute;
     /**
      * @param {Object} options
      * @param {HTMLElement} options.element

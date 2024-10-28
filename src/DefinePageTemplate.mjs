@@ -60,6 +60,11 @@ export class DefinePageTemplate {
 	 * @private
 	 * @type {string}
 	 */
+	callerAttribute;
+	/**
+	 * @private
+	 * @type {string}
+	 */
 	targetAttribute;
 	/**
 	 * @private
