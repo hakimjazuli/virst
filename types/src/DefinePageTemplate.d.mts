@@ -7,6 +7,7 @@
  * <div ${templateName}="${path};${templateName};${mode}"></div>
  * // mode = 'inner' | 'outer'
  * ```
+ * - `templateName` of `head` & `body` are reserved for `document.body` and `document.body` of the template `document`, you can use it without adding `targetAttribute="head"` or `targetAttribute="body"` on the respective element;
  * ```html
  * // template document
  * <div ${targetAttribute}="${selector}"></div>

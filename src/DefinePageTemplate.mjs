@@ -12,6 +12,7 @@ import { Lifecycle } from './Lifecycle.mjs';
  * <div ${templateName}="${path};${templateName};${mode}"></div>
  * // mode = 'inner' | 'outer'
  * ```
+ * - `templateName` of `head` & `body` are reserved for `document.body` and `document.body` of the template `document`, you can use it without adding `targetAttribute="head"` or `targetAttribute="body"` on the respective element;
  * ```html
  * // template document
  * <div ${targetAttribute}="${selector}"></div>
@@ -127,7 +128,15 @@ export class DefinePageTemplate {
 		}
 		try {
 			const doc = await helper.getDocument(path);
+			const docScripts = doc.querySelectorAll('script');
+			for (let i = 0; i < docScripts.length; i++) {
+				docScripts[i].remove();
+			}
 			DefinePageTemplate.chachedTemplate[path] = {};
+			const docBody = doc.body;
+			DefinePageTemplate.chachedTemplate[path]['body'] = [docBody, docBody.innerHTML];
+			const docHead = doc.body;
+			DefinePageTemplate.chachedTemplate[path]['head'] = [docHead, docHead.innerHTML];
 			const templates = doc.querySelectorAll(`[${targetAttribute}]`);
 			let retElement;
 			for (let i = 0; i < templates.length; i++) {
