@@ -1,3 +1,7 @@
+/**
+ * @description
+ * shared statics
+ */
 export class helper {
     /**
      * subscriber
@@ -32,16 +36,12 @@ export class helper {
     private static cachedDocument;
     static docScopeElement: string;
     static storageIdentifier: string;
-    static LCCBIdentifier: string;
     static DCCBIdentifier: string;
     static ACCBIdentifier: string;
     static onViewCBIdentifier: string;
     static onExitViewCBIdentifier: string;
-    /**
-     * @param {HTMLElement|Element} element
-     * @returns {HTMLElement}
-     */
-    static cloneNode: (element: HTMLElement | Element) => HTMLElement;
+    static templatePrefix: string;
+    static keptElement: string;
     /**
      * @readonly
      */

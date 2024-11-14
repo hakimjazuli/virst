@@ -1,6 +1,6 @@
 // @ts-check
 
-import { helper } from './helper.mjs';
+import { helper } from './helper.export.mjs';
 
 /**
  * @description
@@ -40,6 +40,8 @@ export class App {
 		}
 		App.__ = this;
 		helper.debounce = appDebounceMS;
-		defineQRouter.queryChangeThrottleMs = appDebounceMS;
+		if (defineQRouter) {
+			defineQRouter.queryChangeThrottleMs = appDebounceMS;
+		}
 	}
 }

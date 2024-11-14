@@ -1,7 +1,7 @@
 // @ts-check
 
 import { $ } from './$.mjs';
-import { helper } from './helper.mjs';
+import { helper } from './helper.export.mjs';
 import { Lifecycle } from './Lifecycle.mjs';
 import { Ping } from './Ping.mjs';
 

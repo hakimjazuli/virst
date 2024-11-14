@@ -3,6 +3,12 @@ export type attributeChangedLifecycle = (options: {
     newValue: string;
 }) => Promise<void>;
 export type lifecycleHandler = {
+    isConnected: boolean;
+    /**
+     * - swap element using DefinePageTemplateInstance swap method;
+     * - use mode "inner"/"outer" carefully;
+     */
+    swap: (options: Omit<import("./DefinePageTemplate.mjs").swapWithPageTemplateOptions, "element">) => void;
     element: HTMLElement;
     /**
      * - use to modify the innerHTML of the `LifeCycleInstance` element;

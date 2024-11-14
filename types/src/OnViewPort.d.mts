@@ -49,13 +49,18 @@ export class onViewPort {
     private static onViewCallbacksOptions;
     /**
      * @private
+     * @type {Map<HTMLElement|Element, true>}
+     */
+    private static registeredOnExit;
+    /**
+     * @private
      * @param {IntersectionObserverEntry} entry
      */
     private static handleEntry;
     /**
      * @param {import('./onViewPortHandler.type.mjs').elementsCallbacks} elementsCallbacks
      */
-    constructor(elementsCallbacks: import("./onViewPortHandler.type.mjs").elementsCallbacks);
+    constructor({ element, onExitViewCallback, onViewCallback, lifecyclesOnDisconnected }: import("./onViewPortHandler.type.mjs").elementsCallbacks);
     /**
      * @param {Element|HTMLElement} element
      * @returns {import('./onViewPortHandler.type.mjs').onViewPortHandler}

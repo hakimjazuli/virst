@@ -1,7 +1,8 @@
 // @ts-check
 
 import { $ } from './$.mjs';
-import { helper } from './helper.mjs';
+import { DefinePageTemplate } from './DefinePageTemplate.mjs';
+import { helper } from './helper.export.mjs';
 import { Let } from './Let.mjs';
 import { onViewPort } from './onViewPort.mjs';
 import { Ping } from './Ping.mjs';
@@ -339,6 +340,11 @@ export class Lifecycle {
 	};
 	/**
 	 * @private
+	 * @type {Map<HTMLElement, true>}
+	 */
+	static registeredLCCB = new Map();
+	/**
+	 * @private
 	 * @param {Node} addedNode
 	 * @param {string} attributeName
 	 */
@@ -354,14 +360,23 @@ export class Lifecycle {
 		) {
 			return;
 		}
-		if (addedNode.hasAttribute(helper.LCCBIdentifier)) {
+		if (Lifecycle.registeredLCCB.has(addedNode)) {
 			return;
 		}
-		addedNode.setAttribute(helper.LCCBIdentifier, '');
+		Lifecycle.registeredLCCB.set(addedNode, true);
 		const handler = Lifecycle.ID.get(this.currentDocumentScope)[attributeName];
 		Lifecycle.addedNodeScoper(addedNode, async () => {
 			if (addedNode.parentElement) {
 				handler({
+					get isConnected() {
+						return addedNode.isConnected;
+					},
+					swap: (options) => {
+						if (!(DefinePageTemplate instanceof DefinePageTemplate)) {
+							return;
+						}
+						DefinePageTemplate.__.swap({ element: addedNode, ...options });
+					},
 					onViewPort: (options) => new onViewPort({ element: addedNode, ...options }),
 					element: addedNode,
 					html: (strings, ...values) => {
@@ -372,6 +387,7 @@ export class Lifecycle {
 						Lifecycle.setDCCB(addedNode, async () => {
 							Lifecycle.addedNodeScoper(addedNode, async () => {
 								await disconnectCallback();
+								Lifecycle.registeredLCCB.delete(addedNode);
 							});
 						});
 					},

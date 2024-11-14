@@ -1,7 +1,7 @@
 // @ts-check
 
 import { $ } from './$.mjs';
-import { helper } from './helper.mjs';
+import { helper } from './helper.export.mjs';
 import { Let } from './Let.mjs';
 import { Lifecycle } from './Lifecycle.mjs';
 import { queueUnique } from './queueUnique.mjs';
@@ -106,7 +106,7 @@ export class For {
 							}
 							continue;
 						}
-						const childElement_ = helper.cloneNode(this.childElement);
+						const childElement_ = this.childElement.cloneNode(true);
 						this.parentElement.appendChild(childElement_);
 						if (this.incrementalRender) {
 							await helper.timeout(0);

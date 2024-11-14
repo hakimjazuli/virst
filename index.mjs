@@ -46,7 +46,8 @@
  * > - it's better to use more dedicated library like [animeJS](https://animejs.com/)
  * ## v0.^12.x
  * - drop supports for `Component`
- * > - we don't have support for scoped styling out of the box, it's possible using workarround using selector `Lifecycle` `onConnected` `attr` parameter as css selector inside `html` callback parameter with style tag, which we decided this workarround would be counter productive, therefore we drop it;
+ * - uses native web component instead using `WebComponent` class
+ * - it's a fix for `Lifecycle` behaviour and simple `WebComponent` generation class
  */
 
 import { $ } from './src/$.mjs';
@@ -59,12 +60,14 @@ import { DefineStorage } from './src/DefineStorage.mjs';
 import { Derived } from './src/Derived.mjs';
 import { Event_ } from './src/Event_.mjs';
 import { For } from './src/For.mjs';
+import { helper } from './src/helper.export.mjs';
 import { Let } from './src/Let.mjs';
 import { Lifecycle } from './src/Lifecycle.mjs';
 import { List } from './src/List.mjs';
 import { Ping } from './src/Ping.mjs';
 import { ShortCut } from './src/ShortCut.mjs';
 import { Try_ } from './src/Try_.mjs';
+import { WebComponent } from './src/WebComponent.mjs';
 import { WorkerMainThread } from './src/WorkerMainThread.mjs';
 import { WorkerThread } from './src/WorkerThread.mjs';
 import { _ } from './src/_.mjs';
@@ -83,6 +86,10 @@ import { _ } from './src/_.mjs';
 /**
  * @typedef {(options:{attributeName:string, newValue:string})=>Promise<void>} attributeChangedLifecycle
  * @typedef {Object} lifecycleHandler
+ * @property {boolean} lifecycleHandler.isConnected
+ * @property {(options:Omit<import('./src/DefinePageTemplate.mjs').swapWithPageTemplateOptions, 'element'>)=>void} lifecycleHandler.swap
+ * - swap element using DefinePageTemplateInstance swap method;
+ * - use mode "inner"/"outer" carefully;
  * @property {HTMLElement} lifecycleHandler.element
  * @property {(strings:TemplateStringsArray,...values:string[])=>void} lifecycleHandler.html
  * - use to modify the innerHTML of the `LifeCycleInstance` element;
@@ -109,4 +116,4 @@ import { _ } from './src/_.mjs';
  * @property {onViewPortLifecycleHandler["onDisconnected"][]} lifecyclesOnDisconnected
  */
 
-export { $, App, CRUD, DefinePageTemplate, DefineQRouter, DefineShortCuts, DefineStorage, Derived, Event_, For, Let, Lifecycle, List, Ping, ShortCut, Try_, WorkerMainThread, WorkerThread, _ };
+export { $, App, CRUD, DefinePageTemplate, DefineQRouter, DefineShortCuts, DefineStorage, Derived, Event_, For, helper, Let, Lifecycle, List, Ping, ShortCut, Try_, WebComponent, WorkerMainThread, WorkerThread, _ };

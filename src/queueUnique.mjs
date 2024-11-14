@@ -1,6 +1,7 @@
 // @ts-check
 
-import { helper } from './helper.mjs';
+import { helper } from './helper.export.mjs';
+('./helper.export.mjs/index.js');
 
 export class queueUnique {
 	/**

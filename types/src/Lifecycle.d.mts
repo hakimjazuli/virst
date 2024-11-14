@@ -81,6 +81,11 @@ export class Lifecycle {
     private static addedNodeScoper;
     /**
      * @private
+     * @type {Map<HTMLElement, true>}
+     */
+    private static registeredLCCB;
+    /**
+     * @private
      * @param {HTMLElement} element
      * @param {()=>Promise<void>} disconnectedCallback
      * @returns {void}

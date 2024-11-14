@@ -2,7 +2,7 @@
 
 import { Let } from './Let.mjs';
 import { Derived } from './Derived.mjs';
-import { helper } from './helper.mjs';
+import { helper } from './helper.export.mjs';
 
 /**
  * @description

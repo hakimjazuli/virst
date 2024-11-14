@@ -16,17 +16,40 @@
  * > - the class itself register a `Lifecycle` for `templateName`,  which then upon connected, it will fetch the `path` then selects `targetAttribute`="`selector`" as template that then replace main page `innerHTML` with selected element `innerHTML` from template;
  * > - fetched page will be then be cached, along with any `[targetAttribute]` on that page
  */
+/**
+ * @typedef {Object} swapWithPageTemplateOptions
+ * @property {HTMLElement} element
+ * @property {string} path
+ * @property {string} templateName
+ * @property {renderMode} mode
+ */
 export class DefinePageTemplate {
     /**
      * @type {DefinePageTemplate}
      */
     static __: DefinePageTemplate;
     /**
-     * @private
      * @typedef {{[templateName:string]:[element:HTMLElement,innerHTML:string]}} templateSingle
      * @type {{[path:string]:templateSingle}}
      */
-    private static chachedTemplate;
+    static chachedTemplate: {
+        [path: string]: {
+            [templateName: string]: [element: HTMLElement, innerHTML: string];
+        };
+    };
+    /**
+     * @type {string}
+     */
+    static callerAttribute: string;
+    /**
+     * @type {string}
+     */
+    static targetAttribute: string;
+    /**
+     * @private
+     * @type {(path:string)=>string}
+     */
+    private static targetPathRule;
     /**
      * @typedef {'inner'|'outer'|string} renderMode
      */
@@ -37,6 +60,13 @@ export class DefinePageTemplate {
      * @param {renderMode} mode
      */
     private static replace;
+    /**
+     * @param {string} path
+     * @param {string} templateName
+     * @param {string} targetAttribute
+     * @returns {Promise<[element:HTMLElement,innerHTML:string]>}
+     */
+    static fromCache: (targetAttribute: string, path: string, templateName: string) => Promise<[element: HTMLElement, innerHTML: string]>;
     /**
      * @param {Object} options
      * @param {string} options.callerAttribute
@@ -50,33 +80,9 @@ export class DefinePageTemplate {
         targetPathRule?: (path: string) => string;
     });
     /**
-     * @private
-     * @type {string}
+     * @param {swapWithPageTemplateOptions} options
      */
-    private targetAttribute;
-    /**
-     * @private
-     * @type {(path:string)=>string}
-     */
-    private targetPathRule;
-    /**
-     * @private
-     * @type {string}
-     */
-    private callerAttribute;
-    /**
-     * @param {Object} options
-     * @param {HTMLElement} options.element
-     * @param {string} options.path
-     * @param {string} options.templateName
-     * @param {renderMode} options.mode
-     */
-    swap: (options: {
-        element: HTMLElement;
-        path: string;
-        templateName: string;
-        mode: string;
-    }) => void;
+    swap: (options: swapWithPageTemplateOptions) => void;
     /**
      * @private
      * @param {Object} options
@@ -87,3 +93,9 @@ export class DefinePageTemplate {
      */
     private renderElement;
 }
+export type swapWithPageTemplateOptions = {
+    element: HTMLElement;
+    path: string;
+    templateName: string;
+    mode: string;
+};

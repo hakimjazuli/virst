@@ -1,5 +1,9 @@
 // @ts-check
 
+/**
+ * @description
+ * shared statics
+ */
 export class helper {
 	/**
 	 * subscriber
@@ -31,13 +35,21 @@ export class helper {
 		if (path in helper.cachedDocument) {
 			return helper.cachedDocument[path];
 		}
-		const response = await fetch(path);
-		if (!response.ok) {
-			throw Error(`Error fetching: status="${response.status}"`);
+		let response;
+		try {
+			response = await fetch(path);
+			if (!response.ok) {
+				response = await fetch(`${path}.html`);
+			}
+			if (!response.ok) {
+				throw Error(`Error fetching: status="${response.status}"`);
+			}
+			const htmlString = await response.text();
+			const parser = new DOMParser();
+			return (helper.cachedDocument[path] = parser.parseFromString(htmlString, 'text/html'));
+		} catch (error) {
+			console.error({ error, response });
 		}
-		const htmlString = await response.text();
-		const parser = new DOMParser();
-		return (helper.cachedDocument[path] = parser.parseFromString(htmlString, 'text/html'));
 	};
 	/**
 	 * @private
@@ -46,25 +58,12 @@ export class helper {
 	static cachedDocument = {};
 	static docScopeElement = 'virst-sc';
 	static storageIdentifier = 'virst-st';
-	static LCCBIdentifier = 'virst-lc';
 	static DCCBIdentifier = 'virst-dc';
 	static ACCBIdentifier = 'virst-ac';
 	static onViewCBIdentifier = `virst-ov`;
 	static onExitViewCBIdentifier = `virst-oxv`;
-	/**
-	 * @param {HTMLElement|Element} element
-	 * @returns {HTMLElement}
-	 */
-	static cloneNode = (element) => {
-		const childElement_ = element.cloneNode(true);
-		if (!(childElement_ instanceof HTMLElement)) {
-			return;
-		}
-		childElement_.removeAttribute(helper.LCCBIdentifier);
-		childElement_.removeAttribute(helper.onViewCBIdentifier);
-		childElement_.removeAttribute(helper.onExitViewCBIdentifier);
-		return childElement_;
-	};
+	static templatePrefix = 'virst-template';
+	static keptElement = 'virst-keep';
 	/**
 	 * @readonly
 	 */

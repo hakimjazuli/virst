@@ -1,7 +1,7 @@
 // @ts-check
 
 import { $ } from './$.mjs';
-import { helper } from './helper.mjs';
+import { helper } from './helper.export.mjs';
 import { Let } from './Let.mjs';
 
 /**

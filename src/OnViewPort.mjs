@@ -1,6 +1,6 @@
 // @ts-check
 
-import { helper } from './helper.mjs';
+import { helper } from './helper.export.mjs';
 import { Ping } from './Ping.mjs';
 
 /**
@@ -18,18 +18,18 @@ export class onViewPort {
 	/**
 	 * @param {import('./onViewPortHandler.type.mjs').elementsCallbacks} elementsCallbacks
 	 */
-	constructor(elementsCallbacks) {
-		const { element, onExitViewCallback, onViewCallback, lifecyclesOnDisconnected } =
-			elementsCallbacks;
+	constructor({ element, onExitViewCallback, onViewCallback, lifecyclesOnDisconnected }) {
 		onViewPort.observer.observe(element);
 		element[helper.onViewCBIdentifier] = onViewCallback;
 		element[helper.onExitViewCBIdentifier] = onExitViewCallback;
 		for (let i = 0; i < lifecyclesOnDisconnected.length; i++) {
 			lifecyclesOnDisconnected[i](async () => {
 				onViewPort.removeOnViewCallback(element);
-				await element[helper.onExitViewCBIdentifier](
-					onViewPort.onViewCallbacksOptions(element)
-				);
+				if (element[helper.onExitViewCBIdentifier]) {
+					await element[helper.onExitViewCBIdentifier](
+						onViewPort.onViewCallbacksOptions(element)
+					);
+				}
 				onViewPort.removeOnExitViewCallback(element);
 				onViewPort.unobserve(element);
 			});
@@ -108,22 +108,28 @@ export class onViewPort {
 	};
 	/**
 	 * @private
+	 * @type {Map<HTMLElement|Element, true>}
+	 */
+	static registeredOnExit = new Map();
+	/**
+	 * @private
 	 * @param {IntersectionObserverEntry} entry
 	 */
 	static handleEntry = async (entry) => {
 		const element = entry.target;
 		if (entry.isIntersecting && helper.onViewCBIdentifier in element) {
 			await element[helper.onViewCBIdentifier](onViewPort.onViewCallbacksOptions(element));
-			element.setAttribute(helper.onViewCBIdentifier, '');
+			this.registeredOnExit.set(element, true);
 		}
 		if (
 			!entry.isIntersecting &&
 			helper.onExitViewCBIdentifier in element &&
-			element.hasAttribute(helper.onViewCBIdentifier)
+			this.registeredOnExit.has(element)
 		) {
 			await element[helper.onExitViewCBIdentifier](
 				onViewPort.onViewCallbacksOptions(element)
 			);
+			this.registeredOnExit.delete(element);
 		}
 	};
 }

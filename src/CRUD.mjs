@@ -48,7 +48,6 @@ export class CRUD {
 			if (mapped[name]) {
 				this[name] = new Ping(false, async () => {
 					const source = mapped[name];
-					console.log(name, mapped[name].asyncCallback);
 					await source.asyncCallback();
 					if (source.updateRead) {
 						this.read();

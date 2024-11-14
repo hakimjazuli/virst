@@ -1,6 +1,6 @@
 // @ts-check
 
-import { helper } from './helper.mjs';
+import { helper } from './helper.export.mjs';
 import { Ping } from './Ping.mjs';
 
 /**

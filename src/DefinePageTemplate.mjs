@@ -1,6 +1,6 @@
 // @ts-check
 
-import { helper } from './helper.mjs';
+import { helper } from './helper.export.mjs';
 import { Lifecycle } from './Lifecycle.mjs';
 
 /**
@@ -21,13 +21,19 @@ import { Lifecycle } from './Lifecycle.mjs';
  * > - the class itself register a `Lifecycle` for `templateName`,  which then upon connected, it will fetch the `path` then selects `targetAttribute`="`selector`" as template that then replace main page `innerHTML` with selected element `innerHTML` from template;
  * > - fetched page will be then be cached, along with any `[targetAttribute]` on that page
  */
+/**
+ * @typedef {Object} swapWithPageTemplateOptions
+ * @property {HTMLElement} element
+ * @property {string} path
+ * @property {string} templateName
+ * @property {renderMode} mode
+ */
 export class DefinePageTemplate {
 	/**
 	 * @type {DefinePageTemplate}
 	 */
 	static __;
 	/**
-	 * @private
 	 * @typedef {{[templateName:string]:[element:HTMLElement,innerHTML:string]}} templateSingle
 	 * @type {{[path:string]:templateSingle}}
 	 */
@@ -45,9 +51,9 @@ export class DefinePageTemplate {
 			return;
 		}
 		DefinePageTemplate.__ = this;
-		this.targetAttribute = targetAttribute;
-		this.targetPathRule = targetPathRule;
-		this.callerAttribute = callerAttribute;
+		DefinePageTemplate.targetAttribute = targetAttribute;
+		DefinePageTemplate.targetPathRule = targetPathRule;
+		DefinePageTemplate.callerAttribute = callerAttribute;
 		new Lifecycle({
 			attributeName: callerAttribute,
 			bypassNested: true,
@@ -57,26 +63,20 @@ export class DefinePageTemplate {
 		});
 	}
 	/**
-	 * @private
 	 * @type {string}
 	 */
-	callerAttribute;
+	static callerAttribute;
 	/**
-	 * @private
 	 * @type {string}
 	 */
-	targetAttribute;
+	static targetAttribute;
 	/**
 	 * @private
 	 * @type {(path:string)=>string}
 	 */
-	targetPathRule;
+	static targetPathRule;
 	/**
-	 * @param {Object} options
-	 * @param {HTMLElement} options.element
-	 * @param {string} options.path
-	 * @param {string} options.templateName
-	 * @param {renderMode} options.mode
+	 * @param {swapWithPageTemplateOptions} options
 	 */
 	swap = (options) => {
 		this.renderElement(options);
@@ -93,7 +93,7 @@ export class DefinePageTemplate {
 	static replace = (element, fromCache, mode = 'inner') => {
 		switch (mode) {
 			case 'outer':
-				const template_ = helper.cloneNode(fromCache[0]);
+				const template_ = fromCache[0].cloneNode(true);
 				element.replaceWith(template_);
 				break;
 			case 'inner':
@@ -112,7 +112,7 @@ export class DefinePageTemplate {
 	 */
 	renderElement = async ({ element, path: path_, templateName, mode = 'inner' }) => {
 		if (!path_ || !templateName) {
-			const callerAttribute = this.callerAttribute;
+			const callerAttribute = DefinePageTemplate.callerAttribute;
 			const templateSelector = element.getAttribute(callerAttribute);
 			if (!templateSelector) {
 				console.warn({
@@ -122,50 +122,57 @@ export class DefinePageTemplate {
 				});
 				return;
 			}
-			[path_, templateName, mode = 'inner'] = templateSelector.split(helper.separator);
+			[path_, templateName, mode = 'inner'] = helper.splitX(
+				templateSelector,
+				helper.separator
+			);
 		}
-		const targetAttribute = this.targetAttribute;
-		const path = this.targetPathRule(path_);
+		const targetAttribute = DefinePageTemplate.targetAttribute;
+		const path = DefinePageTemplate.targetPathRule(path_);
+		const fromCache = await DefinePageTemplate.fromCache(targetAttribute, path, templateName);
+		DefinePageTemplate.replace(element, fromCache, mode);
+	};
+	/**
+	 * @param {string} path
+	 * @param {string} templateName
+	 * @param {string} targetAttribute
+	 * @returns {Promise<[element:HTMLElement,innerHTML:string]>}
+	 */
+	static fromCache = async (targetAttribute, path, templateName) => {
 		const fromCache = DefinePageTemplate.chachedTemplate[path]?.[templateName];
 		if (fromCache) {
-			DefinePageTemplate.replace(element, fromCache, mode);
+			return fromCache;
+		}
+		const doc = await helper.getDocument(path);
+		const docScripts = doc.querySelectorAll('script');
+		for (let i = 0; i < docScripts.length; i++) {
+			docScripts[i].remove();
+		}
+		DefinePageTemplate.chachedTemplate[path] = {};
+		const docBody = doc.body;
+		DefinePageTemplate.chachedTemplate[path]['body'] = [docBody, docBody.innerHTML];
+		const docHead = doc.head;
+		DefinePageTemplate.chachedTemplate[path]['head'] = [docHead, docHead.innerHTML];
+		const templates = doc.querySelectorAll(`[${targetAttribute}]`);
+		let retElement;
+		for (let i = 0; i < templates.length; i++) {
+			const templateElement = templates[i];
+			const templateName_ = templateElement.getAttribute(targetAttribute);
+			if (!(templateElement instanceof HTMLElement)) {
+				continue;
+			}
+			DefinePageTemplate.chachedTemplate[path][templateName_] = [
+				templateElement,
+				templateElement.innerHTML,
+			];
+			if (templateName_ === templateName) {
+				retElement = templateElement;
+			}
+		}
+		if (templateName !== 'head' && templateName !== 'body' && !retElement) {
+			console.error(`couldn't find '[${targetAttribute}="${templateName}"]' in the ${path}`);
 			return;
 		}
-		try {
-			const doc = await helper.getDocument(path);
-			const docScripts = doc.querySelectorAll('script');
-			for (let i = 0; i < docScripts.length; i++) {
-				docScripts[i].remove();
-			}
-			DefinePageTemplate.chachedTemplate[path] = {};
-			const docBody = doc.body;
-			DefinePageTemplate.chachedTemplate[path]['body'] = [docBody, docBody.innerHTML];
-			const docHead = doc.body;
-			DefinePageTemplate.chachedTemplate[path]['head'] = [docHead, docHead.innerHTML];
-			const templates = doc.querySelectorAll(`[${targetAttribute}]`);
-			let retElement;
-			for (let i = 0; i < templates.length; i++) {
-				const templateElement = templates[i];
-				const templateName_ = templateElement.getAttribute(targetAttribute);
-				if (!(templateElement instanceof HTMLElement)) {
-					continue;
-				}
-				DefinePageTemplate.chachedTemplate[path][templateName_] = [
-					templateElement,
-					templateElement.innerHTML,
-				];
-				if (templateName_ === templateName) {
-					retElement = templateElement;
-				}
-			}
-			if (!retElement) {
-				throw Error(
-					`couldn't find '[${targetAttribute}="${templateName}"]' in the ${path}`
-				);
-			}
-			DefinePageTemplate.replace(element, fromCache, mode);
-		} catch (error) {
-			console.error(error);
-		}
+		return DefinePageTemplate.chachedTemplate[path]?.[templateName];
 	};
 }

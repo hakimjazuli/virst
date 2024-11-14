@@ -25,13 +25,9 @@ export class DefineQRouter<queryValueType extends {
     static __: DefineQRouter<any, any>;
     /**
      * @private
-     * @param {HTMLAnchorElement} element
+     * @param {HTMLElement} element
      */
     private static smoothScroll;
-    /**
-     * @private
-     */
-    private static redirectToIndex;
     /**
      * @private
      * @type {'pop'|'push'}
@@ -46,14 +42,11 @@ export class DefineQRouter<queryValueType extends {
      * @param {Object} options
      * @param {queryValueType} options.queries
      * @param {NamedQueryParam} [options.useAsNavigation]
-     * @param {(hrefValue:string)=>string} [options.navigationPathRule]
-     * - modify path
      * @param {number} [options.queryChangeThrottleMs]
      */
-    constructor({ queries, useAsNavigation, navigationPathRule, queryChangeThrottleMs, }: {
+    constructor({ queries, useAsNavigation, queryChangeThrottleMs }: {
         queries: queryValueType;
         useAsNavigation?: NamedQueryParam;
-        navigationPathRule?: (hrefValue: string) => string;
         queryChangeThrottleMs?: number;
     });
     /**
@@ -75,6 +68,11 @@ export class DefineQRouter<queryValueType extends {
      */
     private handler;
     /**
+     * @private
+     * @type {string}
+     */
+    private useAsNavigation;
+    /**
      * @type {Record.<NamedQueryParam, Let<string>>}
      */
     routes: Record<NamedQueryParam, Let<string>>;
@@ -85,9 +83,12 @@ export class DefineQRouter<queryValueType extends {
     /**
      * @private
      * @param {NamedQueryParam} [useAsNavigation]
-     * @param {(hrefValue:string)=>string} [navigationPathRule]
      */
     private useVirstURL;
+    /**
+     * @private
+     */
+    private redirectToIndex;
     /**
      * @private
      * @param {Ping["fifo"]} ping

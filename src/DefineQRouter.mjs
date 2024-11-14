@@ -1,7 +1,7 @@
 // @ts-check
 
 import { $ } from './$.mjs';
-import { helper } from './helper.mjs';
+import { helper } from './helper.export.mjs';
 import { Let } from './Let.mjs';
 import { Lifecycle } from './Lifecycle.mjs';
 import { Ping } from './Ping.mjs';
@@ -74,22 +74,16 @@ export class DefineQRouter {
 	 * @param {Object} options
 	 * @param {queryValueType} options.queries
 	 * @param {NamedQueryParam} [options.useAsNavigation]
-	 * @param {(hrefValue:string)=>string} [options.navigationPathRule]
-	 * - modify path
 	 * @param {number} [options.queryChangeThrottleMs]
 	 */
-	constructor({
-		queries,
-		useAsNavigation = undefined,
-		navigationPathRule = undefined,
-		queryChangeThrottleMs = 0,
-	}) {
+	constructor({ queries, useAsNavigation = undefined, queryChangeThrottleMs = 0 }) {
 		if (DefineQRouter.__ instanceof DefineQRouter) {
 			helper.warningSingleton(DefineQRouter);
 			return;
 		}
 		DefineQRouter.__ = this;
-		DefineQRouter.redirectToIndex();
+		this.useAsNavigation = useAsNavigation;
+		this.redirectToIndex();
 		// @ts-ignore
 		this.routes = {};
 		this.queryChangeThrottleMs = queryChangeThrottleMs;
@@ -98,8 +92,8 @@ export class DefineQRouter {
 		for (const key in queries) {
 			const keyQuery = (this.handlers[key.toString()] = new this.handler(key, queries[key]));
 			const thisQueryString = (this.routes[key.toString()] = keyQuery.string);
-			new $(async () => {
-				thisQueryString.value;
+			new $(async (first) => {
+				let url_ = thisQueryString.value;
 				const exceptionSet = keyQuery.clearAllWhenImSetExcept;
 				const clearListWhenImSet = keyQuery.clearListWhenImSet;
 				DefineQRouter.onAfterResolved = keyQuery.onAfterResolved;
@@ -131,41 +125,44 @@ export class DefineQRouter {
 						}
 					}
 				}
+				if (key == useAsNavigation) {
+					if (first && url_ == '') {
+					} else if (
+						url_.startsWith(helper.templatePrefix) ||
+						url_.startsWith(`/${helper.templatePrefix}`)
+					) {
+						window.location.href = `/`;
+						return;
+					}
+				}
 				if (DefineQRouter.historyStateMode === 'push') {
 					this.requestChanges(this.pushPing);
 				}
 				DefineQRouter.historyStateMode = 'push';
 			});
 		}
-		this.useVirstURL(useAsNavigation, navigationPathRule);
+		this.useVirstURL(useAsNavigation);
 	}
 	/**
 	 * @private
-	 * @param {NamedQueryParam} [useAsNavigation]
-	 * @param {(hrefValue:string)=>string} [navigationPathRule]
+	 * @type {string}
 	 */
-	useVirstURL = (useAsNavigation, navigationPathRule) => {
+	useAsNavigation;
+	/**
+	 * @private
+	 * @param {NamedQueryParam} [useAsNavigation]
+	 */
+	useVirstURL = (useAsNavigation) => {
 		if (useAsNavigation === undefined || !(useAsNavigation in this.routes)) {
-			return;
-		}
-		if (!navigationPathRule) {
-			console.error({
-				message: 'there are error on DefineQRouter instantiation',
-				error: {
-					useAsNavigation: 'useAsNavigation is definied, yet navigationPathRule is not',
-					navigationPathRule,
-				},
-			});
 			return;
 		}
 		const handlerSignal = this.routes[useAsNavigation];
 		new Lifecycle({
 			attributeName: 'href',
 			bypassNested: true,
+			documentScope: document,
 			onConnected: async ({ element, onDisconnected }) => {
-				if (!(element instanceof HTMLAnchorElement)) {
-					return;
-				}
+				console.log('hahah');
 				element.onclick = (event) => {
 					event.preventDefault();
 					let path_ = element.getAttribute('href') ?? '';
@@ -173,7 +170,9 @@ export class DefineQRouter {
 						DefineQRouter.smoothScroll(element);
 						return;
 					}
-					path_ = navigationPathRule(path_);
+					if (!path_) {
+						return;
+					}
 					handlerSignal.value = path_;
 				};
 				onDisconnected(async () => {
@@ -181,10 +180,32 @@ export class DefineQRouter {
 				});
 			},
 		});
+		// window.addEventListener('click', (event) => {
+		// 	let element = event.target;
+		// 	while (element) {
+		// 		if (!(element instanceof HTMLElement)) {
+		// 			return;
+		// 		}
+		// 		if (element.tagName === 'A' && element.hasAttribute('href')) {
+		// 			event.preventDefault();
+		// 			let path_ = element.getAttribute('href') ?? '';
+		// 			if (path_.startsWith('#')) {
+		// 				DefineQRouter.smoothScroll(element);
+		// 				return;
+		// 			}
+		// 			if (!path_) {
+		// 				return;
+		// 			}
+		// 			handlerSignal.value = path_;
+		// 			return;
+		// 		}
+		// 		element = element.parentElement;
+		// 	}
+		// });
 	};
 	/**
 	 * @private
-	 * @param {HTMLAnchorElement} element
+	 * @param {HTMLElement} element
 	 */
 	static smoothScroll = (element) => {
 		const targetId = element.getAttribute('href').slice(1);
@@ -198,11 +219,19 @@ export class DefineQRouter {
 	/**
 	 * @private
 	 */
-	static redirectToIndex = () => {
-		const currentPath = window.location.pathname.split('/').pop();
-		if (currentPath !== 'index.html' && currentPath !== '') {
-			window.location.href = '/';
+	redirectToIndex = () => {
+		const currentPath = window.location.pathname.replace('/', '');
+		if (currentPath == '') {
+			return;
 		}
+		if (
+			currentPath.startsWith(helper.templatePrefix) ||
+			currentPath.startsWith(`/${helper.templatePrefix}`)
+		) {
+			window.location.href = `/`;
+			return;
+		}
+		window.location.href = `/?${this.useAsNavigation}=${currentPath}`;
 	};
 	/**
 	 * @param {Ping["fifo"]} ping

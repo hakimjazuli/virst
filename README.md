@@ -38,7 +38,8 @@ bun i virst
 > - it's better to use more dedicated library like [animeJS](https://animejs.com/)
 ## v0.^12.x
 - drop supports for `Component`
-> - we don't have support for scoped styling out of the box, it's possible using workarround using selector `Lifecycle` `onConnected` `attr` parameter as css selector inside `html` callback parameter with style tag, which we decided this workarround would be counter productive, therefore we drop it;
+- uses native web component instead using `WebComponent` class
+- it's a fix for `Lifecycle` behaviour and simple `WebComponent` generation class
 
 
 <h2 id="exported-api-and-type-list">exported-api-and-type-list</h2>
@@ -65,6 +66,8 @@ bun i virst
 
 - [For](#for)
 
+- [helper](#helper)
+
 - [Let](#let)
 
 - [Lifecycle](#lifecycle)
@@ -80,6 +83,8 @@ bun i virst
 - [ShortCut](#shortcut)
 
 - [Try_](#try_)
+
+- [WebComponent](#webcomponent)
 
 - [WorkerMainThread](#workermainthread)
 
@@ -187,6 +192,15 @@ use this instead of normal `eventListener` declaration for:- creating `autoqueu
 *) <sub>[go to exported list](#exported-api-and-type-list)</sub>
 
 
+<h2 id="helper">helper</h2>
+
+*) <sub>[go to exported list](#exported-api-and-type-list)</sub>
+
+shared statics
+
+*) <sub>[go to exported list](#exported-api-and-type-list)</sub>
+
+
 <h2 id="let">Let</h2>
 
 *) <sub>[go to exported list](#exported-api-and-type-list)</sub>
@@ -255,6 +269,15 @@ trigger based callback integrated to the internal library  queue handler;can be
 *) <sub>[go to exported list](#exported-api-and-type-list)</sub>
 
 error as value helper;method(s):- async;- sync;
+
+*) <sub>[go to exported list](#exported-api-and-type-list)</sub>
+
+
+<h2 id="webcomponent">WebComponent</h2>
+
+*) <sub>[go to exported list](#exported-api-and-type-list)</sub>
+
+native web component creation helper;
 
 *) <sub>[go to exported list](#exported-api-and-type-list)</sub>
 

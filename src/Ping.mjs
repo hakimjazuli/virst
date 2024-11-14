@@ -1,6 +1,6 @@
 // @ts-check
 
-import { helper } from './helper.mjs';
+import { helper } from './helper.export.mjs';
 import { queueFIFO } from './queueFIFO.mjs';
 import { queueObjectFIFO } from './queueObjectFIFO.mjs';
 import { queueUnique } from './queueUnique.mjs';
