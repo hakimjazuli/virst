@@ -277,7 +277,7 @@ error as value helper;method(s):- async;- sync;
 
 *) <sub>[go to exported list](#exported-api-and-type-list)</sub>
 
-native web component creation helper;
+- native web component creation helper;- you can modify `WebComponent.commonStyles` static method to add it on the style tag generated from `onConnectedOptions.styles` before any of `WebComponentInstance` is created;
 
 *) <sub>[go to exported list](#exported-api-and-type-list)</sub>
 
