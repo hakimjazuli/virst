@@ -1,32 +1,60 @@
+export { Lifecycle } from "./src/lifecycle/Lifecycle.mjs";
+export { onViewPort } from "./src/lifecycle/onViewPort.export.mjs";
+export { Ping } from "./src/queue/Ping.mjs";
+export { Q } from "./src/queue/Q.mjs";
+export { QueuedBlock } from "./src/queue/QueuedBlock.mjs";
+export { $ } from "./src/signals/$.mjs";
+export { Derived } from "./src/signals/Derived.mjs";
+export { Let } from "./src/signals/Let.mjs";
+export { List } from "./src/signals/List.mjs";
+export { _ } from "./src/signals/_.mjs";
+export { App } from "./src/utils/App.mjs";
+export { CRUD } from "./src/utils/CRUD.mjs";
+export { DefinePageTemplate } from "./src/utils/DefinePageTemplate.mjs";
+export { DefineQRouter } from "./src/utils/DefineQRouter.mjs";
+export { DefineShortCuts } from "./src/utils/DefineShortCuts.mjs";
+export { DefineStorage } from "./src/utils/DefineStorage.mjs";
+export { Event_ } from "./src/utils/Event_.mjs";
+export { For } from "./src/utils/For.mjs";
+export { FSsrc } from "./src/utils/FSsrc.mjs";
+export { helper } from "./src/utils/helper.export.mjs";
+export { ShortCut } from "./src/utils/ShortCut.mjs";
+export { Try_ } from "./src/utils/Try_.mjs";
+export { virst } from "./src/utils/virst.export.mjs";
+export { WebComponent } from "./src/utils/WebComponent.mjs";
+export { WorkerMainThread } from "./src/utils/WorkerMainThread.mjs";
+export { WorkerThread } from "./src/utils/WorkerThread.mjs";
 export type documentScope = HTMLElement | Element | ShadowRoot | Document;
-export type attributeChangedLifecycle = (options: {
+export type attributeChangedLifecycle = ((options: {
     attributeName: string;
     newValue: string;
-}) => Promise<void>;
+}) => Promise<void>);
 export type lifecycleHandler = {
     isConnected: boolean;
     /**
      * - swap element using DefinePageTemplateInstance swap method;
      * - use mode "inner"/"outer" carefully;
      */
-    swap: (options: Omit<import("./src/DefinePageTemplate.mjs").swapWithPageTemplateOptions, "element">) => void;
+    swap: (options: Omit<import("./src/utils/DefinePageTemplate.mjs").swapWithPageTemplateOptions, "element">) => void;
     element: HTMLElement;
     /**
      * - use to modify the innerHTML of the `LifeCycleInstance` element;
      */
-    html: (strings: TemplateStringsArray, ...values: string[]) => void;
-    lifecycleObserver: import("./src/Lifecycle.mjs").Lifecycle;
+    html: (strings: TemplateStringsArray, ...values: string[]) => {
+        inner: () => void;
+        string: string;
+    };
+    lifecycleObserver: import("./src/lifecycle/Lifecycle.mjs").Lifecycle;
     onDisconnected: (arg0: () => Promise<void>) => void;
     onAttributeChanged: (arg0: attributeChangedLifecycle) => void;
-    onViewPort: (elementsCallbacks: import("./src/onViewPortHandler.type.mjs").elementsLCCallbacks) => import("./src/onViewPort.mjs").onViewPort;
+    onViewPort: (elementsCallbacks: import("./src/lifecycle/onViewPortHandler.type.mjs").elementsLCCallbacks) => import("./src/lifecycle/onViewPort.export.mjs").onViewPort;
 };
-export type onViewPortType = import("./src/onViewPort.mjs").onViewPort;
 export type onViewPortHandler = {
     removeOnExitViewCallback: () => void;
     removeOnViewCallback: () => void;
     unobserveElement: () => void;
 };
-export type onViewPortLifecycleHandler = import("./src/lifecycleHandler.type.mjs").lifecycleHandler;
+export type onViewPortLifecycleHandler = import("./src/lifecycle/lifecycleHandler.type.mjs").lifecycleHandler;
 export type elementsCallbacks = elementsLCCallbacks & {
     element: HTMLElement;
 };
@@ -35,25 +63,3 @@ export type elementsLCCallbacks = {
     onExitViewCallback: (onViewCallbacksOptions: onViewPortHandler) => Promise<void>;
     lifecyclesOnDisconnected: onViewPortLifecycleHandler["onDisconnected"][];
 };
-import { $ } from './src/$.mjs';
-import { App } from './src/App.mjs';
-import { CRUD } from './src/CRUD.mjs';
-import { DefinePageTemplate } from './src/DefinePageTemplate.mjs';
-import { DefineQRouter } from './src/DefineQRouter.mjs';
-import { DefineShortCuts } from './src/DefineShortCuts.mjs';
-import { DefineStorage } from './src/DefineStorage.mjs';
-import { Derived } from './src/Derived.mjs';
-import { Event_ } from './src/Event_.mjs';
-import { For } from './src/For.mjs';
-import { helper } from './src/helper.export.mjs';
-import { Let } from './src/Let.mjs';
-import { Lifecycle } from './src/Lifecycle.mjs';
-import { List } from './src/List.mjs';
-import { Ping } from './src/Ping.mjs';
-import { ShortCut } from './src/ShortCut.mjs';
-import { Try_ } from './src/Try_.mjs';
-import { WebComponent } from './src/WebComponent.mjs';
-import { WorkerMainThread } from './src/WorkerMainThread.mjs';
-import { WorkerThread } from './src/WorkerThread.mjs';
-import { _ } from './src/_.mjs';
-export { $, App, CRUD, DefinePageTemplate, DefineQRouter, DefineShortCuts, DefineStorage, Derived, Event_, For, helper, Let, Lifecycle, List, Ping, ShortCut, Try_, WebComponent, WorkerMainThread, WorkerThread, _ };
