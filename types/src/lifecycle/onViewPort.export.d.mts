@@ -25,7 +25,7 @@ export class onViewPort {
      * @see https://developer.mozilla.org/docs/Web/API/IntersectionObserver/disconnect
      */
     static disconnect: () => void;
-    static get root(): Document | Element;
+    static get root(): Element | Document;
     static get rootMargin(): string;
     /**
      * @private

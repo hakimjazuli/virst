@@ -122,7 +122,7 @@ export class Lifecycle {
 	 * @returns {Promise<void>}
 	 */
 	initiator = async () => {
-		await this.checkNestedAddedNodes(this.currentDocumentScope, this.attr);
+		await this.addedNodeHandler(this.currentDocumentScope, this.attr, true);
 	};
 	/**
 	 * @private
@@ -274,7 +274,7 @@ export class Lifecycle {
 		}
 		while (node) {
 			if ('hasAttribute' in node && !node.hasAttribute(helper.docScopeElement)) {
-				if (!isAssigned && tempNode === node) {
+				if (!isAssigned && tempNode === node && 'setAttribute' in tempNode) {
 					isAssigned = true;
 					tempNode.setAttribute(helper.docScopeElement, '');
 				}
@@ -323,11 +323,19 @@ export class Lifecycle {
 	static registeredLCCB = new Map();
 	/**
 	 * @private
-	 * @param {Node} addedNode
+	 * @param {documentScope} addedNode
 	 * @param {string} attributeName
+	 * @param {boolean} checkChild
 	 * @returns {Promise<void>}
 	 */
-	addedNodeHandler = async (addedNode, attributeName) => {
+	addedNodeHandler = async (addedNode, attributeName, checkChild) => {
+		if (checkChild && 'querySelectorAll' in addedNode) {
+			const validAttributeSelector = helper.validAttributeNameSelector(attributeName);
+			const elements = addedNode.querySelectorAll(`[${validAttributeSelector}]`);
+			for (let i = 0; i < elements.length; i++) {
+				await this.addedNodeHandler(elements[i], attributeName, false);
+			}
+		}
 		if (!(addedNode instanceof HTMLElement)) {
 			return;
 		}
@@ -462,27 +470,6 @@ export class Lifecycle {
 	};
 	/**
 	 * @private
-	 * @param {documentScope} documentScope
-	 * @param {string} attributeName
-	 * @returns {Promise<void>}
-	 */
-	checkNestedAddedNodes = async (documentScope, attributeName) => {
-		const validAttributeSelector = helper.validAttributeNameSelector(attributeName);
-		if (!('querySelectorAll' in documentScope)) {
-			return;
-		}
-		/**
-		 * bypass for browser native/other library behaviour,
-		 * including but not limited to:
-		 * - show link on the corner of the document are creating `[href]` which interfere with `virst` `Lifecycle` instances;
-		 */
-		const elements = documentScope.querySelectorAll(`[${validAttributeSelector}]`);
-		for (let i = 0; i < elements.length; i++) {
-			await this.addedNodeHandler(elements[i], attributeName);
-		}
-	};
-	/**
-	 * @private
 	 * @param {MutationRecord[]} mutationList
 	 * @returns {Promise<void>}
 	 */
@@ -494,9 +481,7 @@ export class Lifecycle {
 				for (let j = 0; j < mutation.addedNodes.length; j++) {
 					const addedNode = mutation.addedNodes[j];
 					for (const attributeName in handler) {
-						await this.addedNodeHandler(addedNode, attributeName);
-						// @ts-ignore
-						await this.checkNestedAddedNodes(addedNode, attributeName);
+						await this.addedNodeHandler(addedNode, attributeName, true);
 					}
 				}
 			}

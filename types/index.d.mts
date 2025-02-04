@@ -24,7 +24,7 @@ export { virst } from "./src/utils/virst.export.mjs";
 export { WebComponent } from "./src/utils/WebComponent.mjs";
 export { WorkerMainThread } from "./src/utils/WorkerMainThread.mjs";
 export { WorkerThread } from "./src/utils/WorkerThread.mjs";
-export type documentScope = HTMLElement | Element | ShadowRoot | Document;
+export type documentScope = HTMLElement | Element | ShadowRoot | Document | Node;
 export type attributeChangedLifecycle = ((options: {
     attributeName: string;
     newValue: string;

@@ -185,8 +185,9 @@ export class Lifecycle {
     private checkValidScoping;
     /**
      * @private
-     * @param {Node} addedNode
+     * @param {documentScope} addedNode
      * @param {string} attributeName
+     * @param {boolean} checkChild
      * @returns {Promise<void>}
      */
     private addedNodeHandler;
@@ -197,13 +198,6 @@ export class Lifecycle {
      * @returns {void}
      */
     private callACCB;
-    /**
-     * @private
-     * @param {documentScope} documentScope
-     * @param {string} attributeName
-     * @returns {Promise<void>}
-     */
-    private checkNestedAddedNodes;
     /**
      * @private
      * @param {MutationRecord[]} mutationList

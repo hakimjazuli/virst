@@ -105,6 +105,7 @@ export class Let {
 	};
 	/**
 	 * destroy all props
+	 * @returns {void}
 	 */
 	unRef = () => {
 		this.removeAll$();
@@ -122,13 +123,16 @@ export class Let {
 	get subscriptions() {
 		return $.signals.get(this);
 	}
+	/**
+	 * notify all subscriptions
+	 * @returns {void}
+	 */
 	call$ = () => {
 		new Ping(true, async () => {
 			if (!this.subscriptions) {
 				return;
 			}
 			helper.handlePromiseAll(this, Array.from(this.subscriptions), false);
-			// await Promise.all(this.subscriptions);
 		});
 	};
 	/**

@@ -61,6 +61,7 @@ export class Let<V> {
     remove$: ($_: $) => void;
     /**
      * destroy all props
+     * @returns {void}
      */
     unRef: () => void;
     /**
@@ -76,6 +77,10 @@ export class Let<V> {
      * @type {Set<$["effect"]>}
      */
     get subscriptions(): Set<(isAtInitialization: boolean) => Promise<void>>;
+    /**
+     * notify all subscriptions
+     * @returns {void}
+     */
     call$: () => void;
     /**
      * @param {V} newValue

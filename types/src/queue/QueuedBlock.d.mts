@@ -1,1 +1,1 @@
-export function QueuedBlock<F>(asyncFn: F): F;
+export function QueuedBlock<F extends Function>(asyncFn: F): F;
