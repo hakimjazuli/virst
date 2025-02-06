@@ -51,12 +51,14 @@ export class helper {
     static warningSingleton: (class_: any) => void;
     /**
      * @private
+     * @type {Set<string>}
      */
-    private static generateUniqueString;
+    private static uniqueID_;
     /**
-     * @type {string|null}
+     * @private
+     * @type {string}
      */
-    static attr: string | null;
+    private static get uniqueID();
     /**
      * using setter and getter, to avoid error when used in non clientBrowser runtime;
      * @private
