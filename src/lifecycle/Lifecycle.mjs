@@ -318,7 +318,7 @@ export class Lifecycle {
 	};
 	/**
 	 * @private
-	 * @type {Map<HTMLElement, true>}
+	 * @type {Map<HTMLElement, Set<string>>}
 	 */
 	static registeredLCCB = new Map();
 	/**
@@ -347,9 +347,14 @@ export class Lifecycle {
 			return;
 		}
 		if (Lifecycle.registeredLCCB.has(addedNode)) {
-			return;
+			const checkLCCB = Lifecycle.registeredLCCB.get(addedNode);
+			if (checkLCCB.has(attributeName)) {
+				return;
+			}
+			checkLCCB.add(attributeName);
+		} else {
+			Lifecycle.registeredLCCB.set(addedNode, new Set([attributeName]));
 		}
-		Lifecycle.registeredLCCB.set(addedNode, true);
 		const handler = Lifecycle.ID.get(this.currentDocumentScope)[attributeName];
 		Lifecycle.addedNodeScoper(addedNode, async () => {
 			if (addedNode.parentElement) {

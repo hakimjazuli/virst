@@ -67,16 +67,25 @@ export class helper {
 	};
 	/**
 	 * @private
+	 * @type {Set<string>}
 	 */
-	static generateUniqueString() {
-		const timestamp = Date.now();
-		const randomPart = Math.floor(Math.random() * 1_000_000);
-		return `${timestamp}${randomPart}`;
-	}
+	static uniqueID_ = new Set();
 	/**
-	 * @type {string|null}
+	 * @private
+	 * @type {string}
 	 */
-	static attr = null;
+	static get uniqueID() {
+		const randomPart = Math.floor(Math.random() * 1_000_000_000_000_000);
+		const uniqueString = `${Date.now()}${randomPart}`;
+		if (helper.uniqueID_.has(uniqueString)) {
+			return helper.uniqueID;
+		}
+		helper.uniqueID_.add(uniqueString);
+		setTimeout(() => {
+			helper.uniqueID_.delete(uniqueString);
+		}, 100);
+		return uniqueString;
+	}
 	/**
 	 * using setter and getter, to avoid error when used in non clientBrowser runtime;
 	 * @private
@@ -84,13 +93,13 @@ export class helper {
 	 */
 	static currentDocumentScope_ = undefined;
 	static get currentDocumentScope() {
-		if (this.currentDocumentScope_ === undefined) {
-			this.currentDocumentScope_ = window.document;
+		if (helper.currentDocumentScope_ === undefined) {
+			helper.currentDocumentScope_ = window.document;
 		}
-		return this.currentDocumentScope_;
+		return helper.currentDocumentScope_;
 	}
 	static set currentDocumentScope(newScope) {
-		this.currentDocumentScope_ = newScope;
+		helper.currentDocumentScope_ = newScope;
 	}
 	/**
 	 * @private
@@ -103,9 +112,9 @@ export class helper {
 	 */
 	static attributeIndexGenerator = (forced = false) => {
 		if (helper.currentDocumentScope == window.document && !forced) {
-			return (this.attr = null);
+			return null;
 		}
-		return (this.attr = `${helper.attrPrefix}${this.generateUniqueString()}`);
+		return `${helper.attrPrefix}${helper.uniqueID}`;
 	};
 	/**
 	 * @param {number} ms

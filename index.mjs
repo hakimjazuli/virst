@@ -99,10 +99,10 @@ export { WorkerThread } from './src/utils/WorkerThread.mjs';
  * @property {HTMLElement} lifecycleHandler.element
  * @property {(strings:TemplateStringsArray,...values:string[])=>{inner:()=>void, string:string}} lifecycleHandler.html
  * - use to modify the innerHTML of the `LifeCycleInstance` element;
- * @property {import('./src/lifecycle/Lifecycle.mjs').Lifecycle} lifecycleHandler.lifecycleObserver
+ * @property {import('./Lifecycle.mjs').Lifecycle} lifecycleHandler.lifecycleObserver
  * @property {(arg0:()=>Promise<void>)=>void} lifecycleHandler.onDisconnected
  * @property {(arg0:attributeChangedLifecycle)=>void} lifecycleHandler.onAttributeChanged
- * @property {(elementsCallbacks:import('./src/lifecycle/onViewPortHandler.type.mjs').elementsLCCallbacks)=>import('./src/lifecycle/onViewPort.export.mjs').onViewPort} lifecycleHandler.onViewPort
+ * @property {(elementsCallbacks:import('./onViewPortHandler.type.mjs').elementsLCCallbacks)=>import('./onViewPort.export.mjs').onViewPort} lifecycleHandler.onViewPort
  */
 /**
  * @description
