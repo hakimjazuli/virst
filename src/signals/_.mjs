@@ -26,7 +26,6 @@ export class _ {
 	 * @param {V} value
 	 * @param {Object} [options]
 	 * @param {documentScope} [options.documentScope]
-	 * @param {boolean} [options.bypassNested]
 	 */
 	static l = (value, options) => new Let(value, helper.attributeIndexGenerator(), options);
 	/**
@@ -42,7 +41,6 @@ export class _ {
 	 * @param {()=>Promise<V>} asyncCallback
 	 * @param {Object} [options]
 	 * @param {documentScope} [options.documentScope]
-	 * @param {boolean} [options.bypassNested]
 	 */
 	static d = (asyncCallback, options) =>
 		new Derived(asyncCallback, helper.attributeIndexGenerator(), options);

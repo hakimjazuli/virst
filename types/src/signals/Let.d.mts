@@ -42,11 +42,9 @@ export class Let<V> {
      * @param {string} [attributeName]
      * @param {Object} [options]
      * @param {documentScope} [options.documentScope]
-     * @param {boolean} [options.bypassNested]
      */
     constructor(value: V, attributeName?: string, options?: {
         documentScope?: import("../lifecycle/documentScope.type.mjs").documentScope;
-        bypassNested?: boolean;
     });
     /**
      * remove all effects

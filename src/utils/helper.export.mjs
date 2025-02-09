@@ -94,7 +94,7 @@ export class helper {
 	static currentDocumentScope_ = undefined;
 	static get currentDocumentScope() {
 		if (helper.currentDocumentScope_ === undefined) {
-			helper.currentDocumentScope_ = window.document;
+			helper.currentDocumentScope_ = document;
 		}
 		return helper.currentDocumentScope_;
 	}
@@ -111,7 +111,7 @@ export class helper {
 	 * @return {string|null}
 	 */
 	static attributeIndexGenerator = (forced = false) => {
-		if (helper.currentDocumentScope == window.document && !forced) {
+		if (helper.currentDocumentScope == document && !forced) {
 			return null;
 		}
 		return `${helper.attrPrefix}${helper.uniqueID}`;

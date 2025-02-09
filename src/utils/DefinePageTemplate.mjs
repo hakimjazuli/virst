@@ -56,7 +56,6 @@ export class DefinePageTemplate {
 		DefinePageTemplate.callerAttribute = callerAttribute;
 		new Lifecycle({
 			attributeName: callerAttribute,
-			bypassNested: true,
 			onConnected: async ({ element }) => {
 				await this.renderElement({ element });
 			},
@@ -122,10 +121,7 @@ export class DefinePageTemplate {
 				});
 				return;
 			}
-			[path_, templateName, mode = 'inner'] = helper.splitX(
-				templateSelector,
-				helper.separator
-			);
+			[path_, templateName, mode = 'inner'] = helper.splitX(templateSelector, helper.separator);
 		}
 		const targetAttribute = DefinePageTemplate.targetAttribute;
 		const path = DefinePageTemplate.targetPathRule(path_);

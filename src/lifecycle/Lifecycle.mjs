@@ -24,9 +24,10 @@ export class Lifecycle {
 	 * @typedef {(options:import('./lifecycleHandler.type.mjs').lifecycleHandler)=>void} attributeLifecyclesHandler
 	 * @typedef {import('./documentScope.type.mjs').documentScope} documentScope
 	 * @typedef {import('../signals/Let.mjs').Let<MutationRecord[]>} mutationRecordSignal
-	 * @typedef {[MutationObserver,
-	 * mutationRecordSignal
-	 * ]} documentScopedReturn
+	 * @typedef {{mutationObserver:MutationObserver,
+	 * mutationRecordSignal:mutationRecordSignal,
+	 * attributeNames:Set<string>
+	 * }} documentScopedReturn
 	 */
 	/**
 	 * @param {Object} options
@@ -34,25 +35,23 @@ export class Lifecycle {
 	 * @param {string} [options.attributeName]
 	 * - allow global attributeName to be handled inside nested `Lifecycle`
 	 * @param {documentScope} [options.documentScope]
-	 * @param {boolean} [options.bypassNested]
 	 */
 	constructor({
 		onConnected,
 		attributeName = helper.attributeIndexGenerator(),
 		documentScope = helper.currentDocumentScope,
-		bypassNested = false,
 	}) {
 		new Ping(true, async () => {
 			this.attr = attributeName;
 			this.onConnected = onConnected;
 			this.currentDocumentScope = documentScope;
-			if (bypassNested) {
-				this.assignBypass();
-			}
-			const [mObs, mLet] = Lifecycle.createMutationObserver(documentScope);
-			this.mutationObserver = mObs;
-			this.mutationSignal = mLet;
-			this.takeRecords = mObs.takeRecords;
+			const { mutationObserver, mutationRecordSignal } = Lifecycle.createObserver(
+				documentScope,
+				attributeName
+			);
+			this.mutationObserver = mutationObserver;
+			this.mutationSignal = mutationRecordSignal;
+			this.takeRecords = mutationObserver.takeRecords;
 			const registeredAttribute = this.isScopeMapped();
 			const onParentDisconnceted = Lifecycle.currentOnParentDCCB;
 			if (onParentDisconnceted) {
@@ -67,7 +66,7 @@ export class Lifecycle {
 				 */
 				case 'newScope':
 					this.effect = new $(async (first) => {
-						const mutationList = mLet.value;
+						const mutationList = mutationRecordSignal.value;
 						if (first) {
 							await this.initiator();
 							return;
@@ -96,25 +95,18 @@ export class Lifecycle {
 	}
 	/**
 	 * @private
-	 * @type {Map<documentScope, Set<string>>}
-	 */
-	static bypassNest = new Map();
-	/**
-	 * @private
 	 * @return {"addToScope"|"newScope"|string}
 	 */
 	isScopeMapped = () => {
 		const documentScope = this.currentDocumentScope;
 		if (!Lifecycle.ID.has(documentScope)) {
-			Lifecycle.ID.set(documentScope, {
-				[this.attr]: this.onConnected,
-			});
+			Lifecycle.ID.set(documentScope, new Map().set(this.attr, this.onConnected));
 			return 'newScope';
 		}
 		if (this.attr in Lifecycle.ID.get(documentScope)) {
 			return this.attr;
 		}
-		Lifecycle.ID.get(documentScope)[this.attr] = this.onConnected;
+		Lifecycle.ID.get(documentScope).set(this.attr, this.onConnected);
 		return 'addToScope';
 	};
 	/**
@@ -125,45 +117,36 @@ export class Lifecycle {
 		await this.addedNodeHandler(this.currentDocumentScope, this.attr, true);
 	};
 	/**
-	 * @private
-	 * @returns {void}
-	 */
-	assignBypass = () => {
-		const attributeName = this.attr;
-		const documentScope = this.currentDocumentScope;
-		const ref = Lifecycle.bypassNest.get(documentScope);
-		if (!ref) {
-			Lifecycle.bypassNest.set(documentScope, new Set([attributeName]));
-		} else {
-			ref.add(attributeName);
-		}
-	};
-	/**
 	 * @type {string}
 	 */
 	attr;
 	/**
 	 * @private
-	 * @type {Map<documentScope, [MutationObserver,mutationRecordSignal]>}
+	 * @type {Map<documentScope, {mutationObserver:MutationObserver,mutationRecordSignal:mutationRecordSignal, attributeNames:Set<string>}>}
 	 */
 	static registeredDocumentScope = new Map();
 	/**
 	 * @param {documentScope} documentScope
+	 * @param {string} attributeName
 	 * @returns {documentScopedReturn}
 	 */
-	static createMutationObserver = (documentScope) => {
+	static createObserver = (documentScope, attributeName) => {
 		if (Lifecycle.registeredDocumentScope.has(documentScope)) {
-			return Lifecycle.registeredDocumentScope.get(documentScope);
+			const ret_ = Lifecycle.registeredDocumentScope.get(documentScope);
+			if (!ret_.attributeNames.has(attributeName)) {
+				ret_.attributeNames.add(attributeName);
+			}
+			return ret_;
 		}
 		/**
 		 * @type {mutationRecordSignal}
 		 */
 		// @ts-ignore
-		const documentMutations_ = Let.dataOnly('');
-		const documentObserver = new MutationObserver((mutationList) => {
-			documentMutations_.value = mutationList;
+		const mutationRecordSignal = Let.dataOnly('');
+		const mutationObserver = new MutationObserver((mutationList) => {
+			mutationRecordSignal.value = mutationList;
 		});
-		documentObserver.observe(documentScope, {
+		mutationObserver.observe(documentScope, {
 			childList: true,
 			subtree: true,
 			attributes: true,
@@ -171,7 +154,11 @@ export class Lifecycle {
 		/**
 		 * @type {documentScopedReturn}
 		 */
-		const ret_ = [documentObserver, documentMutations_];
+		const ret_ = {
+			mutationObserver,
+			mutationRecordSignal,
+			attributeNames: new Set([attributeName]),
+		};
 		Lifecycle.registeredDocumentScope.set(documentScope, ret_);
 		return ret_;
 	};
@@ -207,7 +194,7 @@ export class Lifecycle {
 	/**
 	 * attributeIdentification
 	 * @private
-	 * @type {Map<documentScope,{[attributeName:string]:attributeLifecyclesHandler}>}
+	 * @type {Map<documentScope, Map<string, attributeLifecyclesHandler>>}
 	 */
 	static ID = new Map();
 	/**
@@ -254,60 +241,22 @@ export class Lifecycle {
 	onConnected;
 	/**
 	 * @private
-	 * @param {documentScope} node
+	 * @param {documentScope} documentScope
+	 * @param {HTMLElement} element
 	 * @param {string} attributeName
-	 * @returns {boolean}
-	 */
-	checkValidScoping = (node, attributeName) => {
-		const tempNode = node;
-		if (!(node instanceof HTMLElement)) {
-			return false;
-		}
-		const documentScope = this.currentDocumentScope;
-		let isAssigned = false;
-		const docRef = Lifecycle.bypassNest.get(documentScope);
-		if (docRef) {
-			if (docRef.has(attributeName)) {
-				node.setAttribute(helper.docScopeElement, '');
-				return true;
-			}
-		}
-		while (node) {
-			if ('hasAttribute' in node && !node.hasAttribute(helper.docScopeElement)) {
-				if (!isAssigned && tempNode === node && 'setAttribute' in tempNode) {
-					isAssigned = true;
-					tempNode.setAttribute(helper.docScopeElement, '');
-				}
-				node = node.parentElement;
-				continue;
-			}
-			if (node === documentScope) {
-				return true;
-			}
-			return false;
-		}
-		/**
-		 * this is document node
-		 */
-		return true;
-	};
-
-	/**
-	 * @private
-	 * @param {HTMLElement} documentScope
 	 * @param {()=>Promise<any>} scopedCallback
 	 * @returns {void}
 	 */
-	static addedNodeScoper = (documentScope, scopedCallback) => {
+	static addedNodeScoper = (documentScope, element, attributeName, scopedCallback) => {
 		Lifecycle.scopedPing({
-			documentScope,
+			documentScope: element,
 			runCheckAtFirst: true,
 			scopedCallback: async () => {
 				/**
 				 * @type {import('./lifecycleHandler.type.mjs').lifecycleHandler["onDisconnected"]}
 				 */
 				const currentOnParentDCCB = (disconnectedCallback) => {
-					Lifecycle.setDCCB(documentScope, disconnectedCallback);
+					Lifecycle.setDCCB(documentScope, element, attributeName, disconnectedCallback);
 				};
 				const tempCurrentOnParentDCCB = Lifecycle.currentOnParentDCCB;
 				Lifecycle.currentOnParentDCCB = currentOnParentDCCB;
@@ -318,9 +267,28 @@ export class Lifecycle {
 	};
 	/**
 	 * @private
-	 * @type {Map<HTMLElement, Set<string>>}
+	 * @param {string} attributeName
+	 * @param {documentScope} element
+	 * @param {documentScope} documentScope
 	 */
-	static registeredLCCB = new Map();
+	checkValidScoping = (attributeName, element, documentScope) => {
+		if (element !== documentScope && element !== document) {
+			const ref = Lifecycle.registeredDocumentScope.get(element);
+			if (ref && ref.attributeNames.has(attributeName)) {
+				return false;
+			}
+			if (element.parentElement) {
+				return this.checkValidScoping(attributeName, element.parentElement, documentScope);
+			}
+		}
+		if (!Lifecycle.registeredDocumentScope.has(documentScope)) {
+			return false;
+		}
+		if (!Lifecycle.registeredDocumentScope.get(documentScope).attributeNames.has(attributeName)) {
+			return false;
+		}
+		return true;
+	};
 	/**
 	 * @private
 	 * @param {documentScope} addedNode
@@ -336,29 +304,46 @@ export class Lifecycle {
 				await this.addedNodeHandler(elements[i], attributeName, false);
 			}
 		}
-		if (!(addedNode instanceof HTMLElement)) {
-			return;
-		}
+		const currentDocumentScope = this.currentDocumentScope;
 		if (
+			!(addedNode instanceof HTMLElement) ||
 			!('hasAttribute' in addedNode) ||
 			!addedNode.hasAttribute(attributeName) ||
-			!this.checkValidScoping(addedNode, attributeName)
+			!this.checkValidScoping(attributeName, addedNode, currentDocumentScope)
 		) {
 			return;
 		}
-		if (Lifecycle.registeredLCCB.has(addedNode)) {
-			const checkLCCB = Lifecycle.registeredLCCB.get(addedNode);
-			if (checkLCCB.has(attributeName)) {
-				return;
+		let currentDCCB = Lifecycle.getDCCB(addedNode);
+		if (currentDCCB && currentDCCB.has(attributeName)) {
+			const fixValidScoping = [];
+			const outOfScope_ = [];
+			currentDCCB.get(attributeName).forEach((dccbs, outOfScope) => {
+				if (outOfScope === currentDocumentScope) {
+					return;
+				}
+				console.warn({
+					warning:
+						'you have `element` with `outOfScope` `attributeName`, the `currentDocumentScope` has the same `attributeName`',
+					attributeName,
+					outOfScope,
+					currentDocumentScope,
+					LifecycleInstance: this,
+				});
+				fixValidScoping.push(...Array.from(dccbs));
+				outOfScope_.push(outOfScope);
+			});
+			await helper.handlePromiseAll(this.addedNodeHandler, fixValidScoping);
+			for (let i = 0; i < outOfScope_.length; i++) {
+				currentDCCB.get(attributeName).delete(outOfScope_[i]);
 			}
-			checkLCCB.add(attributeName);
-		} else {
-			Lifecycle.registeredLCCB.set(addedNode, new Set([attributeName]));
 		}
-		const handler = Lifecycle.ID.get(this.currentDocumentScope)[attributeName];
-		Lifecycle.addedNodeScoper(addedNode, async () => {
+		const handlers = Lifecycle.ID.get(currentDocumentScope);
+		if (!handlers || !handlers.has(attributeName)) {
+			return;
+		}
+		Lifecycle.addedNodeScoper(currentDocumentScope, addedNode, attributeName, async () => {
 			if (addedNode.parentElement) {
-				handler({
+				handlers.get(attributeName)({
 					get isConnected() {
 						return addedNode.isConnected;
 					},
@@ -380,19 +365,28 @@ export class Lifecycle {
 						};
 					},
 					lifecycleObserver: this,
-					onDisconnected: (disconnectCallback) => {
-						Lifecycle.setDCCB(addedNode, async () => {
-							Lifecycle.addedNodeScoper(addedNode, async () => {
-								await disconnectCallback();
-								Lifecycle.registeredLCCB.delete(addedNode);
-							});
+					onDisconnected: async (disconnectCallback) => {
+						Lifecycle.setDCCB(currentDocumentScope, addedNode, attributeName, async () => {
+							Lifecycle.addedNodeScoper(
+								currentDocumentScope,
+								addedNode,
+								attributeName,
+								async () => {
+									await disconnectCallback();
+								}
+							);
 						});
 					},
 					onAttributeChanged: (attributeChangedCallback) => {
-						Lifecycle.setACCB(addedNode, async (options) => {
-							Lifecycle.addedNodeScoper(addedNode, async () => {
-								await attributeChangedCallback(options);
-							});
+						Lifecycle.setACCB(addedNode, attributeName, async (options) => {
+							Lifecycle.addedNodeScoper(
+								currentDocumentScope,
+								addedNode,
+								attributeName,
+								async () => {
+									await attributeChangedCallback(options);
+								}
+							);
 						});
 					},
 				});
@@ -401,20 +395,30 @@ export class Lifecycle {
 	};
 	/**
 	 * @private
+	 * @param {documentScope} documentScope
 	 * @param {HTMLElement} element
+	 * @param {string} attributeName
 	 * @param {()=>Promise<void>} disconnectedCallback
-	 * @returns {void}
+	 * @returns {Promise<void>}
 	 */
-	static setDCCB = (element, disconnectedCallback) => {
-		if (!(helper.DCCBIdentifier in element)) {
-			element[helper.DCCBIdentifier] = new Set();
+	static setDCCB = async (documentScope, element, attributeName, disconnectedCallback) => {
+		let currentDCCB = Lifecycle.getDCCB(element);
+		if (!currentDCCB) {
+			currentDCCB = element[helper.DCCBIdentifier] = new Map();
 		}
-		element[helper.DCCBIdentifier].add(disconnectedCallback);
+		if (!currentDCCB.has(attributeName)) {
+			currentDCCB.set(attributeName, new Map());
+		}
+		const attributedDCCB = currentDCCB.get(attributeName);
+		if (!attributedDCCB.has(documentScope)) {
+			attributedDCCB.set(documentScope, new Set());
+		}
+		attributedDCCB.get(documentScope).add(disconnectedCallback);
 	};
 	/**
 	 * @private
 	 * @param {HTMLElement|Element} element
-	 * @returns {void|Set<()=>Promise<void>>}
+	 * @returns {void|Map<string, Map<documentScope, Set<()=>Promise<void>>>>}
 	 */
 	static getDCCB = (element) => {
 		if (!(helper.DCCBIdentifier in element)) {
@@ -425,19 +429,24 @@ export class Lifecycle {
 	/**
 	 * @private
 	 * @param {HTMLElement|Element} element
+	 * @param {string} attributeName
 	 * @param {import('./lifecycleHandler.type.mjs').attributeChangedLifecycle} attributeChangedCallback
 	 * @returns {void}
 	 */
-	static setACCB = (element, attributeChangedCallback) => {
-		if (!(helper.ACCBIdentifier in element)) {
-			element[helper.ACCBIdentifier] = new Set();
+	static setACCB = (element, attributeName, attributeChangedCallback) => {
+		let currentACCB = Lifecycle.getACCB(element);
+		if (!currentACCB) {
+			currentACCB = element[helper.ACCBIdentifier] = new Map();
 		}
-		element[helper.ACCBIdentifier].add(attributeChangedCallback);
+		if (!currentACCB.has(attributeName)) {
+			currentACCB.set(attributeName, new Set());
+		}
+		currentACCB.get(attributeName).add(attributeChangedCallback);
 	};
 	/**
 	 * @private
 	 * @param {HTMLElement|Element} element
-	 * @returns {void|Set<import('./lifecycleHandler.type.mjs').attributeChangedLifecycle>}
+	 * @returns {void|Map<string, Set<import('./lifecycleHandler.type.mjs').attributeChangedLifecycle>>}
 	 */
 	static getACCB = (element) => {
 		if (!(helper.ACCBIdentifier in element)) {
@@ -460,17 +469,19 @@ export class Lifecycle {
 			true,
 			async () => {
 				const handlers = [];
-				attributeChangedCallback_.forEach(async (callback) => {
-					handlers.push(async () => {
-						await callback({
-							attributeName,
-							newValue: element.getAttribute(attributeName) ?? '',
+				attributeChangedCallback_.forEach(async (mappedACCB) => {
+					mappedACCB.forEach((callback) => {
+						handlers.push(async () => {
+							await callback({
+								attributeName,
+								newValue: element.getAttribute(attributeName) ?? '',
+							});
 						});
 					});
 				});
 				await helper.handlePromiseAll(this, handlers);
 			},
-			{ unique: attributeName }
+			{ unique: element }
 		);
 	};
 	/**
@@ -485,8 +496,10 @@ export class Lifecycle {
 			if (mutation.addedNodes) {
 				for (let j = 0; j < mutation.addedNodes.length; j++) {
 					const addedNode = mutation.addedNodes[j];
-					for (const attributeName in handler) {
-						await this.addedNodeHandler(addedNode, attributeName, true);
+					if (handler) {
+						handler.forEach(async (_, attributeName) => {
+							await this.addedNodeHandler(addedNode, attributeName, true);
+						});
 					}
 				}
 			}
@@ -515,9 +528,11 @@ export class Lifecycle {
 	 */
 	removeParentOfNestedLCDCCB = (element) => {
 		if (Lifecycle.ID.has(element)) {
-			element[helper.DCCBIdentifier].add(async () => {
-				Lifecycle.ID.delete(element);
-			});
+			element[helper.DCCBIdentifier].set('', [
+				async () => {
+					Lifecycle.ID.delete(element);
+				},
+			]);
 		}
 	};
 	/**
@@ -530,6 +545,9 @@ export class Lifecycle {
 		new Ping(
 			true,
 			async () => {
+				/**
+				 * @type {Array<()=>Promise<void>>}
+				 */
 				const disconnectedCallbacks = [];
 				for (let i = 0; i < elements.length; i++) {
 					const element = elements[i];
@@ -539,12 +557,16 @@ export class Lifecycle {
 					this.removeParentOfNestedLCDCCB(element);
 					const disconnectCallback = Lifecycle.getDCCB(element);
 					if (disconnectCallback) {
-						disconnectedCallbacks.push(...disconnectCallback);
+						disconnectCallback.forEach((mappedDCCB) => {
+							mappedDCCB.forEach((setDCCB) => {
+								disconnectedCallbacks.push(...Array.from(setDCCB));
+							});
+						});
 					}
 				}
 				await helper.handlePromiseAll(this, disconnectedCallbacks);
 			},
-			{ unique: elements }
+			{ unique: removedNode }
 		);
 	};
 	/**

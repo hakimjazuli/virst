@@ -140,13 +140,12 @@ export class Let {
 	 * @param {string} [attributeName]
 	 * @param {Object} [options]
 	 * @param {documentScope} [options.documentScope]
-	 * @param {boolean} [options.bypassNested]
 	 */
 	constructor(value, attributeName = undefined, options = {}) {
 		this.value_ = value;
 		if (attributeName) {
 			this.attr = attributeName;
-			const { bypassNested = true, documentScope = undefined } = options;
+			const { documentScope = undefined } = options;
 			Lifecycle.scopedPing({
 				documentScope,
 				runCheckAtFirst: true,
@@ -154,7 +153,6 @@ export class Let {
 					new Lifecycle({
 						documentScope,
 						attributeName,
-						bypassNested,
 						onConnected: async ({ element, onDisconnected }) => {
 							const effect = new $(async () => {
 								Let.domReflector(this.value, attributeName, element, this);

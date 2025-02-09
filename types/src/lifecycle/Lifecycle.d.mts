@@ -9,19 +9,19 @@
 export class Lifecycle {
     /**
      * @private
-     * @type {Map<documentScope, Set<string>>}
-     */
-    private static bypassNest;
-    /**
-     * @private
-     * @type {Map<documentScope, [MutationObserver,mutationRecordSignal]>}
+     * @type {Map<documentScope, {mutationObserver:MutationObserver,mutationRecordSignal:mutationRecordSignal, attributeNames:Set<string>}>}
      */
     private static registeredDocumentScope;
     /**
      * @param {documentScope} documentScope
+     * @param {string} attributeName
      * @returns {documentScopedReturn}
      */
-    static createMutationObserver: (documentScope: import("./documentScope.type.mjs").documentScope) => [MutationObserver, Let<MutationRecord[]>];
+    static createObserver: (documentScope: import("./documentScope.type.mjs").documentScope, attributeName: string) => {
+        mutationObserver: MutationObserver;
+        mutationRecordSignal: Let<MutationRecord[]>;
+        attributeNames: Set<string>;
+    };
     /**
      * @param {Object} options
      * @param {documentScope} options.documentScope
@@ -50,37 +50,37 @@ export class Lifecycle {
     /**
      * attributeIdentification
      * @private
-     * @type {Map<documentScope,{[attributeName:string]:attributeLifecyclesHandler}>}
+     * @type {Map<documentScope, Map<string, attributeLifecyclesHandler>>}
      */
     private static ID;
     /**
      * @private
-     * @param {HTMLElement} documentScope
+     * @param {documentScope} documentScope
+     * @param {HTMLElement} element
+     * @param {string} attributeName
      * @param {()=>Promise<any>} scopedCallback
      * @returns {void}
      */
     private static addedNodeScoper;
     /**
      * @private
-     * @type {Map<HTMLElement, Set<string>>}
-     */
-    private static registeredLCCB;
-    /**
-     * @private
+     * @param {documentScope} documentScope
      * @param {HTMLElement} element
+     * @param {string} attributeName
      * @param {()=>Promise<void>} disconnectedCallback
-     * @returns {void}
+     * @returns {Promise<void>}
      */
     private static setDCCB;
     /**
      * @private
      * @param {HTMLElement|Element} element
-     * @returns {void|Set<()=>Promise<void>>}
+     * @returns {void|Map<string, Map<documentScope, Set<()=>Promise<void>>>>}
      */
     private static getDCCB;
     /**
      * @private
      * @param {HTMLElement|Element} element
+     * @param {string} attributeName
      * @param {import('./lifecycleHandler.type.mjs').attributeChangedLifecycle} attributeChangedCallback
      * @returns {void}
      */
@@ -88,7 +88,7 @@ export class Lifecycle {
     /**
      * @private
      * @param {HTMLElement|Element} element
-     * @returns {void|Set<import('./lifecycleHandler.type.mjs').attributeChangedLifecycle>}
+     * @returns {void|Map<string, Set<import('./lifecycleHandler.type.mjs').attributeChangedLifecycle>>}
      */
     private static getACCB;
     /**
@@ -106,9 +106,10 @@ export class Lifecycle {
      * @typedef {(options:import('./lifecycleHandler.type.mjs').lifecycleHandler)=>void} attributeLifecyclesHandler
      * @typedef {import('./documentScope.type.mjs').documentScope} documentScope
      * @typedef {import('../signals/Let.mjs').Let<MutationRecord[]>} mutationRecordSignal
-     * @typedef {[MutationObserver,
-     * mutationRecordSignal
-     * ]} documentScopedReturn
+     * @typedef {{mutationObserver:MutationObserver,
+     * mutationRecordSignal:mutationRecordSignal,
+     * attributeNames:Set<string>
+     * }} documentScopedReturn
      */
     /**
      * @param {Object} options
@@ -116,13 +117,11 @@ export class Lifecycle {
      * @param {string} [options.attributeName]
      * - allow global attributeName to be handled inside nested `Lifecycle`
      * @param {documentScope} [options.documentScope]
-     * @param {boolean} [options.bypassNested]
      */
-    constructor({ onConnected, attributeName, documentScope, bypassNested, }: {
+    constructor({ onConnected, attributeName, documentScope, }: {
         onConnected: (options: import("./lifecycleHandler.type.mjs").lifecycleHandler) => void;
         attributeName?: string;
         documentScope?: import("./documentScope.type.mjs").documentScope;
-        bypassNested?: boolean;
     });
     /**
      * @type {string}
@@ -168,19 +167,14 @@ export class Lifecycle {
      */
     private initiator;
     /**
-     * @private
-     * @returns {void}
-     */
-    private assignBypass;
-    /**
      * @returns {void}
      */
     disconnect: () => void;
     /**
      * @private
-     * @param {documentScope} node
      * @param {string} attributeName
-     * @returns {boolean}
+     * @param {documentScope} element
+     * @param {documentScope} documentScope
      */
     private checkValidScoping;
     /**

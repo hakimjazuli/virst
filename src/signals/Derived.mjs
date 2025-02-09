@@ -38,7 +38,6 @@ export class Derived extends Let {
 	 * @param {string} [attributeName]
 	 * @param {Object} [options]
 	 * @param {import('../lifecycle/documentScope.type.mjs').documentScope} [options.documentScope]
-	 * @param {boolean} [options.bypassNested]
 	 */
 	constructor(asyncCallback, attributeName = undefined, options) {
 		super('', attributeName, options);

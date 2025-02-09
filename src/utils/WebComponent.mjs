@@ -175,7 +175,6 @@ export class WebComponent {
 							newLifecycle: (onConnected) =>
 								new Lifecycle({
 									onConnected,
-									bypassNested: true,
 									documentScope: this,
 								}),
 							element: this,

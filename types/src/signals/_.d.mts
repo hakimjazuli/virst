@@ -20,11 +20,9 @@ export class _ {
      * @param {V} value
      * @param {Object} [options]
      * @param {documentScope} [options.documentScope]
-     * @param {boolean} [options.bypassNested]
      */
     static l: <V>(value: V, options?: {
         documentScope?: import("../lifecycle/documentScope.type.mjs").documentScope;
-        bypassNested?: boolean;
     }) => Let<V>;
     /**
      * syntax sugar for `Let.dataOnly`
@@ -39,11 +37,9 @@ export class _ {
      * @param {()=>Promise<V>} asyncCallback
      * @param {Object} [options]
      * @param {documentScope} [options.documentScope]
-     * @param {boolean} [options.bypassNested]
      */
     static d: <V>(asyncCallback: () => Promise<V>, options?: {
         documentScope?: import("../lifecycle/documentScope.type.mjs").documentScope;
-        bypassNested?: boolean;
     }) => Derived<V>;
     /**
      * syntax sugar for `Derived.dataOnly`

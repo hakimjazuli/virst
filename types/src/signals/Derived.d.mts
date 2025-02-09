@@ -32,11 +32,9 @@ export class Derived<V> extends Let<any> {
      * @param {string} [attributeName]
      * @param {Object} [options]
      * @param {import('../lifecycle/documentScope.type.mjs').documentScope} [options.documentScope]
-     * @param {boolean} [options.bypassNested]
      */
     constructor(asyncCallback: () => Promise<V>, attributeName?: string, options?: {
         documentScope?: import("../lifecycle/documentScope.type.mjs").documentScope;
-        bypassNested?: boolean;
     });
 }
 import { Let } from './Let.mjs';

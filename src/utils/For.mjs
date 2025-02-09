@@ -54,11 +54,7 @@ export class For {
 				const effect = new $(async (first) => {
 					const value = listInstance.value;
 					if (first) {
-						await this.onParentConnected(
-							element,
-							childLifeCycleCallback,
-							onDisconnected
-						);
+						await this.onParentConnected(element, childLifeCycleCallback, onDisconnected);
 						return;
 					}
 					this.reRender(value);
@@ -160,7 +156,6 @@ export class For {
 	 */
 	childLifecycle = (childLifeCycleCallback, onParentDisconnected) => {
 		new Lifecycle({
-			bypassNested: true,
 			attributeName: `${helper.ForChildAttributePrefix}${this.attr}`,
 			documentScope: this.parentElement,
 			onConnected: async ({

@@ -44,7 +44,6 @@ export class FSsrc {
 		const sourceMapper = this.sourceMapper;
 		new Lifecycle({
 			attributeName,
-			bypassNested: true,
 			onConnected: async ({ element, onAttributeChanged }) => {
 				const attributeValue = element.getAttribute(attributeName);
 				/**
