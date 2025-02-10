@@ -158,7 +158,7 @@ export class DefineQRouter {
 		}
 		const handlerSignal = this.routes[useAsNavigation];
 		new Lifecycle({
-			attributeName: 'href',
+			attr: 'href',
 			documentScope: document,
 			onConnected: async ({ element, onDisconnected }) => {
 				console.log('hahah');

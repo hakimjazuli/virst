@@ -28,6 +28,15 @@ export class helper {
     /**
      * @readonly
      */
+    static readonly classes: "virst-a-class";
+    /**
+     * @param {string} string
+     * @returns {string[]}
+     */
+    static toValidClassNames: (string: string) => string[];
+    /**
+     * @readonly
+     */
     static readonly qRouteChange: "virst-qrc";
     static docScopeElement: string;
     static storageIdentifier: string;

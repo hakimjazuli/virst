@@ -90,7 +90,7 @@ export { WorkerThread } from './src/utils/WorkerThread.mjs';
  * type helper for `lifecycleHandler` & `attributeChangedLifecycle`
  */
 /**
- * @typedef {((options:{attributeName:string, newValue:string})=>Promise<void>)} attributeChangedLifecycle
+ * @typedef {((options:{attr:string, newValue:string})=>Promise<void>)} attributeChangedLifecycle
  * @typedef {Object} lifecycleHandler
  * @property {boolean} lifecycleHandler.isConnected
  * @property {(options:Omit<import('./src/utils/DefinePageTemplate.mjs').swapWithPageTemplateOptions, 'element'>)=>void} lifecycleHandler.swap

@@ -1,5 +1,5 @@
 export type attributeChangedLifecycle = ((options: {
-    attributeName: string;
+    attr: string;
     newValue: string;
 }) => Promise<void>);
 export type lifecycleHandler = {

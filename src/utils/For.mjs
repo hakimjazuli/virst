@@ -24,13 +24,13 @@ export class For {
 	 * @typedef {Object} childLifeCycleCallback
 	 * @property {(arg0:{element:HTMLElement,ForInstance:For})=>Promise<void>} [childLifeCycleCallback.onConnected]
 	 * @property {(arg0:{element:HTMLElement,ForInstance:For})=>Promise<void>} [childLifeCycleCallback.onDisconnected]
-	 * @property {(arg0:{element:HTMLElement,ForInstance:For,attributeName:string, newValue:string})=>Promise<void>} [childLifeCycleCallback.onAttributeChanged]
+	 * @property {(arg0:{element:HTMLElement,ForInstance:For,attr:string, newValue:string})=>Promise<void>} [childLifeCycleCallback.onAttributeChanged]
 	 */
 	/**
 	 * @param {Object} options
 	 * @param {List} options.listInstance
 	 * @param {childLifeCycleCallback} [options.childLifeCycleCallback]
-	 * @param {string} [options.attributeName]
+	 * @param {string} [options.attr]
 	 * @param {boolean} [options.incrementalRender]
 	 * handling mode for how to render (when component is increasing the child number)
 	 * - false `default`: render all at once, it's fast however have problem of large `Cumulative Layout Shifts`;
@@ -42,14 +42,14 @@ export class For {
 	constructor({
 		listInstance,
 		childLifeCycleCallback = {},
-		attributeName = helper.attributeIndexGenerator(),
+		attr = helper.attributeIndexGenerator(),
 		incrementalRender = false,
 	}) {
 		this.listInstance = listInstance;
-		this.attr = attributeName;
+		this.attr = attr;
 		this.incrementalRender = incrementalRender;
 		new Lifecycle({
-			attributeName,
+			attr: attr,
 			onConnected: async ({ element, onDisconnected }) => {
 				const effect = new $(async (first) => {
 					const value = listInstance.value;
@@ -156,7 +156,7 @@ export class For {
 	 */
 	childLifecycle = (childLifeCycleCallback, onParentDisconnected) => {
 		new Lifecycle({
-			attributeName: `${helper.ForChildAttributePrefix}${this.attr}`,
+			attr: `${helper.ForChildAttributePrefix}${this.attr}`,
 			documentScope: this.parentElement,
 			onConnected: async ({
 				element: childElement,
@@ -165,11 +165,11 @@ export class For {
 				onAttributeChanged,
 			}) => {
 				if (childLifeCycleCallback.onAttributeChanged) {
-					onAttributeChanged(async ({ attributeName, newValue }) => {
+					onAttributeChanged(async ({ attr: attr, newValue }) => {
 						await childLifeCycleCallback.onAttributeChanged({
 							element: childElement,
 							ForInstance: this,
-							attributeName,
+							attr,
 							newValue,
 						});
 					});

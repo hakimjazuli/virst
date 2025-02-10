@@ -15,13 +15,13 @@ export class For {
      * @typedef {Object} childLifeCycleCallback
      * @property {(arg0:{element:HTMLElement,ForInstance:For})=>Promise<void>} [childLifeCycleCallback.onConnected]
      * @property {(arg0:{element:HTMLElement,ForInstance:For})=>Promise<void>} [childLifeCycleCallback.onDisconnected]
-     * @property {(arg0:{element:HTMLElement,ForInstance:For,attributeName:string, newValue:string})=>Promise<void>} [childLifeCycleCallback.onAttributeChanged]
+     * @property {(arg0:{element:HTMLElement,ForInstance:For,attr:string, newValue:string})=>Promise<void>} [childLifeCycleCallback.onAttributeChanged]
      */
     /**
      * @param {Object} options
      * @param {List} options.listInstance
      * @param {childLifeCycleCallback} [options.childLifeCycleCallback]
-     * @param {string} [options.attributeName]
+     * @param {string} [options.attr]
      * @param {boolean} [options.incrementalRender]
      * handling mode for how to render (when component is increasing the child number)
      * - false `default`: render all at once, it's fast however have problem of large `Cumulative Layout Shifts`;
@@ -30,7 +30,7 @@ export class For {
      * > - `paginated` style page;
      * > - infinite scroll, where you load only few at a times incrementally;
      */
-    constructor({ listInstance, childLifeCycleCallback, attributeName, incrementalRender, }: {
+    constructor({ listInstance, childLifeCycleCallback, attr, incrementalRender, }: {
         listInstance: import("../signals/List.mjs").List<any>;
         childLifeCycleCallback?: {
             onConnected?: (arg0: {
@@ -44,11 +44,11 @@ export class For {
             onAttributeChanged?: (arg0: {
                 element: HTMLElement;
                 ForInstance: For;
-                attributeName: string;
+                attr: string;
                 newValue: string;
             }) => Promise<void>;
         };
-        attributeName?: string;
+        attr?: string;
         incrementalRender?: boolean;
     });
     /**

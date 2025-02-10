@@ -7,7 +7,7 @@
  * /**
  *  * @typedef {Object} constructorOptions
  *  * - for efficiency, only fill this options when you intent to use the library as sole `View` part of your stack;
- *  * - the inputed root component must manually fills attributeName option argument, to target root element on the real dom;
+ *  * - the inputed root component must manually fills attr option argument, to target root element on the real dom;
  *  * @property {(import("../lifecycle/Lifecycle.mjs").Lifecycle)[]} [options.lifecycles]
  *  * @property {(import("./For.mjs").For)[]} [options.forS]
  *  * @property {import('./DefineShortCuts.mjs').DefineShortCuts} [options.defineShortcuts]
@@ -35,7 +35,7 @@ export class App {
 }
 /**
  * * - for efficiency, only fill this options when you intent to use the library as sole `View` part of your stack;
- * * - the inputed root component must manually fills attributeName option argument, to target root element on the real dom;
+ * * - the inputed root component must manually fills attr option argument, to target root element on the real dom;
  * *
  */
 export type constructorOptions = {

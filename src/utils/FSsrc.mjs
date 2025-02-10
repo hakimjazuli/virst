@@ -38,14 +38,14 @@ export class FSsrc {
 	};
 	/**
 	 * @private
-	 * @param {string} attributeName
+	 * @param {string} attr
 	 */
-	FSSrcLifecycle = (attributeName) => {
+	FSSrcLifecycle = (attr) => {
 		const sourceMapper = this.sourceMapper;
 		new Lifecycle({
-			attributeName,
+			attr,
 			onConnected: async ({ element, onAttributeChanged }) => {
-				const attributeValue = element.getAttribute(attributeName);
+				const attributeValue = element.getAttribute(attr);
 				/**
 				 * @param {string} attributeValue_
 				 */
@@ -54,10 +54,10 @@ export class FSsrc {
 					if (!newAttribute) {
 						return;
 					}
-					element.setAttribute(attributeName, newAttribute);
+					element.setAttribute(attr, newAttribute);
 				};
-				onAttributeChanged(async ({ attributeName: attributeName_, newValue }) => {
-					if (attributeName_ !== attributeName) {
+				onAttributeChanged(async ({ attr: attributeName_, newValue }) => {
+					if (attributeName_ !== attr) {
 						return;
 					}
 					await handle(newValue);

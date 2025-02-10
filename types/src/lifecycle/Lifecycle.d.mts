@@ -9,18 +9,18 @@
 export class Lifecycle {
     /**
      * @private
-     * @type {Map<documentScope, {mutationObserver:MutationObserver,mutationRecordSignal:mutationRecordSignal, attributeNames:Set<string>}>}
+     * @type {Map<documentScope, {mutationObserver:MutationObserver,mutationRecordSignal:mutationRecordSignal, attr:Set<string>}>}
      */
     private static registeredDocumentScope;
     /**
      * @param {documentScope} documentScope
-     * @param {string} attributeName
+     * @param {string} attr
      * @returns {documentScopedReturn}
      */
-    static createObserver: (documentScope: import("./documentScope.type.mjs").documentScope, attributeName: string) => {
+    static createObserver: (documentScope: import("./documentScope.type.mjs").documentScope, attr: string) => {
         mutationObserver: MutationObserver;
         mutationRecordSignal: Let<MutationRecord[]>;
-        attributeNames: Set<string>;
+        attr: Set<string>;
     };
     /**
      * @param {Object} options
@@ -108,19 +108,19 @@ export class Lifecycle {
      * @typedef {import('../signals/Let.mjs').Let<MutationRecord[]>} mutationRecordSignal
      * @typedef {{mutationObserver:MutationObserver,
      * mutationRecordSignal:mutationRecordSignal,
-     * attributeNames:Set<string>
+     * attr:Set<string>
      * }} documentScopedReturn
      */
     /**
      * @param {Object} options
      * @param {attributeLifecyclesHandler} options.onConnected
-     * @param {string} [options.attributeName]
+     * @param {string} [options.attr]
      * - allow global attributeName to be handled inside nested `Lifecycle`
      * @param {documentScope} [options.documentScope]
      */
-    constructor({ onConnected, attributeName, documentScope, }: {
+    constructor({ onConnected, attr, documentScope, }: {
         onConnected: (options: import("./lifecycleHandler.type.mjs").lifecycleHandler) => void;
-        attributeName?: string;
+        attr?: string;
         documentScope?: import("./documentScope.type.mjs").documentScope;
     });
     /**

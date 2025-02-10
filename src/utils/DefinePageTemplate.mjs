@@ -55,7 +55,7 @@ export class DefinePageTemplate {
 		DefinePageTemplate.targetPathRule = targetPathRule;
 		DefinePageTemplate.callerAttribute = callerAttribute;
 		new Lifecycle({
-			attributeName: callerAttribute,
+			attr: callerAttribute,
 			onConnected: async ({ element }) => {
 				await this.renderElement({ element });
 			},

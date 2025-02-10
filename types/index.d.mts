@@ -26,7 +26,7 @@ export { WorkerMainThread } from "./src/utils/WorkerMainThread.mjs";
 export { WorkerThread } from "./src/utils/WorkerThread.mjs";
 export type documentScope = HTMLElement | Element | ShadowRoot | Document | Node;
 export type attributeChangedLifecycle = ((options: {
-    attributeName: string;
+    attr: string;
     newValue: string;
 }) => Promise<void>);
 export type lifecycleHandler = {

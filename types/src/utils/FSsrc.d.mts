@@ -21,7 +21,7 @@ export class FSsrc {
     private handleFSCsrc;
     /**
      * @private
-     * @param {string} attributeName
+     * @param {string} attr
      */
     private FSSrcLifecycle;
     /**

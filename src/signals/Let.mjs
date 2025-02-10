@@ -47,9 +47,9 @@ export class Let {
 				}
 				element[target] = val;
 				if (
+					element.parentElement &&
 					target === 'value' &&
 					'value' in element &&
-					element.parentNode &&
 					'oninput' in element &&
 					!element.hasAttribute(helper.val)
 				) {
@@ -61,6 +61,32 @@ export class Let {
 					};
 				}
 			} catch (error) {
+				if (element.parentElement && target === 'class') {
+					if (!element.hasAttribute(helper.classes)) {
+						element.setAttribute(helper.classes, '');
+						let prevAppliedClasses = letObject.value;
+						new $(async () => {
+							const value = letObject.value;
+							if ('class' in value && 'class' in prevAppliedClasses) {
+								const currentClasses = helper.toValidClassNames(value.class);
+								const prevAppliedClasses_ = helper.toValidClassNames(prevAppliedClasses.class);
+								const maxCount = Math.max(currentClasses.length, prevAppliedClasses_.length);
+								for (let i = 0; i < maxCount; i++) {
+									const prevAppliedClass = prevAppliedClasses_[i];
+									if (prevAppliedClass) {
+										element.classList.remove(prevAppliedClass);
+									}
+									const currentClass = currentClasses[i];
+									if (currentClass) {
+										element.classList.add(currentClass);
+									}
+								}
+							}
+							prevAppliedClasses = value;
+						});
+					}
+					continue;
+				}
 				val = JSON.stringify(val).replace(/^"(.*)"$/, '$1');
 				if (target == '') {
 					console.warn({
@@ -152,7 +178,7 @@ export class Let {
 				scopedCallback: async () => {
 					new Lifecycle({
 						documentScope,
-						attributeName,
+						attr: attributeName,
 						onConnected: async ({ element, onDisconnected }) => {
 							const effect = new $(async () => {
 								Let.domReflector(this.value, attributeName, element, this);

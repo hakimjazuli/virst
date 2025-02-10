@@ -26,28 +26,28 @@ export class Lifecycle {
 	 * @typedef {import('../signals/Let.mjs').Let<MutationRecord[]>} mutationRecordSignal
 	 * @typedef {{mutationObserver:MutationObserver,
 	 * mutationRecordSignal:mutationRecordSignal,
-	 * attributeNames:Set<string>
+	 * attr:Set<string>
 	 * }} documentScopedReturn
 	 */
 	/**
 	 * @param {Object} options
 	 * @param {attributeLifecyclesHandler} options.onConnected
-	 * @param {string} [options.attributeName]
+	 * @param {string} [options.attr]
 	 * - allow global attributeName to be handled inside nested `Lifecycle`
 	 * @param {documentScope} [options.documentScope]
 	 */
 	constructor({
 		onConnected,
-		attributeName = helper.attributeIndexGenerator(),
+		attr = helper.attributeIndexGenerator(),
 		documentScope = helper.currentDocumentScope,
 	}) {
 		new Ping(true, async () => {
-			this.attr = attributeName;
+			this.attr = attr;
 			this.onConnected = onConnected;
 			this.currentDocumentScope = documentScope;
 			const { mutationObserver, mutationRecordSignal } = Lifecycle.createObserver(
 				documentScope,
-				attributeName
+				attr
 			);
 			this.mutationObserver = mutationObserver;
 			this.mutationSignal = mutationRecordSignal;
@@ -122,19 +122,19 @@ export class Lifecycle {
 	attr;
 	/**
 	 * @private
-	 * @type {Map<documentScope, {mutationObserver:MutationObserver,mutationRecordSignal:mutationRecordSignal, attributeNames:Set<string>}>}
+	 * @type {Map<documentScope, {mutationObserver:MutationObserver,mutationRecordSignal:mutationRecordSignal, attr:Set<string>}>}
 	 */
 	static registeredDocumentScope = new Map();
 	/**
 	 * @param {documentScope} documentScope
-	 * @param {string} attributeName
+	 * @param {string} attr
 	 * @returns {documentScopedReturn}
 	 */
-	static createObserver = (documentScope, attributeName) => {
+	static createObserver = (documentScope, attr) => {
 		if (Lifecycle.registeredDocumentScope.has(documentScope)) {
 			const ret_ = Lifecycle.registeredDocumentScope.get(documentScope);
-			if (!ret_.attributeNames.has(attributeName)) {
-				ret_.attributeNames.add(attributeName);
+			if (!ret_.attr.has(attr)) {
+				ret_.attr.add(attr);
 			}
 			return ret_;
 		}
@@ -157,7 +157,7 @@ export class Lifecycle {
 		const ret_ = {
 			mutationObserver,
 			mutationRecordSignal,
-			attributeNames: new Set([attributeName]),
+			attr: new Set([attr]),
 		};
 		Lifecycle.registeredDocumentScope.set(documentScope, ret_);
 		return ret_;
@@ -274,7 +274,7 @@ export class Lifecycle {
 	checkValidScoping = (attributeName, element, documentScope) => {
 		if (element !== documentScope && element !== document) {
 			const ref = Lifecycle.registeredDocumentScope.get(element);
-			if (ref && ref.attributeNames.has(attributeName)) {
+			if (ref && ref.attr.has(attributeName)) {
 				return false;
 			}
 			if (element.parentElement) {
@@ -284,7 +284,7 @@ export class Lifecycle {
 		if (!Lifecycle.registeredDocumentScope.has(documentScope)) {
 			return false;
 		}
-		if (!Lifecycle.registeredDocumentScope.get(documentScope).attributeNames.has(attributeName)) {
+		if (!Lifecycle.registeredDocumentScope.get(documentScope).attr.has(attributeName)) {
 			return false;
 		}
 		return true;
@@ -473,7 +473,7 @@ export class Lifecycle {
 					mappedACCB.forEach((callback) => {
 						handlers.push(async () => {
 							await callback({
-								attributeName,
+								attr: attributeName,
 								newValue: element.getAttribute(attributeName) ?? '',
 							});
 						});

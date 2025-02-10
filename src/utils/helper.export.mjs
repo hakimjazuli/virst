@@ -39,6 +39,19 @@ export class helper {
 	/**
 	 * @readonly
 	 */
+	static classes = 'virst-a-class';
+	/**
+	 * @param {string} string
+	 * @returns {string[]}
+	 */
+	static toValidClassNames = (string) =>
+		string
+			.replace(/[^a-zA-Z0-9]+/g, ' ')
+			.trim()
+			.split(' ');
+	/**
+	 * @readonly
+	 */
 	static qRouteChange = 'virst-qrc';
 	static docScopeElement = 'virst-sc';
 	static storageIdentifier = 'virst-st';
