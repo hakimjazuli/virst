@@ -65,9 +65,12 @@ export class Let {
 					if (!element.hasAttribute(helper.classes)) {
 						element.setAttribute(helper.classes, '');
 						let prevAppliedClasses = letObject.value;
-						new $(async () => {
+						new $(async (first) => {
 							const value = letObject.value;
-							if ('class' in value && 'class' in prevAppliedClasses) {
+							if (JSON.stringify(value) === JSON.stringify(prevAppliedClasses) && !first) {
+								return;
+							}
+							try {
 								const currentClasses = helper.toValidClassNames(value.class);
 								const prevAppliedClasses_ = helper.toValidClassNames(prevAppliedClasses.class);
 								const maxCount = Math.max(currentClasses.length, prevAppliedClasses_.length);
@@ -81,6 +84,16 @@ export class Let {
 										element.classList.add(currentClass);
 									}
 								}
+							} catch (error) {
+								console.warn({
+									signal: this,
+									value,
+									error,
+									cause: 'signal value incorrectly formatted',
+									validFormat: {
+										class: 'string of classNames separated by spaces',
+									},
+								});
 							}
 							prevAppliedClasses = value;
 						});
