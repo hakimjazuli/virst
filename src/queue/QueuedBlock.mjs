@@ -4,7 +4,7 @@ import { uniqueVirstQueue } from './Q.mjs';
 
 /**
  * @description
- * function wrapper that turns callback into queued calls
+ * function wrapper that turns callback into queued calls;
  */
 /**
  * @template {Function} F

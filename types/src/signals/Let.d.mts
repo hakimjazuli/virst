@@ -2,19 +2,23 @@
  * @description
  * `signal` based reactivity;
  * assigning newValue to Let insance:
+ * - `dataOnly`:
+ * ```js
+ * const dataOnlyExample = Let.dataOnly(args0);
+ * ```
+ * - with `domReflector`;
  * ```js
  * const letSingle = new Let(1, ...args);
  * letSingle.value++; // 2;
  * letSingle.value = 3 // 3;
  * ```
- * `dataOnly`:
- * ```js
- * const dataOnlyExample = Let.dataOnly(args0);
+ * > - the `domReflector` will automatically synchronise the value with the element on the dom;
+ * ```html
+ * <div attributeName="...selectorsSeparatedBySemicolon"></div>
  * ```
- * - `methods`:
- * > - `call$`: manually triggers `effects` subscribed to `thisInstance`;
- * > - `remove$`: unubscribe `thisInstance` from specific `effect`;
- * > - `removeAll$`: unubscribe `thisInstance` from all of its `effects`;
+ * > - selector can be `attributeName` or `propertyName`:
+ * > > - special selector `value`: will automatically bind the value with `oninput` event;
+ * > > - special selector `class`: will dynamically add/remove `classes`, must be formated like this `{class: "strings of HTMLClassNames separated by space"}`
  */
 /**
  * @template V

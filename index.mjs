@@ -51,6 +51,9 @@
  * - drop supports for `Component`
  * - uses native web component instead using `WebComponent` class
  * - it's a fix for `Lifecycle` behaviour and simple `WebComponent` generation class
+ * ## v0.^15.x
+ * - fixed `Lifecycle` scope mechanism
+ * - added `class` `attributeSelector` to dynamically proportional binding conditionally by using `signal` value;
  */
 export { Lifecycle } from './src/lifecycle/Lifecycle.mjs';
 export { onViewPort } from './src/lifecycle/onViewPort.export.mjs';

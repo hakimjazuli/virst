@@ -10,10 +10,8 @@ import { Ping } from '../queue/Ping.mjs';
 /**
  * @description
  * - helper class to track connected/disconnected/attributeChanged of an element;
- * - if there are global `attributeName` `test` are inside nested `Lifecycle`, add `virst-gs` and list of the names of the global `attributeName`, with semicolon `;` as separator;
- * ```html
- * <div test="innerText" virst-gs="test;"></div>
- * ```
+ * - instead of manually assigning whether `attributeName` should be `global` or not, `outOffScoped` `attributeName` will produce warning in the runtime;
+ * > - you can ignore it, as the most local Lifecycle will take priority, and when there are no other scope, the most global will take place, the warning is only to notify that you can still optimize your code further by renaming the conflicting `attributeName` by abiding more to the semantics;
  */
 export class Lifecycle {
 	/**

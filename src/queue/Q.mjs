@@ -7,10 +7,15 @@ import { virst } from '../utils/virst.export.mjs';
  */
 export const uniqueVirstQueue = (virst['uniqueVirstQueue'] =
 	virst['uniqueVirstQueue'] ?? new Map());
-	
+
 /**
  * @description
- * helper methods for creating Promise to block execution code that return resume property to allow subsequent calls to proceed;
+ * helper methods for creating Promise to block execution code that return { resume } to allow subsequent calls to proceed;
+ * ```js
+ * const { resume } = await Q.fifo(); // or Q.unique(id)
+ * // code
+ *  resume(); // before return
+ * ```
  */
 export class Q {
 	/**

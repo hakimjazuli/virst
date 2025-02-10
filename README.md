@@ -44,6 +44,9 @@ bun i virst
 - drop supports for `Component`
 - uses native web component instead using `WebComponent` class
 - it's a fix for `Lifecycle` behaviour and simple `WebComponent` generation class
+## v0.^15.x
+- fixed `Lifecycle` scope mechanism
+- added `class` `attributeSelector` to dynamically proportional binding conditionally by using `signal` value;
 ## exported-api-and-type-list
 - [Lifecycle](#lifecycle)
 - [onViewPort](#onviewport)
@@ -73,7 +76,7 @@ bun i virst
 - [WorkerThread](#workerthread)
 <h2 id="lifecycle">Lifecycle</h2>
 
-- helper class to track connected/disconnected/attributeChanged of an element;- if there are global `attributeName` `test` are inside nested `Lifecycle`, add `virst-gs` and list of the names of the global `attributeName`, with semicolon `;` as separator;```html<div test="innerText" virst-gs="test;"></div>```
+- helper class to track connected/disconnected/attributeChanged of an element;- instead of manually assigning whether `attributeName` should be `global` or not, `outOffScoped` `attributeName` will produce warning in the runtime;> - you can ignore it, as the most local Lifecycle will take priority, and when there are no other scope, the most global will take place, the warning is only to notify that you can still optimize your code further by renaming the conflicting `attributeName` by abiding more to the semantics;
 
 *) <sub>[go to exported list](#exported-api-and-type-list)</sub>
 
@@ -91,13 +94,13 @@ trigger based callback integrated to the internal library  queue handler;can be
 
 <h2 id="q">Q</h2>
 
-helper methods for creating Promise to block execution code that return resume property to allow subsequent calls to proceed;
+helper methods for creating Promise to block execution code that return { resume } to allow subsequent calls to proceed;```jsconst { resume } = await Q.fifo(); // or Q.unique(id)// code resume(); // before return```
 
 *) <sub>[go to exported list](#exported-api-and-type-list)</sub>
 
 <h2 id="queuedblock">QueuedBlock</h2>
 
-function wrapper that turns callback into queued calls
+function wrapper that turns callback into queued calls;
 
 *) <sub>[go to exported list](#exported-api-and-type-list)</sub>
 
@@ -109,13 +112,13 @@ generate side effect for `signal` based reactivity such as for:- [Let](#let)``
 
 <h2 id="derived">Derived</h2>
 
-- this class is extended from `Let` [`Let`](#let)-`signal` based reactivity, wich value are derived from reacting to [`Let<T>.value`](#let) effects that are called in the `asyncCallback` this class instantiation;```js// @ts-checkconst letSingle = new Let(1);const doubleExample = new Derived(async()=>{	const value = letSingle.value; // autoscubscribed to `letSingle` value changes;return value * 2; // returned value are to be derivedValue});```- `dataOnly`:```jsconst dataOnlyExample = Derived.dataOnly(asyncCallback);```> - this will automatically opt you out from `domReflector`;- make sure to check `argument` documentation in your `IDE` `typeHint`;
+- this class is extended from `Let` [`Let`](#let)- `signal` based reactivity, wich value are derived from reacting to [`Let<T>.value`](#let) effects that are called in the `asyncCallback` this class instantiation;```js// @ts-checkconst letSingle = new Let(1);const doubleExample = new Derived(async()=>{	const value = letSingle.value; // autoscubscribed to `letSingle` value changes;return value * 2; // returned value are to be derivedValue});```- `dataOnly`:```jsconst dataOnlyExample = Derived.dataOnly(asyncCallback);```> - this will automatically opt you out from `domReflector`;- make sure to check `argument` documentation in your `IDE` `typeHint`;
 
 *) <sub>[go to exported list](#exported-api-and-type-list)</sub>
 
 <h2 id="let">Let</h2>
 
-`signal` based reactivity;assigning newValue to Let insance:```jsconst letSingle = new Let(1, ...args);letSingle.value++; // 2;letSingle.value = 3 // 3;````dataOnly`:```jsconst dataOnlyExample = Let.dataOnly(args0);```- `methods`:> - `call$`: manually triggers `effects` subscribed to `thisInstance`;> - `remove$`: unubscribe `thisInstance` from specific `effect`;> - `removeAll$`: unubscribe `thisInstance` from all of its `effects`;
+`signal` based reactivity;assigning newValue to Let insance:- `dataOnly`:```jsconst dataOnlyExample = Let.dataOnly(args0);```- with `domReflector`;```jsconst letSingle = new Let(1, ...args);letSingle.value++; // 2;letSingle.value = 3 // 3;```> - the `domReflector` will automatically synchronise the value with the element on the dom;```html<div attributeName="...selectorsSeparatedBySemicolon"></div>```> - selector can be `attributeName` or `propertyName`:> > - special selector `value`: will automatically bind the value with `oninput` event;> > - special selector `class`: will dynamically add/remove `classes`, must be formated like this `{class: "strings of HTMLClassNames separated by space"}`
 
 *) <sub>[go to exported list](#exported-api-and-type-list)</sub>
 

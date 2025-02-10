@@ -1,7 +1,7 @@
 /**
  * @description
  * - this class is extended from `Let` [`Let`](#let)
- * -`signal` based reactivity, wich value are derived from reacting to [`Let<T>.value`](#let) effects that are called in the `asyncCallback` this class instantiation;
+ * - `signal` based reactivity, wich value are derived from reacting to [`Let<T>.value`](#let) effects that are called in the `asyncCallback` this class instantiation;
  * ```js
  * // @ts-check
  * const letSingle = new Let(1);
