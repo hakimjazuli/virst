@@ -51,6 +51,10 @@ export class Let<V> {
         documentScope?: import("../lifecycle/documentScope.type.mjs").documentScope;
     });
     /**
+     * @type {Set<$["effect"]>}
+     */
+    get subscriptions(): Set<(isAtInitialization: boolean) => Promise<void>>;
+    /**
      * remove all effects
      * @return {void}
      */
@@ -75,10 +79,6 @@ export class Let<V> {
      * @type {string}
      */
     attr: string;
-    /**
-     * @type {Set<$["effect"]>}
-     */
-    get subscriptions(): Set<(isAtInitialization: boolean) => Promise<void>>;
     /**
      * notify all subscriptions
      * @returns {void}

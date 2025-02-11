@@ -41,11 +41,11 @@ export class $ {
 	static letInstances = new Set();
 	static isRegistering = false;
 	remove$ = () => {
-		if (!$.effects.has(this.effect) && !$.effects.get(this.effect)) {
+		if (!$.effects.has(this.effect)) {
 			return;
 		}
 		$.effects.get(this.effect).forEach((letInstances) => {
-			$.signals.delete(letInstances);
+			$.signals.get(letInstances).delete(this.effect);
 		});
 		$.effects.delete(this.effect);
 	};
@@ -66,10 +66,9 @@ export class $ {
 			$.effects.set(asyncCallback, new Set(letInstances));
 			letInstances.forEach((let_) => {
 				if (!$.signals.has(let_)) {
-					$.signals.set(let_, new Set([asyncCallback]));
-				} else {
-					$.signals.get(let_).add(asyncCallback);
+					$.signals.set(let_, new Set());
 				}
+				$.signals.get(let_).add(asyncCallback);
 			});
 			$.letInstances.clear();
 		});

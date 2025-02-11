@@ -124,16 +124,21 @@ export class Let {
 	 */
 	static dataOnly = (data) => new Let(data);
 	/**
+	 * @type {Set<$["effect"]>}
+	 */
+	get subscriptions() {
+		return $.signals.get(this);
+	}
+	/**
 	 * remove all effects
 	 * @return {void}
 	 */
 	removeAll$ = () => {
 		$.effects.forEach((signals) => {
-			if (signals.has(this)) {
-				signals.delete(this);
-			}
+			signals.delete(this);
 		});
 		this.subscriptions.clear();
+		$.signals.delete(this);
 	};
 	/**
 	 * remove effect
@@ -160,12 +165,6 @@ export class Let {
 	 * @type {V}
 	 */
 	value_;
-	/**
-	 * @type {Set<$["effect"]>}
-	 */
-	get subscriptions() {
-		return $.signals.get(this);
-	}
 	/**
 	 * notify all subscriptions
 	 * @returns {void}
