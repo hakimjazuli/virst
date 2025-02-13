@@ -18,14 +18,14 @@ export class WebComponent<Props extends {
      * @typedef {Object} onConnectedOptions
      * @property {HTMLElement} element
      * @property {import('../lifecycle/lifecycleHandler.type.mjs').lifecycleHandler["html"]} html
-     * @property {()=>void} css
+     * @property {(strings:TemplateStringsArray,...values:string[])=>void} css
      * @property {ShadowRoot} shadowRoot
      * @property {(slotsKey:slotKey)=>string} slot
      * @property {Record<Extract<keyof Props, string>, Let<string>>} props
      * @property {(disconnectedCallback:()=>Promise<void>)=>void} onDisconnected
      * @property {(adoptedCallback:()=>Promise<void>)=>void} onAdopted
      * @property {(onConnected:(options:import('../lifecycle/lifecycleHandler.type.mjs').lifecycleHandler)=>void)=>Lifecycle} newLifecycle
-     * @property {(options:Omit<import('../lifecycle/onViewPortHandler.type.mjs').elementsLCCallbacks,'lifecyclesOnDisconnected'|'element'>)=>void} lifecycleHandler.onViewPort
+     * @property {(onViewCallbackOptions:import('../lifecycle/onViewPortHandler.type.mjs').onViewPortHandler["onViewPort"])=>import('../lifecycle/onViewPort.export.mjs').onViewPort} lifecycleHandler.onViewPort
      * @property {(attributeChangedCallback:(options:{propName:propKey,newValue:string,oldValue:string})=>Promise<void>)=>void} onAttributeChange
      * @param {Object} a0
      * @param {string} [a0.tagName]
@@ -47,14 +47,14 @@ export class WebComponent<Props extends {
         onConnected: (options: {
             element: HTMLElement;
             html: import("../lifecycle/lifecycleHandler.type.mjs").lifecycleHandler["html"];
-            css: () => void;
+            css: (strings: TemplateStringsArray, ...values: string[]) => void;
             shadowRoot: ShadowRoot;
             slot: (slotsKey: slotKey) => string;
             props: Record<Extract<keyof Props, string>, Let<string>>;
             onDisconnected: (disconnectedCallback: () => Promise<void>) => void;
             onAdopted: (adoptedCallback: () => Promise<void>) => void;
             newLifecycle: (onConnected: (options: import("../lifecycle/lifecycleHandler.type.mjs").lifecycleHandler) => void) => Lifecycle;
-            onViewPort: (options: Omit<import("../lifecycle/onViewPortHandler.type.mjs").elementsLCCallbacks, "lifecyclesOnDisconnected" | "element">) => void;
+            onViewPort: (onViewCallbackOptions: import("../lifecycle/onViewPortHandler.type.mjs").onViewPortHandler["onViewPort"]) => import("../lifecycle/onViewPort.export.mjs").onViewPort;
             onAttributeChange: (attributeChangedCallback: (options: {
                 propName: propKey;
                 newValue: string;
@@ -76,14 +76,14 @@ export class WebComponent<Props extends {
         onConnected?: (options: Omit<{
             element: HTMLElement;
             html: import("../lifecycle/lifecycleHandler.type.mjs").lifecycleHandler["html"];
-            css: () => void;
+            css: (strings: TemplateStringsArray, ...values: string[]) => void;
             shadowRoot: ShadowRoot;
             slot: (slotsKey: slotKey) => string;
             props: Record<Extract<keyof Props, string>, Let<string>>;
             onDisconnected: (disconnectedCallback: () => Promise<void>) => void;
             onAdopted: (adoptedCallback: () => Promise<void>) => void;
             newLifecycle: (onConnected: (options: import("../lifecycle/lifecycleHandler.type.mjs").lifecycleHandler) => void) => Lifecycle;
-            onViewPort: (options: Omit<import("../lifecycle/onViewPortHandler.type.mjs").elementsLCCallbacks, "lifecyclesOnDisconnected" | "element">) => void;
+            onViewPort: (onViewCallbackOptions: import("../lifecycle/onViewPortHandler.type.mjs").onViewPortHandler["onViewPort"]) => import("../lifecycle/onViewPort.export.mjs").onViewPort;
             onAttributeChange: (attributeChangedCallback: (options: {
                 propName: propKey;
                 newValue: string;
@@ -101,14 +101,14 @@ export class WebComponent<Props extends {
         onConnected?: (options: Omit<{
             element: HTMLElement;
             html: import("../lifecycle/lifecycleHandler.type.mjs").lifecycleHandler["html"];
-            css: () => void;
+            css: (strings: TemplateStringsArray, ...values: string[]) => void;
             shadowRoot: ShadowRoot;
             slot: (slotsKey: slotKey) => string;
             props: Record<Extract<keyof Props, string>, Let<string>>;
             onDisconnected: (disconnectedCallback: () => Promise<void>) => void;
             onAdopted: (adoptedCallback: () => Promise<void>) => void;
             newLifecycle: (onConnected: (options: import("../lifecycle/lifecycleHandler.type.mjs").lifecycleHandler) => void) => Lifecycle;
-            onViewPort: (options: Omit<import("../lifecycle/onViewPortHandler.type.mjs").elementsLCCallbacks, "lifecyclesOnDisconnected" | "element">) => void;
+            onViewPort: (onViewCallbackOptions: import("../lifecycle/onViewPortHandler.type.mjs").onViewPortHandler["onViewPort"]) => import("../lifecycle/onViewPort.export.mjs").onViewPort;
             onAttributeChange: (attributeChangedCallback: (options: {
                 propName: propKey;
                 newValue: string;

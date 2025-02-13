@@ -9,6 +9,10 @@ export const uniqueVirstQueue = (virst['uniqueVirstQueue'] =
 	virst['uniqueVirstQueue'] ?? new Map());
 
 /**
+ * @typedef {{}|null|number|string|boolean|symbol|bigint|function} anyButUndefined
+ */
+
+/**
  * @description
  * helper methods for creating Promise to block execution code that return { resume } to allow subsequent calls to proceed;
  * ```js
@@ -32,8 +36,8 @@ export class Q {
 		const next = new Promise((resolve) => {
 			resolveFn = resolve;
 		});
-		const prev = this.fifo_;
-		this.fifo_ = next;
+		const prev = Q.fifo_;
+		Q.fifo_ = next;
 		await prev;
 		return {
 			resume: () => {
@@ -44,7 +48,7 @@ export class Q {
 	/**
 	 * Ensures that each id has only one task running at a time.
 	 * Calls with the same id will wait for the previous call to finish.
-	 * @param {{}|null|number|string|boolean|symbol|bigint|function} id
+	 * @param {anyButUndefined} id
 	 * @returns {Promise<{resume:()=>void}>} Resolves when it's safe to proceed for the given id, returning a cleanup function
 	 */
 	static unique = async (id) => {
@@ -66,7 +70,7 @@ export class Q {
 		} else {
 			const prev = uniqueVirstQueue.get(id);
 			await prev;
-			return await this.unique(id);
+			return await Q.unique(id);
 		}
 	};
 }

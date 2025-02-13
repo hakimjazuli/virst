@@ -1,14 +1,13 @@
-export type onViewPortHandler = {
-    removeOnExitViewCallback: () => void;
-    removeOnViewCallback: () => void;
+export type onExitViewPortArg0 = () => Promise<void>;
+export type onViewCallbackOptions = {
+    onExitViewPort: (arg0: () => Promise<void>) => void;
     unobserveElement: () => void;
+    removeOnViewCallback: () => void;
+    removeOnExitCallback: () => void;
 };
-export type onViewPortLifecycleHandler = import("./lifecycleHandler.type.mjs").lifecycleHandler;
-export type elementsCallbacks = elementsLCCallbacks & {
+export type onViewPortHandler = {
     element: HTMLElement;
-};
-export type elementsLCCallbacks = {
-    onViewCallback: (onViewCallbacksOptions: onViewPortHandler) => Promise<void>;
-    onExitViewCallback: (onViewCallbacksOptions: onViewPortHandler) => Promise<void>;
-    lifecyclesOnDisconnected: onViewPortLifecycleHandler["onDisconnected"][];
+    attr: string;
+    onViewPort: (onSightCallbackOptions: onViewCallbackOptions) => Promise<void>;
+    lifecyclesOnDisconnected: Array<(arg0: () => Promise<void>) => void>;
 };

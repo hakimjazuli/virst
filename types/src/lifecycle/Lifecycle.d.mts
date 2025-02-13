@@ -41,25 +41,11 @@ export class Lifecycle {
         runCheckAtFirst: boolean;
     }) => Ping["fifo"];
     /**
-     * @private
-     * @type {import('./lifecycleHandler.type.mjs').lifecycleHandler["onDisconnected"]} onParentDisconnected
-     */
-    private static currentOnParentDCCB;
-    /**
      * attributeIdentification
      * @private
      * @type {Map<documentScope, Map<string, attributeLifecyclesHandler>>}
      */
     private static ID;
-    /**
-     * @private
-     * @param {documentScope} documentScope
-     * @param {HTMLElement} element
-     * @param {string} attributeName
-     * @param {()=>Promise<any>} scopedCallback
-     * @returns {void}
-     */
-    private static addedNodeScoper;
     /**
      * @private
      * @param {documentScope} documentScope

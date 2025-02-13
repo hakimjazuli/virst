@@ -5,14 +5,15 @@
  * - `typehelper` for onViewPort
  */
 /**
- * @typedef {Object} onViewPortHandler
- * @property {()=>void} removeOnExitViewCallback
- * @property {()=>void} removeOnViewCallback
+ * @typedef {()=>Promise<void>} onExitViewPortArg0
+ * @typedef {Object} onViewCallbackOptions
+ * @property {(arg0:()=>Promise<void>)=>void} onExitViewPort
  * @property {()=>void} unobserveElement
- * @typedef {import('./lifecycleHandler.type.mjs').lifecycleHandler} onViewPortLifecycleHandler
- * @typedef {elementsLCCallbacks & { element: HTMLElement }} elementsCallbacks
- * @typedef {Object} elementsLCCallbacks
- * @property {(onViewCallbacksOptions: onViewPortHandler) => Promise<void>} onViewCallback
- * @property {(onViewCallbacksOptions: onViewPortHandler) => Promise<void>} onExitViewCallback
- * @property {onViewPortLifecycleHandler["onDisconnected"][]} lifecyclesOnDisconnected
+ * @property {()=>void} removeOnViewCallback
+ * @property {()=>void} removeOnExitCallback
+ * @typedef {Object} onViewPortHandler
+ * @property {HTMLElement} element
+ * @property {string} attr
+ * @property {(onSightCallbackOptions:onViewCallbackOptions)=>Promise<void>} onViewPort
+ * @property {Array<(arg0:()=>Promise<void>)=>void>} lifecyclesOnDisconnected
  */

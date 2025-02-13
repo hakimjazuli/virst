@@ -54,6 +54,9 @@
  * ## v0.^15.x
  * - fixed `Lifecycle` scope mechanism
  * - added `class` `attributeSelector` to dynamically proportional binding conditionally by using `signal` value;
+ * ## v0.^16.x
+ * - semantics and fixes for `onViewPort`;
+ * >- `onViewPort` will no longer be exported to `virst` main module;
  */
 export { Lifecycle } from './src/lifecycle/Lifecycle.mjs';
 export { onViewPort } from './src/lifecycle/onViewPort.export.mjs';
@@ -105,21 +108,22 @@ export { WorkerThread } from './src/utils/WorkerThread.mjs';
  * @property {import('./src/lifecycle/Lifecycle.mjs').Lifecycle} lifecycleHandler.lifecycleObserver
  * @property {(arg0:()=>Promise<void>)=>void} lifecycleHandler.onDisconnected
  * @property {(arg0:attributeChangedLifecycle)=>void} lifecycleHandler.onAttributeChanged
- * @property {(elementsCallbacks:import('./src/lifecycle/onViewPortHandler.type.mjs').elementsLCCallbacks)=>import('./src/lifecycle/onViewPort.export.mjs').onViewPort} lifecycleHandler.onViewPort
+ * @property {(onViewCallbackOptions:import('./src/lifecycle/onViewPortHandler.type.mjs').onViewPortHandler["onViewPort"])=>import('./src/lifecycle/onViewPort.export.mjs').onViewPort} lifecycleHandler.onViewPort
  */
 /**
  * @description
  * - `typehelper` for onViewPort
  */
 /**
- * @typedef {Object} onViewPortHandler
- * @property {()=>void} removeOnExitViewCallback
- * @property {()=>void} removeOnViewCallback
+ * @typedef {()=>Promise<void>} onExitViewPortArg0
+ * @typedef {Object} onViewCallbackOptions
+ * @property {(arg0:()=>Promise<void>)=>void} onExitViewPort
  * @property {()=>void} unobserveElement
- * @typedef {import('./src/lifecycle/lifecycleHandler.type.mjs').lifecycleHandler} onViewPortLifecycleHandler
- * @typedef {elementsLCCallbacks & { element: HTMLElement }} elementsCallbacks
- * @typedef {Object} elementsLCCallbacks
- * @property {(onViewCallbacksOptions: onViewPortHandler) => Promise<void>} onViewCallback
- * @property {(onViewCallbacksOptions: onViewPortHandler) => Promise<void>} onExitViewCallback
- * @property {onViewPortLifecycleHandler["onDisconnected"][]} lifecyclesOnDisconnected
+ * @property {()=>void} removeOnViewCallback
+ * @property {()=>void} removeOnExitCallback
+ * @typedef {Object} onViewPortHandler
+ * @property {HTMLElement} element
+ * @property {string} attr
+ * @property {(onSightCallbackOptions:onViewCallbackOptions)=>Promise<void>} onViewPort
+ * @property {Array<(arg0:()=>Promise<void>)=>void>} lifecyclesOnDisconnected
  */

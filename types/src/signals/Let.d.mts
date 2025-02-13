@@ -29,12 +29,12 @@ export class Let<V> {
      */
     /**
      * @param {any} val
-     * @param {string} attributeName
+     * @param {string} attr
      * @param {HTMLElement} element
      * @param {Let} letObject
      * @returns {void}
      */
-    static domReflector: (val: any, attributeName: string, element: HTMLElement, letObject: Let<any>) => void;
+    static domReflector: (val: any, attr: string, element: HTMLElement, letObject: Let<any>) => void;
     /**
      * @template V
      * @param {V} data

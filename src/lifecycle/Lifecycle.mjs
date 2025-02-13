@@ -51,12 +51,6 @@ export class Lifecycle {
 			this.mutationSignal = mutationRecordSignal;
 			this.takeRecords = mutationObserver.takeRecords;
 			const registeredAttribute = this.isScopeMapped();
-			const onParentDisconnceted = Lifecycle.currentOnParentDCCB;
-			if (onParentDisconnceted) {
-				onParentDisconnceted(async () => {
-					this.disconnect();
-				});
-			}
 			switch (registeredAttribute) {
 				/**
 				 * uses `switch case` over `guard clause` in case of source update that requires additional
@@ -185,11 +179,6 @@ export class Lifecycle {
 			helper.currentDocumentScope = currentScope;
 		}).fifo;
 	/**
-	 * @private
-	 * @type {import('./lifecycleHandler.type.mjs').lifecycleHandler["onDisconnected"]} onParentDisconnected
-	 */
-	static currentOnParentDCCB = undefined;
-	/**
 	 * attributeIdentification
 	 * @private
 	 * @type {Map<documentScope, Map<string, attributeLifecyclesHandler>>}
@@ -237,32 +226,6 @@ export class Lifecycle {
 	 * @type {attributeLifecyclesHandler}
 	 */
 	onConnected;
-	/**
-	 * @private
-	 * @param {documentScope} documentScope
-	 * @param {HTMLElement} element
-	 * @param {string} attributeName
-	 * @param {()=>Promise<any>} scopedCallback
-	 * @returns {void}
-	 */
-	static addedNodeScoper = (documentScope, element, attributeName, scopedCallback) => {
-		Lifecycle.scopedPing({
-			documentScope: element,
-			runCheckAtFirst: true,
-			scopedCallback: async () => {
-				/**
-				 * @type {import('./lifecycleHandler.type.mjs').lifecycleHandler["onDisconnected"]}
-				 */
-				const currentOnParentDCCB = (disconnectedCallback) => {
-					Lifecycle.setDCCB(documentScope, element, attributeName, disconnectedCallback);
-				};
-				const tempCurrentOnParentDCCB = Lifecycle.currentOnParentDCCB;
-				Lifecycle.currentOnParentDCCB = currentOnParentDCCB;
-				await scopedCallback();
-				Lifecycle.currentOnParentDCCB = tempCurrentOnParentDCCB;
-			},
-		});
-	};
 	/**
 	 * @private
 	 * @param {string} attributeName
@@ -339,57 +302,48 @@ export class Lifecycle {
 		if (!handlers || !handlers.has(attributeName)) {
 			return;
 		}
-		Lifecycle.addedNodeScoper(currentDocumentScope, addedNode, attributeName, async () => {
-			if (addedNode.parentElement) {
-				handlers.get(attributeName)({
-					get isConnected() {
-						return addedNode.isConnected;
-					},
-					swap: (options) => {
-						if (!(DefinePageTemplate instanceof DefinePageTemplate)) {
-							return;
-						}
-						DefinePageTemplate.__.swap({ element: addedNode, ...options });
-					},
-					onViewPort: (options) => new onViewPort({ element: addedNode, ...options }),
-					element: addedNode,
-					html: (strings, ...values) => {
-						const string = helper.literal(strings, ...values);
-						return {
-							inner: () => {
-								addedNode.innerHTML = string;
-							},
-							string,
-						};
-					},
-					lifecycleObserver: this,
-					onDisconnected: async (disconnectCallback) => {
-						Lifecycle.setDCCB(currentDocumentScope, addedNode, attributeName, async () => {
-							Lifecycle.addedNodeScoper(
-								currentDocumentScope,
-								addedNode,
-								attributeName,
-								async () => {
-									await disconnectCallback();
-								}
-							);
-						});
-					},
-					onAttributeChanged: (attributeChangedCallback) => {
-						Lifecycle.setACCB(addedNode, attributeName, async (options) => {
-							Lifecycle.addedNodeScoper(
-								currentDocumentScope,
-								addedNode,
-								attributeName,
-								async () => {
-									await attributeChangedCallback(options);
-								}
-							);
-						});
-					},
+		if (addedNode.parentElement) {
+			const onDisconnected = async (disconnectCallback) => {
+				Lifecycle.setDCCB(currentDocumentScope, addedNode, attributeName, async () => {
+					await disconnectCallback();
 				});
-			}
-		});
+			};
+			handlers.get(attributeName)({
+				get isConnected() {
+					return addedNode.isConnected;
+				},
+				swap: (options) => {
+					if (!(DefinePageTemplate instanceof DefinePageTemplate)) {
+						return;
+					}
+					DefinePageTemplate.__.swap({ element: addedNode, ...options });
+				},
+				onViewPort: (onViewPort_) =>
+					new onViewPort({
+						onViewPort: onViewPort_,
+						element: addedNode,
+						attr: attributeName,
+						lifecyclesOnDisconnected: [onDisconnected],
+					}),
+				element: addedNode,
+				html: (strings, ...values) => {
+					const string = helper.literal(strings, ...values);
+					return {
+						inner: () => {
+							addedNode.innerHTML = string;
+						},
+						string,
+					};
+				},
+				lifecycleObserver: this,
+				onDisconnected,
+				onAttributeChanged: (attributeChangedCallback) => {
+					Lifecycle.setACCB(addedNode, attributeName, async (options) => {
+						await attributeChangedCallback(options);
+					});
+				},
+			});
+		}
 	};
 	/**
 	 * @private
@@ -477,7 +431,7 @@ export class Lifecycle {
 						});
 					});
 				});
-				await helper.handlePromiseAll(this, handlers);
+				await helper.handlePromiseAll(this.callACCB, handlers);
 			},
 			{ unique: element }
 		);
@@ -562,7 +516,7 @@ export class Lifecycle {
 						});
 					}
 				}
-				await helper.handlePromiseAll(this, disconnectedCallbacks);
+				await helper.handlePromiseAll(this.mutationDCHandler, disconnectedCallbacks);
 			},
 			{ unique: removedNode }
 		);

@@ -47,9 +47,11 @@ bun i virst
 ## v0.^15.x
 - fixed `Lifecycle` scope mechanism
 - added `class` `attributeSelector` to dynamically proportional binding conditionally by using `signal` value;
+## v0.^16.x
+- semantics and fixes for `onViewPort`;
+>- `onViewPort` will no longer be exported to `virst` main module;
 ## exported-api-and-type-list
 - [Lifecycle](#lifecycle)
-- [onViewPort](#onviewport)
 - [Ping](#ping)
 - [Q](#q)
 - [QueuedBlock](#queuedblock)
@@ -77,12 +79,6 @@ bun i virst
 <h2 id="lifecycle">Lifecycle</h2>
 
 - helper class to track connected/disconnected/attributeChanged of an element;- instead of manually assigning whether `attributeName` should be `global` or not, `outOffScoped` `attributeName` will produce warning in the runtime;> - you can ignore it, as the most local Lifecycle will take priority, and when there are no other scope, the most global will take place, the warning is only to notify that you can still optimize your code further by renaming the conflicting `attributeName` by abiding more to the semantics;
-
-*) <sub>[go to exported list](#exported-api-and-type-list)</sub>
-
-<h2 id="onviewport">onViewPort</h2>
-
-- observe element on intersecting with `viewPort`;- use inside `Lifecycle` `onConnected` scope;
 
 *) <sub>[go to exported list](#exported-api-and-type-list)</sub>
 

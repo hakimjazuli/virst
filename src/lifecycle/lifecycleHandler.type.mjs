@@ -17,5 +17,5 @@
  * @property {import('./Lifecycle.mjs').Lifecycle} lifecycleHandler.lifecycleObserver
  * @property {(arg0:()=>Promise<void>)=>void} lifecycleHandler.onDisconnected
  * @property {(arg0:attributeChangedLifecycle)=>void} lifecycleHandler.onAttributeChanged
- * @property {(elementsCallbacks:import('./onViewPortHandler.type.mjs').elementsLCCallbacks)=>import('./onViewPort.export.mjs').onViewPort} lifecycleHandler.onViewPort
+ * @property {(onViewCallbackOptions:import('./onViewPortHandler.type.mjs').onViewPortHandler["onViewPort"])=>import('./onViewPort.export.mjs').onViewPort} lifecycleHandler.onViewPort
  */

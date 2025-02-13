@@ -79,14 +79,14 @@ export class WebComponent {
 	 * @typedef {Object} onConnectedOptions
 	 * @property {HTMLElement} element
 	 * @property {import('../lifecycle/lifecycleHandler.type.mjs').lifecycleHandler["html"]} html
-	 * @property {()=>void} css
+	 * @property {(strings:TemplateStringsArray,...values:string[])=>void} css
 	 * @property {ShadowRoot} shadowRoot
 	 * @property {(slotsKey:slotKey)=>string} slot
 	 * @property {Record<Extract<keyof Props, string>, Let<string>>} props
 	 * @property {(disconnectedCallback:()=>Promise<void>)=>void} onDisconnected
 	 * @property {(adoptedCallback:()=>Promise<void>)=>void} onAdopted
 	 * @property {(onConnected:(options:import('../lifecycle/lifecycleHandler.type.mjs').lifecycleHandler)=>void)=>Lifecycle} newLifecycle
-	 * @property {(options:Omit<import('../lifecycle/onViewPortHandler.type.mjs').elementsLCCallbacks,'lifecyclesOnDisconnected'|'element'>)=>void} lifecycleHandler.onViewPort
+	 * @property {(onViewCallbackOptions:import('../lifecycle/onViewPortHandler.type.mjs').onViewPortHandler["onViewPort"])=>import('../lifecycle/onViewPort.export.mjs').onViewPort} lifecycleHandler.onViewPort
 	 * @property {(attributeChangedCallback:(options:{propName:propKey,newValue:string,oldValue:string})=>Promise<void>)=>void} onAttributeChange
 	 * @param {Object} a0
 	 * @param {string} [a0.tagName]
@@ -169,6 +169,12 @@ export class WebComponent {
 							);
 						}
 						/**
+						 * @param {() => Promise<void>} disconnectedCallback_
+						 */
+						const pushDisconnect = (disconnectedCallback_) => {
+							this_.onDisconnected__.push(disconnectedCallback_);
+						};
+						/**
 						 * @type {onConnectedOptions}
 						 */
 						const options = {
@@ -178,15 +184,13 @@ export class WebComponent {
 									documentScope: this,
 								}),
 							element: this,
-							onViewPort: (options) => {
-								this_.onDisconnected__.push(
-									// @ts-ignore
-									new onViewPort({
-										element: this,
-										...options,
-									}).disconnect
-								);
-							},
+							onViewPort: (onviewPort_) =>
+								new onViewPort({
+									attr: '',
+									onViewPort: onviewPort_,
+									element: this,
+									lifecyclesOnDisconnected: [pushDisconnect],
+								}),
 							shadowRoot: this.shadowRoot,
 							onAdopted: (adoptedCallback_) => {
 								this_.onAdopted__.push(adoptedCallback_);
@@ -226,7 +230,7 @@ export class WebComponent {
 					}
 					this.scoped(async () => {
 						const props_ = this.props;
-						await helper.handlePromiseAll(this, this_.onDisconnected__);
+						await helper.handlePromiseAll(this.disconnectedCallback, this_.onDisconnected__);
 						for (const propName in props_) {
 							props_[propName].removeAll$();
 						}
@@ -243,7 +247,7 @@ export class WebComponent {
 					}
 					this.scoped(async () => {
 						this.props[propName].value = newValue;
-						await helper.handlePromiseAll(this, this_.onAttributeChanged__, {
+						await helper.handlePromiseAll(this.scoped, this_.onAttributeChanged__, {
 							propName,
 							oldValue,
 							newValue,
@@ -255,7 +259,7 @@ export class WebComponent {
 						return;
 					}
 					this.scoped(async () => {
-						await helper.handlePromiseAll(this, this_.onAdopted__);
+						await helper.handlePromiseAll(this.adoptedCallback(), this_.onAdopted__);
 					});
 				}
 			}

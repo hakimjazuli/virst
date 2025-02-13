@@ -36,18 +36,21 @@ export class Let {
 	 */
 	/**
 	 * @param {any} val
-	 * @param {string} attributeName
+	 * @param {string} attr
 	 * @param {HTMLElement} element
 	 * @param {Let} letObject
 	 * @returns {void}
 	 */
-	static domReflector = (val, attributeName, element, letObject) => {
-		const targets = helper.splitX(element.getAttribute(attributeName) ?? '', helper.separator);
+	static domReflector = (val, attr, element, letObject) => {
+		const targets = helper.splitX(element.getAttribute(attr) ?? '', helper.separator);
 		for (let j = 0; j < targets.length; j++) {
 			const target = targets[j];
+			if (target === '') {
+				continue;
+			}
 			try {
 				if (!(target in element)) {
-					throw '';
+					throw Error();
 				}
 				element[target] = val;
 				if (
@@ -66,40 +69,37 @@ export class Let {
 				}
 			} catch (error) {
 				if (element.parentElement && target === 'class') {
-					if (!element.hasAttribute(helper.classes)) {
-						element.setAttribute(helper.classes, '');
-						let prevAppliedClasses = letObject.value;
-						new $(async (first) => {
-							const value = letObject.value;
-							if (JSON.stringify(value) === JSON.stringify(prevAppliedClasses) && !first) {
-								return;
+					const prevAppliedClasses = element[helper.classes] ?? [];
+					if (val === null || !('class' in val)) {
+						continue;
+					}
+					try {
+						const currentClasses = helper.toValidClassNames(val.class);
+						if (currentClasses.join(',') === prevAppliedClasses.join(',')) {
+							continue;
+						}
+						const maxCount = Math.max(currentClasses.length, prevAppliedClasses.length);
+						for (let i = 0; i < maxCount; i++) {
+							const prevAppliedClass = prevAppliedClasses[i];
+							if (prevAppliedClass) {
+								element.classList.remove(prevAppliedClass);
 							}
-							try {
-								const currentClasses = helper.toValidClassNames(value.class);
-								const prevAppliedClasses_ = helper.toValidClassNames(prevAppliedClasses.class);
-								const maxCount = Math.max(currentClasses.length, prevAppliedClasses_.length);
-								for (let i = 0; i < maxCount; i++) {
-									const prevAppliedClass = prevAppliedClasses_[i];
-									if (prevAppliedClass) {
-										element.classList.remove(prevAppliedClass);
-									}
-									const currentClass = currentClasses[i];
-									if (currentClass) {
-										element.classList.add(currentClass);
-									}
-								}
-							} catch (error) {
-								console.warn({
-									signal: this,
-									value,
-									error,
-									cause: 'signal value incorrectly formatted',
-									validFormat: {
-										class: 'string of classNames separated by spaces',
-									},
-								});
+							const currentClass = currentClasses[i];
+							if (currentClass) {
+								element.classList.add(currentClass);
 							}
-							prevAppliedClasses = value;
+						}
+						element[helper.classes] = currentClasses;
+					} catch (error) {
+						console.warn({
+							signal: this,
+							value: val,
+							attr,
+							error,
+							cause: 'signal value incorrectly formatted',
+							validFormat: {
+								class: 'string of classNames separated by spaces',
+							},
 						});
 					}
 					continue;
@@ -107,8 +107,9 @@ export class Let {
 				val = JSON.stringify(val).replace(/^"(.*)"$/, '$1');
 				if (target == '') {
 					console.warn({
+						error,
 						element,
-						attributeName,
+						attributeName: attr,
 						message: "doesn't have target",
 					});
 					return;
@@ -174,7 +175,7 @@ export class Let {
 			if (!this.subscriptions) {
 				return;
 			}
-			helper.handlePromiseAll(this, Array.from(this.subscriptions), false);
+			helper.handlePromiseAll(this.call$, Array.from(this.subscriptions), false);
 		});
 	};
 	/**

@@ -3,6 +3,9 @@
  */
 export const uniqueVirstQueue: Map<any, Promise<any>>;
 /**
+ * @typedef {{}|null|number|string|boolean|symbol|bigint|function} anyButUndefined
+ */
+/**
  * @description
  * helper methods for creating Promise to block execution code that return { resume } to allow subsequent calls to proceed;
  * ```js
@@ -27,10 +30,11 @@ export class Q {
     /**
      * Ensures that each id has only one task running at a time.
      * Calls with the same id will wait for the previous call to finish.
-     * @param {{}|null|number|string|boolean|symbol|bigint|function} id
+     * @param {anyButUndefined} id
      * @returns {Promise<{resume:()=>void}>} Resolves when it's safe to proceed for the given id, returning a cleanup function
      */
-    static unique: (id: {} | null | number | string | boolean | symbol | bigint | Function) => Promise<{
+    static unique: (id: anyButUndefined) => Promise<{
         resume: () => void;
     }>;
 }
+export type anyButUndefined = {} | null | number | string | boolean | symbol | bigint | Function;

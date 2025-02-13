@@ -1,44 +1,109 @@
 // @ts-check
 
+import { Q } from '../queue/Q.mjs';
 import { helper } from '../utils/helper.export.mjs';
 
-/**
- * @description
- * - observe element on intersecting with `viewPort`;
- * - use inside `Lifecycle` `onConnected` scope;
- */
 export class onViewPort {
 	/**
-	 * @param {import('./onViewPortHandler.type.mjs').elementsCallbacks} elementsCallbacks
+	 * @typedef {import('./onViewPortHandler.type.mjs').onViewPortHandler} onViewPortHandler
+	 * @typedef {import('./onViewPortHandler.type.mjs').onViewCallbackOptions} onViewCallbackOptions
+	 * @typedef {import('./onViewPortHandler.type.mjs').onExitViewPortArg0} onExitViewPortArg0
 	 */
-	constructor({ element, onExitViewCallback, onViewCallback, lifecyclesOnDisconnected }) {
-		this.element = element;
+	/**
+	 * @type {IntersectionObserver["root"]}
+	 * @see https://developer.mozilla.org/docs/Web/API/IntersectionObserver/root
+	 */
+	static get root() {
+		return onViewPort.observer.root;
+	}
+	/**
+	 * @type {IntersectionObserver["thresholds"]}
+	 * @see https://developer.mozilla.org/docs/Web/API/IntersectionObserver/thresholds
+	 */
+	static get thresholds() {
+		return onViewPort.observer.thresholds;
+	}
+	/**
+	 * @type {IntersectionObserver["rootMargin"]}
+	 * @see https://developer.mozilla.org/docs/Web/API/IntersectionObserver/rootMargin
+	 */
+	static get rootMargin() {
+		return onViewPort.observer.rootMargin;
+	}
+	/**
+	 * @type {IntersectionObserver["takeRecords"]}
+	 * @see https://developer.mozilla.org/docs/Web/API/IntersectionObserver/takeRecords
+	 */
+	static takeRecords = () => onViewPort.observer.takeRecords();
+	/**
+	 * @type {IntersectionObserver["disconnect"]}
+	 * @see https://developer.mozilla.org/docs/Web/API/IntersectionObserver/disconnect
+	 */
+	static disconnect = () => onViewPort.observer.disconnect();
+	/**
+	 * @param {onViewPortHandler} param0
+	 */
+	constructor({ element, attr, onViewPort: onViewPort_, lifecyclesOnDisconnected }) {
+		onViewPort.setOnView(element, attr, onViewPort_);
 		onViewPort.observer.observe(element);
-		element[helper.onViewCBIdentifier] = onViewCallback;
-		element[helper.onExitViewCBIdentifier] = onExitViewCallback;
 		for (let i = 0; i < lifecyclesOnDisconnected.length; i++) {
 			lifecyclesOnDisconnected[i](async () => {
-				onViewPort.removeOnViewCallback(element);
-				if (element[helper.onExitViewCBIdentifier]) {
-					await element[helper.onExitViewCBIdentifier](onViewPort.onViewCallbacksOptions(element));
-				}
-				onViewPort.removeOnExitViewCallback(element);
-				onViewPort.unobserve(element);
+				onViewPort.unobserveElement(element, attr);
 			});
 		}
 	}
 	/**
 	 * @private
+	 * @param {HTMLElement} element
+	 * @returns {Map<string, Set<onViewPortHandler["onViewPort"]>>}
 	 */
-	element;
-	disconnect = async () => {
-		const element = this.element;
-		onViewPort.removeOnViewCallback(element);
-		if (element[helper.onExitViewCBIdentifier]) {
-			await element[helper.onExitViewCBIdentifier](onViewPort.onViewCallbacksOptions(element));
+	static getOnView = (element) => {
+		if (!(element[helper.onViewCBIdentifier] instanceof Map)) {
+			element[helper.onViewCBIdentifier] = new Map();
 		}
-		onViewPort.removeOnExitViewCallback(element);
-		onViewPort.unobserve(element);
+		return element[helper.onViewCBIdentifier];
+	};
+	/**
+	 * @private
+	 * @param {HTMLElement} element
+	 * @param {string} attr
+	 * @param {onViewPortHandler["onViewPort"]} onSightCallback
+	 * @private
+	 */
+	static setOnView = async (element, attr, onSightCallback) => {
+		const { resume } = await Q.unique(element);
+		const current = onViewPort.getOnView(element);
+		if (!current.has(attr)) {
+			current.set(attr, new Set());
+		}
+		current.get(attr).add(onSightCallback);
+		resume();
+	};
+	/**
+	 * @private
+	 * @param {HTMLElement} element
+	 * @returns {Map<string, Set<onExitViewPortArg0>>}
+	 */
+	static getOnExit = (element) => {
+		if (!(element[helper.onExitViewCBIdentifier] instanceof Map)) {
+			element[helper.onExitViewCBIdentifier] = new Map();
+		}
+		return element[helper.onExitViewCBIdentifier];
+	};
+	/**
+	 * @private
+	 * @param {HTMLElement} element
+	 * @param {string} attr
+	 * @param {onExitViewPortArg0} onExitCallback
+	 */
+	static setOnExit = async (element, attr, onExitCallback) => {
+		const { resume } = await Q.unique(element);
+		const current = onViewPort.getOnExit(element);
+		if (!current.has(attr)) {
+			current.set(attr, new Set());
+		}
+		current.get(attr).add(onExitCallback);
+		resume();
 	};
 	/**
 	 * @private
@@ -46,14 +111,14 @@ export class onViewPort {
 	 */
 	static loadCount_ = 10;
 	static get loadCount() {
-		return this.loadCount_;
+		return onViewPort.loadCount_;
 	}
 	static set loadCount(value) {
 		if (typeof value === 'number' && value > 0) {
-			this.loadCount_ = value;
+			onViewPort.loadCount_ = value;
 		} else {
 			console.warn('loadCount must be a positive number. Using the absolute value instead;');
-			this.loadCount_ = Math.abs(value);
+			onViewPort.loadCount_ = Math.abs(value);
 		}
 	}
 	/**
@@ -61,97 +126,100 @@ export class onViewPort {
 	 */
 	static observer = new IntersectionObserver(
 		(entries) => {
-			const loadCount = this.loadCount;
+			const loadCount = onViewPort.loadCount;
 			const promises = [];
 			for (let i = 0; i < entries.length; i++) {
 				promises.push(async () => {
-					await this.handleEntry(entries[i]);
+					await onViewPort.handleEntry(entries[i]);
 				});
 				if ((i + 1) % loadCount !== 0) {
 					continue;
 				}
-				helper.handlePromiseAll(this, promises);
+				helper.handlePromiseAll(onViewPort.observer, promises);
 				promises.length = 0;
 			}
 			if (promises.length > 0) {
-				helper.handlePromiseAll(this, promises);
+				helper.handlePromiseAll(onViewPort.observer, promises);
 			}
 		},
 		{ threshold: [0, 0] }
 	);
-	/**
-	 * @returns {IntersectionObserverEntry[]}
-	 * @see https://developer.mozilla.org/docs/Web/API/IntersectionObserver/takeRecords
-	 */
-	static takeRecords = () => this.observer.takeRecords();
-	/**
-	 * @returns {void}
-	 * @see https://developer.mozilla.org/docs/Web/API/IntersectionObserver/disconnect
-	 */
-	static disconnect = () => this.observer.disconnect();
-	static get root() {
-		return this.observer.root;
-	}
-	static get rootMargin() {
-		return this.observer.rootMargin;
-	}
-	/**
-	 * @private
-	 * @param {Element|HTMLElement} element
-	 * @returns
-	 */
-	static unobserve = (element) => this.observer.unobserve(element);
-	/**
-	 * @private
-	 * @param {Element|HTMLElement} element
-	 */
-	static removeOnViewCallback = (element) => {
-		if (helper.onViewCBIdentifier in element) {
-			delete element[helper.onViewCBIdentifier];
-		}
-	};
-	/**
-	 * @private
-	 * @param {Element|HTMLElement} element
-	 */
-	static removeOnExitViewCallback = (element) => {
-		if (helper.onExitViewCBIdentifier in element) {
-			delete element[helper.onExitViewCBIdentifier];
-		}
-	};
-	/**
-	 * @private
-	 * @type {(element:Element|HTMLElement)=>import('./onViewPortHandler.type.mjs').onViewPortHandler}
-	 */
-	static onViewCallbacksOptions = (element) => {
-		return {
-			removeOnViewCallback: () => onViewPort.removeOnViewCallback(element),
-			removeOnExitViewCallback: () => onViewPort.removeOnExitViewCallback(element),
-			unobserveElement: () => onViewPort.unobserve(element),
-		};
-	};
-	/**
-	 * @private
-	 * @type {Map<HTMLElement|Element, true>}
-	 */
-	static registeredOnExit = new Map();
 	/**
 	 * @private
 	 * @param {IntersectionObserverEntry} entry
 	 */
 	static handleEntry = async (entry) => {
 		const element = entry.target;
-		if (entry.isIntersecting && helper.onViewCBIdentifier in element) {
-			await element[helper.onViewCBIdentifier](onViewPort.onViewCallbacksOptions(element));
-			this.registeredOnExit.set(element, true);
+		if (!(element instanceof HTMLElement)) {
+			return;
 		}
-		if (
-			!entry.isIntersecting &&
-			helper.onExitViewCBIdentifier in element &&
-			this.registeredOnExit.has(element)
-		) {
-			await element[helper.onExitViewCBIdentifier](onViewPort.onViewCallbacksOptions(element));
-			this.registeredOnExit.delete(element);
+		const { resume } = await Q.unique(element);
+		const onsight = onViewPort.getOnView(element);
+		const onexit = onViewPort.getOnExit(element);
+		if (entry.isIntersecting) {
+			if (onsight.size) {
+				onsight.forEach((onSightCBs, attr) => {
+					onSightCBs.forEach(async (onViewCB) => {
+						await onViewCB({
+							onExitViewPort: (onExitCallback) => {
+								onViewPort.setOnExit(element, attr, onExitCallback);
+							},
+							removeOnExitCallback: () => onViewPort.removeOnExitCallback(element, attr),
+							removeOnViewCallback: () => onViewPort.removeSightCallback(element, attr),
+							unobserveElement: () => onViewPort.unobserveElement(element, attr),
+						});
+					});
+				});
+			}
+			resume();
+			return;
 		}
+		if (onexit.size) {
+			onexit.forEach((cbs) => {
+				cbs.forEach(async (cb) => {
+					await cb();
+				});
+			});
+		}
+		resume();
+	};
+	/**
+	 * @private
+	 * @param {HTMLElement} element
+	 * @param {string} attr
+	 * @returns {ReturnType<onViewCallbackOptions["removeOnViewCallback"]>}
+	 */
+	static removeSightCallback = (element, attr) => {
+		const current = onViewPort.getOnView(element);
+		if (!current.has(attr)) {
+			return;
+		}
+		current.get(attr).clear();
+		current.delete(attr);
+	};
+	/**
+	 * @private
+	 * @param {HTMLElement} element
+	 * @param {string} attr
+	 * @returns {ReturnType<onViewCallbackOptions["removeOnExitCallback"]>}
+	 */
+	static removeOnExitCallback = (element, attr) => {
+		const current = onViewPort.getOnExit(element);
+		if (!current.has(attr)) {
+			return;
+		}
+		current.get(attr).clear();
+		current.delete(attr);
+	};
+	/**
+	 * @private
+	 * @param {HTMLElement} element
+	 * @param {string} attr
+	 * @returns {ReturnType<onViewCallbackOptions["unobserveElement"]>}
+	 */
+	static unobserveElement = (element, attr) => {
+		onViewPort.removeSightCallback(element, attr);
+		onViewPort.removeOnExitCallback(element, attr);
+		this.observer.unobserve(element);
 	};
 }
