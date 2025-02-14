@@ -108,7 +108,7 @@ export { WorkerThread } from './src/utils/WorkerThread.mjs';
  * @property {import('./src/lifecycle/Lifecycle.mjs').Lifecycle} lifecycleHandler.lifecycleObserver
  * @property {(arg0:()=>Promise<void>)=>void} lifecycleHandler.onDisconnected
  * @property {(arg0:attributeChangedLifecycle)=>void} lifecycleHandler.onAttributeChanged
- * @property {(onViewCallbackOptions:import('./src/lifecycle/onViewPortHandler.type.mjs').onViewPortHandler["onViewPort"])=>import('./src/lifecycle/onViewPort.export.mjs').onViewPort} lifecycleHandler.onViewPort
+ * @property {(onViewCallback:import('./src/lifecycle/onViewPortHandler.type.mjs').onViewPortHandler["onViewPort"])=>import('./src/lifecycle/onViewPort.export.mjs').onViewPort} lifecycleHandler.onViewPort
  */
 /**
  * @description

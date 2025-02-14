@@ -47,7 +47,7 @@ export type lifecycleHandler = {
     lifecycleObserver: import("./src/lifecycle/Lifecycle.mjs").Lifecycle;
     onDisconnected: (arg0: () => Promise<void>) => void;
     onAttributeChanged: (arg0: attributeChangedLifecycle) => void;
-    onViewPort: (onViewCallbackOptions: import("./src/lifecycle/onViewPortHandler.type.mjs").onViewPortHandler["onViewPort"]) => import("./src/lifecycle/onViewPort.export.mjs").onViewPort;
+    onViewPort: (onViewCallback: import("./src/lifecycle/onViewPortHandler.type.mjs").onViewPortHandler["onViewPort"]) => import("./src/lifecycle/onViewPort.export.mjs").onViewPort;
 };
 export type onExitViewPortArg0 = () => Promise<void>;
 export type onViewCallbackOptions = {
