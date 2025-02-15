@@ -125,6 +125,7 @@ export class Let {
 	 */
 	static dataOnly = (data) => new Let(data);
 	/**
+	 * @private
 	 * @param {Let} letInstance
 	 * @returns {Set<$["effect"]>}
 	 */

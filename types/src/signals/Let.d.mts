@@ -42,10 +42,11 @@ export class Let<V> {
      */
     static dataOnly: <V_1>(data: V_1) => Let<V_1>;
     /**
+     * @private
      * @param {Let} letInstance
      * @returns {Set<$["effect"]>}
      */
-    static subscriptions(letInstance: Let<any>): Set<$["effect"]>;
+    private static subscriptions;
     /**
      * @param {V} value
      * @param {string} [attributeName]
