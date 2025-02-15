@@ -125,10 +125,11 @@ export class Let {
 	 */
 	static dataOnly = (data) => new Let(data);
 	/**
-	 * @type {Set<$["effect"]>}
+	 * @param {Let} letInstance
+	 * @returns {Set<$["effect"]>}
 	 */
-	get subscriptions() {
-		return $.signals.get(this);
+	static subscriptions(letInstance) {
+		return $.signals.get(letInstance);
 	}
 	/**
 	 * remove all effects
@@ -138,7 +139,7 @@ export class Let {
 		$.effects.forEach((signals) => {
 			signals.delete(this);
 		});
-		this.subscriptions.clear();
+		Let.subscriptions(this).clear();
 		$.signals.delete(this);
 	};
 	/**
@@ -150,7 +151,7 @@ export class Let {
 		if ($.effects.has($_.effect)) {
 			$.effects.get($_.effect).delete(this);
 		}
-		this.subscriptions.delete($_.effect);
+		Let.subscriptions(this).delete($_.effect);
 	};
 	/**
 	 * destroy all props
@@ -172,10 +173,10 @@ export class Let {
 	 */
 	call$ = () => {
 		new Ping(true, async () => {
-			if (!this.subscriptions) {
+			if (!Let.subscriptions(this)) {
 				return;
 			}
-			helper.handlePromiseAll(this.call$, Array.from(this.subscriptions), false);
+			helper.handlePromiseAll(this.call$, Array.from(Let.subscriptions(this)), false);
 		});
 	};
 	/**

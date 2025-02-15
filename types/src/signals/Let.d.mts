@@ -42,6 +42,11 @@ export class Let<V> {
      */
     static dataOnly: <V_1>(data: V_1) => Let<V_1>;
     /**
+     * @param {Let} letInstance
+     * @returns {Set<$["effect"]>}
+     */
+    static subscriptions(letInstance: Let<any>): Set<$["effect"]>;
+    /**
      * @param {V} value
      * @param {string} [attributeName]
      * @param {Object} [options]
@@ -50,10 +55,6 @@ export class Let<V> {
     constructor(value: V, attributeName?: string, options?: {
         documentScope?: import("../lifecycle/documentScope.type.mjs").documentScope;
     });
-    /**
-     * @type {Set<$["effect"]>}
-     */
-    get subscriptions(): Set<(isAtInitialization: boolean) => Promise<void>>;
     /**
      * remove all effects
      * @return {void}
