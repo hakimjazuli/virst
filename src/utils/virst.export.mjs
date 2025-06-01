@@ -1,7 +1,16 @@
 // @ts-check
 
+import { helper } from './helper.export.mjs';
+
 /**
  * @description
  * centralized virst object for lib making
  */
-export const virst = (window['virst'] = window['virst'] ?? {});
+export class virst {
+	static get shared() {
+		if (!('virst' in window)) {
+			helper.createImmutable({ name: 'virst', parent: window });
+		}
+		return window['virst'];
+	}
+}

@@ -1,4 +1,5 @@
 export class queueFIFO {
+    static fifoQH: string;
     /**
      * @typedef {import('./queueObjectFIFO.mjs').queueObjectFIFO} queueObjectFIFO
      */

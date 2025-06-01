@@ -1,6 +1,6 @@
 // @ts-check
 
-import { uniqueVirstQueue } from './Q.mjs';
+import { Q } from './Q.mjs';
 
 /**
  * @description
@@ -27,6 +27,8 @@ export const QueuedBlock =
 		const next = new Promise((resolve) => {
 			resolveFn = resolve; // Assign resolveFn to be called later
 		});
+
+		const uniqueVirstQueue = Q.uniqueVirstQueue;
 
 		// Get the previous promise in the queue (if any)
 		const prev = uniqueVirstQueue.get(key) || Promise.resolve();

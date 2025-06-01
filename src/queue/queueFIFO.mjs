@@ -4,6 +4,7 @@ import { virst } from '../utils/virst.export.mjs';
 import { helper } from '../utils/helper.export.mjs';
 
 export class queueFIFO {
+	static fifoQH = helper.Q.fifo;
 	/**
 	 * @typedef {import('./queueObjectFIFO.mjs').queueObjectFIFO} queueObjectFIFO
 	 */
@@ -18,7 +19,10 @@ export class queueFIFO {
 		}
 	};
 	static {
-		virst['QFIFO'] = virst['QFIFO'] ?? queueFIFO.assign_;
+		const fifoQH = queueFIFO.fifoQH;
+		if (!(fifoQH in virst)) {
+			helper.registerObjectToVirst({ name: fifoQH, object: queueFIFO.assign_ });
+		}
 	}
 	/**
 	 * @private
@@ -36,7 +40,7 @@ export class queueFIFO {
 	/**
 	 * @param {(queueObjectFIFO:queueObjectFIFO)=>void} _queue
 	 */
-	static assign = virst['QFIFO'];
+	static assign = virst.shared[queueFIFO.fifoQH];
 	/**
 	 * @private
 	 * @param {queueObjectFIFO} _queue

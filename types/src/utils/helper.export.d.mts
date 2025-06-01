@@ -3,6 +3,31 @@
  * shared statics
  */
 export class helper {
+    static Q: {
+        unique: string;
+        fifo: string;
+        uniqueMap: string;
+    };
+    /**
+     * @param {Object} a0
+     * @param {string} a0.name
+     * @param {Object} [a0.object]
+     * @param {Object} [a0.parent]
+     */
+    static createImmutable: ({ name, object, parent }: {
+        name: string;
+        object?: any;
+        parent?: any;
+    }) => void;
+    /**
+     * @param {Object} a0
+     * @param {string} a0.name
+     * @param {Object} a0.object
+     */
+    static registerObjectToVirst: (a0: {
+        name: string;
+        object: any;
+    }) => void;
     /**
      * @type {string[]}
      */

@@ -1,12 +1,7 @@
 // @ts-check
 
+import { helper } from '../utils/helper.export.mjs';
 import { virst } from '../utils/virst.export.mjs';
-
-/**
- * @type {Map<any, Promise<any>>}
- */
-export const uniqueVirstQueue = (virst['uniqueVirstQueue'] =
-	virst['uniqueVirstQueue'] ?? new Map());
 
 /**
  * @typedef {{}|null|number|string|boolean|symbol|bigint|function} anyButUndefined
@@ -22,6 +17,20 @@ export const uniqueVirstQueue = (virst['uniqueVirstQueue'] =
  * ```
  */
 export class Q {
+	/**
+	 * @private
+	 */
+	static uniqueMap = helper.Q.uniqueMap;
+	static {
+		const uniqueMap = Q.uniqueMap;
+		if (!(uniqueMap in virst)) {
+			helper.registerObjectToVirst({ name: uniqueMap, object: new Map() });
+		}
+	}
+	/**
+	 * @type {Map<any, Promise<any>>}
+	 */
+	static uniqueVirstQueue = virst.shared[Q.uniqueMap];
 	/**
 	 * @private
 	 * @type {Promise<void>}
@@ -52,6 +61,7 @@ export class Q {
 	 * @returns {Promise<{resume:()=>void}>} Resolves when it's safe to proceed for the given id, returning a cleanup function
 	 */
 	static unique = async (id) => {
+		const uniqueVirstQueue = Q.uniqueVirstQueue;
 		if (!uniqueVirstQueue.has(id)) {
 			uniqueVirstQueue.set(id, Promise.resolve());
 			let resolveFn;

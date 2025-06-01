@@ -1,10 +1,50 @@
 // @ts-check
 
+import { virst } from './virst.export.mjs';
+
 /**
  * @description
  * shared statics
  */
 export class helper {
+	static Q = {
+		unique: 'unique',
+		fifo: 'fifo',
+		uniqueMap: 'uniqueMap',
+	};
+	/**
+	 * @param {Object} a0
+	 * @param {string} a0.name
+	 * @param {Object} [a0.object]
+	 * @param {Object} [a0.parent]
+	 */
+	static createImmutable = ({ name, object = {}, parent = virst.shared }) => {
+		if (!parent || typeof parent !== 'object') {
+			throw new Error('Invalid parent object provided to createImmutable.');
+		}
+		try {
+			Object.defineProperty(parent, name, {
+				value: object,
+				writable: false,
+				configurable: false,
+				enumerable: false,
+			});
+		} catch (error) {
+			console.info({
+				parent,
+				message: `"${name}" already defined on the "parent"`,
+				realValue: parent[name],
+			});
+		}
+	};
+	/**
+	 * @param {Object} a0
+	 * @param {string} a0.name
+	 * @param {Object} a0.object
+	 */
+	static registerObjectToVirst = (a0) => {
+		helper.createImmutable(a0);
+	};
 	/**
 	 * @type {string[]}
 	 */

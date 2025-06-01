@@ -1,8 +1,4 @@
 /**
- * @type {Map<any, Promise<any>>}
- */
-export const uniqueVirstQueue: Map<any, Promise<any>>;
-/**
  * @typedef {{}|null|number|string|boolean|symbol|bigint|function} anyButUndefined
  */
 /**
@@ -15,6 +11,14 @@ export const uniqueVirstQueue: Map<any, Promise<any>>;
  * ```
  */
 export class Q {
+    /**
+     * @private
+     */
+    private static uniqueMap;
+    /**
+     * @type {Map<any, Promise<any>>}
+     */
+    static uniqueVirstQueue: Map<any, Promise<any>>;
     /**
      * @private
      * @type {Promise<void>}

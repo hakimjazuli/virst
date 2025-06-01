@@ -3,6 +3,8 @@
 import { helper } from '../utils/helper.export.mjs';
 import { virst } from '../utils/virst.export.mjs';
 
+const uniqueQH = helper.Q.unique;
+
 export class queueUnique {
 	/**
 	 * @typedef {import('./queueUniqueObject.mjs').queueUniqueObject} queueUniqueObject
@@ -18,7 +20,9 @@ export class queueUnique {
 		}
 	};
 	static {
-		virst['QUnique'] = virst['QUnique'] ?? queueUnique.assign_;
+		if (!(uniqueQH in virst)) {
+			helper.registerObjectToVirst({ name: uniqueQH, object: queueUnique.assign_ });
+		}
 	}
 	/**
 	 * @private
@@ -33,7 +37,7 @@ export class queueUnique {
 	/**
 	 * @type {(queueUniqueObject:queueUniqueObject)=>void}
 	 */
-	static assign = virst['QUnique'];
+	static assign = virst.shared[uniqueQH];
 	/**
 	 * @private
 	 * @param {queueUniqueObject} _queue

@@ -8,7 +8,7 @@ export class onViewPort {
      * @type {IntersectionObserver["root"]}
      * @see https://developer.mozilla.org/docs/Web/API/IntersectionObserver/root
      */
-    static get root(): Element | Document;
+    static get root(): Document | Element;
     /**
      * @type {IntersectionObserver["thresholds"]}
      * @see https://developer.mozilla.org/docs/Web/API/IntersectionObserver/thresholds
