@@ -163,7 +163,7 @@ export class Lifecycle {
     private checkValidScoping;
     /**
      * @private
-     * @param {documentScope} addedNode
+     * @param {documentScope} elementAdded
      * @param {string} attributeName
      * @param {boolean} checkChild
      * @returns {Promise<void>}

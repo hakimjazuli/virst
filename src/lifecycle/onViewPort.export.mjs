@@ -2,6 +2,8 @@
 
 import { Q } from '../queue/Q.mjs';
 import { helper } from '../utils/helper.export.mjs';
+import { MappedSharedObject } from '../utils/MappedSharedObject.mjs';
+import { ElementShouldHave } from './ElementShouldHave.mjs';
 
 export class onViewPort {
 	/**
@@ -58,10 +60,11 @@ export class onViewPort {
 	 * @returns {Map<string, Set<onViewPortHandler["onViewPort"]>>}
 	 */
 	static getOnView = (element) => {
-		if (!(element[helper.onViewCBIdentifier] instanceof Map)) {
-			element[helper.onViewCBIdentifier] = new Map();
+		const mapped = MappedSharedObject.elements;
+		if (!mapped.has(element)) {
+			mapped.set(element, new ElementShouldHave({}));
 		}
-		return element[helper.onViewCBIdentifier];
+		return mapped.get(element).viewCallbacks;
 	};
 	/**
 	 * @private
@@ -85,10 +88,11 @@ export class onViewPort {
 	 * @returns {Map<string, Set<onExitViewPortArg0>>}
 	 */
 	static getOnExit = (element) => {
-		if (!(element[helper.onExitViewCBIdentifier] instanceof Map)) {
-			element[helper.onExitViewCBIdentifier] = new Map();
+		const mapped = MappedSharedObject.elements;
+		if (!mapped.has(element)) {
+			mapped.set(element, new ElementShouldHave({}));
 		}
-		return element[helper.onExitViewCBIdentifier];
+		return mapped.get(element).exitViewCallbacks;
 	};
 	/**
 	 * @private

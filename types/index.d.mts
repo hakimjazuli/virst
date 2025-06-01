@@ -1,3 +1,4 @@
+export { ElementShouldHave } from "./src/lifecycle/ElementShouldHave.mjs";
 export { Lifecycle } from "./src/lifecycle/Lifecycle.mjs";
 export { onViewPort } from "./src/lifecycle/onViewPort.export.mjs";
 export { Ping } from "./src/queue/Ping.mjs";
@@ -18,6 +19,7 @@ export { Event_ } from "./src/utils/Event_.mjs";
 export { For } from "./src/utils/For.mjs";
 export { FSsrc } from "./src/utils/FSsrc.mjs";
 export { helper } from "./src/utils/helper.export.mjs";
+export { MappedSharedObject } from "./src/utils/MappedSharedObject.mjs";
 export { ShortCut } from "./src/utils/ShortCut.mjs";
 export { Try_ } from "./src/utils/Try_.mjs";
 export { virst } from "./src/utils/virst.export.mjs";

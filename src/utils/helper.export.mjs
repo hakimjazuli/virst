@@ -31,7 +31,7 @@ export class helper {
 	/**
 	 * @readonly
 	 */
-	static removeDOM$ = 'virst-rm-dom$';
+	// static removeDOM$ = 'virst-rm-dom$';
 	/**
 	 * @readonly
 	 */
@@ -53,18 +53,8 @@ export class helper {
 	 * @readonly
 	 */
 	static qRouteChange = 'virst-qrc';
-	static docScopeElement = 'virst-sc';
 	static storageIdentifier = 'virst-st';
-	static DCCBIdentifier = 'virst-dc';
-	static ACCBIdentifier = 'virst-ac';
-	static onViewCBIdentifier = `virst-ov`;
-	static onExitViewCBIdentifier = `virst-oxv`;
 	static templatePrefix = 'virst-template';
-	static keptElement = 'virst-keep';
-	/**
-	 * @readonly
-	 */
-	static ForQPrefix = `virst-fq-`;
 	/**
 	 * @readonly
 	 */
@@ -160,11 +150,6 @@ export class helper {
 		return result;
 	};
 	static separator = ';';
-	/**
-	 * @param {(...any:any)=>(any|Promise<any>)} fn
-	 * @returns {boolean}
-	 */
-	static isAsync = (fn) => fn.constructor.name === 'AsyncFunction';
 	/**
 	 * @param {string} attributeName
 	 * @returns {string}

@@ -6,6 +6,8 @@ import { helper } from '../utils/helper.export.mjs';
 import { Let } from '../signals/Let.mjs';
 import { onViewPort } from './onViewPort.export.mjs';
 import { Ping } from '../queue/Ping.mjs';
+import { MappedSharedObject } from '../utils/MappedSharedObject.mjs';
+import { ElementShouldHave } from './ElementShouldHave.mjs';
 
 /**
  * @description
@@ -252,29 +254,29 @@ export class Lifecycle {
 	};
 	/**
 	 * @private
-	 * @param {documentScope} addedNode
+	 * @param {documentScope} elementAdded
 	 * @param {string} attributeName
 	 * @param {boolean} checkChild
 	 * @returns {Promise<void>}
 	 */
-	addedNodeHandler = async (addedNode, attributeName, checkChild) => {
-		if (checkChild && 'querySelectorAll' in addedNode) {
+	addedNodeHandler = async (elementAdded, attributeName, checkChild) => {
+		if (checkChild && 'querySelectorAll' in elementAdded) {
 			const validAttributeSelector = helper.validAttributeNameSelector(attributeName);
-			const elements = addedNode.querySelectorAll(`[${validAttributeSelector}]`);
+			const elements = elementAdded.querySelectorAll(`[${validAttributeSelector}]`);
 			for (let i = 0; i < elements.length; i++) {
 				await this.addedNodeHandler(elements[i], attributeName, false);
 			}
 		}
 		const currentDocumentScope = this.currentDocumentScope;
 		if (
-			!(addedNode instanceof HTMLElement) ||
-			!('hasAttribute' in addedNode) ||
-			!addedNode.hasAttribute(attributeName) ||
-			!this.checkValidScoping(attributeName, addedNode, currentDocumentScope)
+			!(elementAdded instanceof HTMLElement) ||
+			!('hasAttribute' in elementAdded) ||
+			!elementAdded.hasAttribute(attributeName) ||
+			!this.checkValidScoping(attributeName, elementAdded, currentDocumentScope)
 		) {
 			return;
 		}
-		let currentDCCB = Lifecycle.getDCCB(addedNode);
+		let currentDCCB = Lifecycle.getDCCB(elementAdded);
 		if (currentDCCB && currentDCCB.has(attributeName)) {
 			const fixValidScoping = [];
 			const outOfScope_ = [];
@@ -302,35 +304,38 @@ export class Lifecycle {
 		if (!handlers || !handlers.has(attributeName)) {
 			return;
 		}
-		if (addedNode.parentElement) {
+		if (elementAdded.parentElement) {
+			/**
+			 * @param {()=>Promise<void>} disconnectCallback
+			 */
 			const onDisconnected = async (disconnectCallback) => {
-				Lifecycle.setDCCB(currentDocumentScope, addedNode, attributeName, async () => {
+				Lifecycle.setDCCB(currentDocumentScope, elementAdded, attributeName, async () => {
 					await disconnectCallback();
 				});
 			};
 			handlers.get(attributeName)({
 				get isConnected() {
-					return addedNode.isConnected;
+					return elementAdded.isConnected;
 				},
 				swap: (options) => {
 					if (!(DefinePageTemplate instanceof DefinePageTemplate)) {
 						return;
 					}
-					DefinePageTemplate.__.swap({ element: addedNode, ...options });
+					DefinePageTemplate.__.swap({ element: elementAdded, ...options });
 				},
 				onViewPort: (onViewPort_) =>
 					new onViewPort({
 						onViewPort: onViewPort_,
-						element: addedNode,
+						element: elementAdded,
 						attr: attributeName,
 						lifecyclesOnDisconnected: [onDisconnected],
 					}),
-				element: addedNode,
+				element: elementAdded,
 				html: (strings, ...values) => {
 					const string = helper.literal(strings, ...values);
 					return {
 						inner: () => {
-							addedNode.innerHTML = string;
+							elementAdded.innerHTML = string;
 						},
 						string,
 					};
@@ -338,7 +343,7 @@ export class Lifecycle {
 				lifecycleObserver: this,
 				onDisconnected,
 				onAttributeChanged: (attributeChangedCallback) => {
-					Lifecycle.setACCB(addedNode, attributeName, async (options) => {
+					Lifecycle.setACCB(elementAdded, attributeName, async (options) => {
 						await attributeChangedCallback(options);
 					});
 				},
@@ -356,7 +361,9 @@ export class Lifecycle {
 	static setDCCB = async (documentScope, element, attributeName, disconnectedCallback) => {
 		let currentDCCB = Lifecycle.getDCCB(element);
 		if (!currentDCCB) {
-			currentDCCB = element[helper.DCCBIdentifier] = new Map();
+			const instance = new ElementShouldHave({});
+			MappedSharedObject.elements.set(element, instance);
+			currentDCCB = instance.disconnectCallbacks;
 		}
 		if (!currentDCCB.has(attributeName)) {
 			currentDCCB.set(attributeName, new Map());
@@ -373,10 +380,11 @@ export class Lifecycle {
 	 * @returns {void|Map<string, Map<documentScope, Set<()=>Promise<void>>>>}
 	 */
 	static getDCCB = (element) => {
-		if (!(helper.DCCBIdentifier in element)) {
+		const mapped = MappedSharedObject.elements;
+		if (!mapped.has(element)) {
 			return;
 		}
-		return element[helper.DCCBIdentifier];
+		return mapped.get(element).disconnectCallbacks;
 	};
 	/**
 	 * @private
@@ -388,7 +396,9 @@ export class Lifecycle {
 	static setACCB = (element, attributeName, attributeChangedCallback) => {
 		let currentACCB = Lifecycle.getACCB(element);
 		if (!currentACCB) {
-			currentACCB = element[helper.ACCBIdentifier] = new Map();
+			const instance = new ElementShouldHave({});
+			MappedSharedObject.elements.set(element, instance);
+			currentACCB = instance.attributeChangesCallbacks;
 		}
 		if (!currentACCB.has(attributeName)) {
 			currentACCB.set(attributeName, new Set());
@@ -401,10 +411,11 @@ export class Lifecycle {
 	 * @returns {void|Map<string, Set<import('./lifecycleHandler.type.mjs').attributeChangedLifecycle>>}
 	 */
 	static getACCB = (element) => {
-		if (!(helper.ACCBIdentifier in element)) {
+		const mapped = MappedSharedObject.elements;
+		if (!mapped.has(element)) {
 			return;
 		}
-		return element[helper.ACCBIdentifier];
+		return mapped.get(element).attributeChangesCallbacks;
 	};
 	/**
 	 * @private
@@ -479,13 +490,12 @@ export class Lifecycle {
 	 * @returns {void}
 	 */
 	removeParentOfNestedLCDCCB = (element) => {
-		if (Lifecycle.ID.has(element)) {
-			element[helper.DCCBIdentifier].set('', [
-				async () => {
-					Lifecycle.ID.delete(element);
-				},
-			]);
+		if (!Lifecycle.ID.has(element)) {
+			return;
 		}
+		Lifecycle.setDCCB(this.currentDocumentScope, element, '', async () => {
+			Lifecycle.ID.delete(element);
+		});
 	};
 	/**
 	 * @private
@@ -533,6 +543,7 @@ export class Lifecycle {
 		}
 		for (let i = 0; i < node.children.length; i++) {
 			Lifecycle.findDeepNested(node.children[i], found);
+			return;
 		}
 		return found;
 	};

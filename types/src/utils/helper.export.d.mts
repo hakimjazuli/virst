@@ -20,7 +20,6 @@ export class helper {
     /**
      * @readonly
      */
-    static readonly removeDOM$: "virst-rm-dom$";
     /**
      * @readonly
      */
@@ -38,18 +37,8 @@ export class helper {
      * @readonly
      */
     static readonly qRouteChange: "virst-qrc";
-    static docScopeElement: string;
     static storageIdentifier: string;
-    static DCCBIdentifier: string;
-    static ACCBIdentifier: string;
-    static onViewCBIdentifier: string;
-    static onExitViewCBIdentifier: string;
     static templatePrefix: string;
-    static keptElement: string;
-    /**
-     * @readonly
-     */
-    static readonly ForQPrefix: "virst-fq-";
     /**
      * @readonly
      */
@@ -97,11 +86,6 @@ export class helper {
      */
     static splitX: (string: string, delimiter: string) => string[];
     static separator: string;
-    /**
-     * @param {(...any:any)=>(any|Promise<any>)} fn
-     * @returns {boolean}
-     */
-    static isAsync: (fn: (...any: any) => (any | Promise<any>)) => boolean;
     /**
      * @param {string} attributeName
      * @returns {string}
