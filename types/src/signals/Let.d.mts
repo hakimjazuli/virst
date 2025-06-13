@@ -82,6 +82,12 @@ export class Let<V> {
      */
     attr: string;
     /**
+     * @private
+     * @type {V}
+     */
+    private prev_;
+    get prev(): V;
+    /**
      * notify all subscriptions
      * @returns {void}
      */

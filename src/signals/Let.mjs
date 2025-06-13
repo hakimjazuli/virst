@@ -167,6 +167,14 @@ export class Let {
 	 * @private
 	 * @type {V}
 	 */
+	prev_;
+	get prev() {
+		return this.prev_;
+	}
+	/**
+	 * @private
+	 * @type {V}
+	 */
 	value_;
 	/**
 	 * notify all subscriptions
@@ -234,6 +242,7 @@ export class Let {
 		if (this.value_ === newValue) {
 			return;
 		}
+		this.prev_ = this.value_;
 		this.value_ = newValue;
 		this.call$();
 	}

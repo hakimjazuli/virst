@@ -7,7 +7,7 @@
 	"types": "./types/index.d.mts",
 	"module": "index.mjs",
 	"scripts": {
-		"dev": "concurrently \"bun --watch ./dev/index.mjs\" \"bun tsc --watch\""
+		"dev": "concurrently 'bun --watch ./dev/index.mjs' 'bun tsc --watch'"
 	},
 	"repository": {
 		"type": "git",
